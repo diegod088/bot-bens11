@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Telegram Bot with Telegram Stars Payment System
+Telegram Bot with Stars-Based Content Access
 
-A bot that forwards media from Telegram links with a free limit for videos.
-Users can pay with Telegram Stars to unlock Premium (videos unlimited for 30 days).
-Photos are always free.
+A bot that forwards media from Telegram links using a star-based currency system.
+Users consume stars to download content. Admins can add stars to user accounts.
 """
 
 import os
@@ -12,11 +11,11 @@ import re
 import asyncio
 import logging
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 # Load environment variables from .env file
 load_dotenv()
-from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, filters, PreCheckoutQueryHandler, CallbackQueryHandler
+from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, filters, CallbackQueryHandler
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon.tl.types import MessageMediaPhoto
@@ -34,7 +33,10 @@ from database import (
     create_user,
     increment_download,
     set_premium,
-    get_user_stats
+    get_user_stats,
+    get_stars,
+    add_stars,
+    remove_stars
 )
 
 # Configure logging
@@ -49,23 +51,27 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_API_ID = os.getenv('TELEGRAM_API_ID')
 TELEGRAM_API_HASH = os.getenv('TELEGRAM_API_HASH')
 TELEGRAM_SESSION_STRING = os.getenv('TELEGRAM_SESSION_STRING')
+ADMIN_ID = int(os.getenv('ADMIN_ID', '0'))  # Admin user ID for /addstars command
 
 # Validate required variables
 if not all([TELEGRAM_BOT_TOKEN, TELEGRAM_API_ID, TELEGRAM_API_HASH, TELEGRAM_SESSION_STRING]):
     raise ValueError("Missing required environment variables")
 
+if ADMIN_ID == 0:
+    logger.warning("ADMIN_ID not set - /addstars command will not work")
+
 # Initialize Telethon client (for downloading from channels)
 telethon_client = TelegramClient(
     StringSession(TELEGRAM_SESSION_STRING),
-    int(TELEGRAM_API_ID),
-    TELEGRAM_API_HASH
-)
-
 # Constants
-FREE_DOWNLOAD_LIMIT = 3  # Free users: 3 videos total before needing Premium
+STARS_PER_DOWNLOAD = 1  # Cost in stars for each download
+FREE_DOWNLOAD_LIMIT = 3  # Free users: 3 videos total before needing stars
 FREE_PHOTO_DAILY_LIMIT = 10  # Free users: 10 photos daily
-PREMIUM_PRICE_STARS = 500  # Price in Telegram Stars (⭐)
 
+# Premium daily limits (unlimited photos, 50 daily for others)
+PREMIUM_VIDEO_DAILY_LIMIT = 50
+PREMIUM_MUSIC_DAILY_LIMIT = 50
+PREMIUM_APK_DAILY_LIMIT = 50
 # Premium daily limits (unlimited photos, 50 daily for others)
 PREMIUM_VIDEO_DAILY_LIMIT = 50
 PREMIUM_MUSIC_DAILY_LIMIT = 50
@@ -277,66 +283,30 @@ async def download_and_send_media(message, chat_id: int, bot):
         raise e
 
 
-async def send_premium_invoice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send invoice for Premium subscription payment with Telegram Stars"""
-    chat_id = update.effective_chat.id
-    title = "💎 Suscripción Premium"
-    description = "Fotos Ilimitadas + 50 Videos + 50 Música + 50 APK diarios | 30 días de acceso"
-    payload = "premium_30_days"
-    currency = "XTR"  # Telegram Stars currency code
+# Payment functions removed - now using internal stars system
+
+
+async def show_stars_info(query, context: ContextTypes.DEFAULT_TYPE):
+    """Show stars system information"""
+    user_id = query.from_user.id
+    stars = get_stars(user_id)
     
-    # Price in Telegram Stars
-    prices = [LabeledPrice("Premium 30 días", PREMIUM_PRICE_STARS)]
-    
-    await context.bot.send_invoice(
-        chat_id=chat_id,
-        title=title,
-        description=description,
-        payload=payload,
-        provider_token="",  # Empty for Stars payments
-        currency=currency,
-        prices=prices
-    )
-
-
-async def precheckout_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Answer pre-checkout query (approve all by default)"""
-    query = update.pre_checkout_query
-    await query.answer(ok=True)
-
-
-async def show_premium_plans(query, context: ContextTypes.DEFAULT_TYPE):
-    """Show premium plans information"""
     message = (
-        "💎 *Planes de Suscripción* 💎\n\n"
+        "⭐ *Sistema de Estrellas* ⭐\n\n"
+        f"Tu Balance: *{stars} estrellas*\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "🆓 *GRATIS*\n"
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        "📸 Fotos: Ilimitadas\n"
-        "🎬 Videos: Solo 3 totales\n"
-        "🎵 Música: ✖️ Bloqueado\n"
-        "📦 APK: ✖️ Bloqueado\n\n"
+        "📥 *Costo por Descarga*\n"
+        f"• Cada descarga: {STARS_PER_DOWNLOAD} ⭐\n"
+        f"• Fotos: {FREE_PHOTO_DAILY_LIMIT} gratis diarias\n"
+        f"• Videos sin estrellas: {FREE_DOWNLOAD_LIMIT} totales\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"💎 *PREMIUM* — {PREMIUM_PRICE_STARS} ⭐\n"
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        "📸 Fotos: Ilimitadas\n"
-        "🎬 Videos: 50 cada día ✨\n"
-        "🎵 Música: 50 cada día ✨\n"
-        "📦 APK: 50 cada día ✨\n"
-        "♻️ Contador se resetea diario\n"
-        "⏰ Válido: 30 días\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "✅ *Con Premium desbloqueas:*\n"
-        "• Música y APK disponibles\n"
-        "• 50 descargas diarias de cada tipo\n"
-        "• Límites se renuevan cada 24h\n\n"
-        "⭐ *Paga con Telegram Stars*\n"
-        "Usa el botón abajo para suscribirte."
+        "💡 *Cómo Obtener Estrellas*\n\n"
+        "Las estrellas son otorgadas por el administrador.\n"
+        "Contacta al soporte para obtener más estrellas.\n\n"
+        "📢 Canal Oficial: @observer_bots"
     )
     
-    # Add payment and channel buttons
     keyboard = [
-        [InlineKeyboardButton("⭐ Pagar con Estrellas", callback_data="pay_premium")],
         [InlineKeyboardButton("📢 Únete al Canal Oficial", url="https://t.me/observer_bots")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -348,10 +318,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle button callbacks"""
     query = update.callback_query
     
-    if query.data == "view_plans":
-        # Show premium plans
+    if query.data == "view_plans" or query.data == "view_stars":
+        # Show stars information
         await query.answer()
-        await show_premium_plans(query, context)
+        await show_stars_info(query, context)
         return
     
     if query.data == "show_guide":
@@ -465,126 +435,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     await query.answer("📄 Procesando...", show_alert=False)
-    
-    if query.data == "pay_premium":
-        # Send the invoice when button is pressed
-        user_id = update.effective_user.id
-        logger.info(f"User {user_id} requested payment invoice")
-        
-        try:
-            await send_premium_invoice_callback(update, context)
-            logger.info(f"Invoice sent successfully to user {user_id}")
-            
-            # Send confirmation message
-            await query.message.reply_text(
-                "✅ *Factura enviada*\n\n"
-                "Revisa el mensaje de pago que apareció arriba.\n"
-                "💳 Completa el pago para activar Premium.",
-                parse_mode='Markdown'
-            )
-            
-        except Exception as e:
-            error_msg = str(e)
-            logger.error(f"Error sending invoice to user {user_id}: {error_msg}")
-            
-            # Check if it's a Telegram Stars configuration error
-            if "currency" in error_msg.lower() or "stars" in error_msg.lower() or "xtr" in error_msg.lower():
-                await query.message.reply_text(
-                    "⚠️ *Sistema de Pagos en Configuración*\n\n"
-                    "El bot aún no tiene habilitado Telegram Stars.\n\n"
-                    "━━━━━━━━━━━━━━━━━━━━\n\n"
-                    "📋 *Para el administrador:*\n"
-                    "1. Abre @BotFather\n"
-                    "2. Usa /mybots\n"
-                    "3. Selecciona este bot\n"
-                    "4. Toca 'Payments'\n"
-                    "5. Habilita 'Telegram Stars'\n\n"
-                    "━━━━━━━━━━━━━━━━━━━━\n\n"
-                    "💡 Mientras tanto, disfruta:\n"
-                    "• 3 videos gratis\n"
-                    "• Fotos ilimitadas\n\n"
-                    "📢 Síguenos: @observer_bots",
-                    parse_mode='Markdown'
-                )
-            else:
-                await query.message.reply_text(
-                    "❌ *Error Temporal*\n\n"
-                    "No se pudo procesar el pago.\n"
-                    "Intenta nuevamente en unos momentos.\n\n"
-                    "📢 Soporte: @observer_bots\n\n"
-                    f"🔧 Error: `{error_msg[:100]}`",
-                    parse_mode='Markdown'
-                )
-
-
-async def send_premium_invoice_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send invoice for Premium subscription when callback button is pressed"""
-    chat_id = update.effective_chat.id
-    title = "💎 Suscripción Premium"
-    description = "50 Videos + 50 Música + 50 APK diarios | Fotos Ilimitadas | 30 días de acceso"
-    payload = "premium_30_days"
-    currency = "XTR"  # Telegram Stars currency code
-    
-    # Price in Telegram Stars
-    prices = [LabeledPrice("Premium 30 días", PREMIUM_PRICE_STARS)]
-    
-    try:
-        await context.bot.send_invoice(
-            chat_id=chat_id,
-            title=title,
-            description=description,
-            payload=payload,
-            provider_token="",  # Empty for Stars payments
-            currency=currency,
-            prices=prices
-        )
-        logger.info(f"Invoice successfully sent to chat {chat_id}")
-    except Exception as e:
-        logger.error(f"Failed to send invoice to chat {chat_id}: {e}")
-        # Send informative error message
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text=(
-                "⚠️ *Sistema de Pagos Temporalmente No Disponible*\n\n"
-                "El bot está configurándose para aceptar pagos con Telegram Stars.\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                "💡 *Mientras tanto:*\n"
-                "• Disfruta de las 3 descargas gratuitas de videos\n"
-                "• 10 fotos diarias gratis\n\n"
-                "📢 Únete al canal para actualizaciones:\n"
-                "@observer_bots\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                f"🔧 Error técnico: `{str(e)[:50]}`"
-            ),
-            parse_mode='Markdown'
-        )
-        raise
-
-
-async def successful_payment_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle successful payment with Telegram Stars"""
-    user_id = update.effective_user.id
-    payment_info = update.message.successful_payment
-    
-    logger.info(f"Payment received from user {user_id}: {payment_info.total_amount} {payment_info.currency}")
-    
-    # Activate Premium for 30 days
-    set_premium(user_id, months=1)
-    
-    from datetime import datetime, timedelta
-    expiry = datetime.now() + timedelta(days=30)
-    
-    await update.message.reply_text(
-        "🎉 *Premium Activado*\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "✅ Pago recibido exitosamente\n"
-        "💎 Suscripción Premium activada\n\n"
-        f"📅 Válido hasta: {expiry.strftime('%d/%m/%Y')}\n"
-        "⏰ Duración: 30 días\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "🚀 Usa /start para comenzar",
-        parse_mode='Markdown'
-    )
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -641,7 +491,12 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "💎 Mejora tu plan con /premium"
         )
     
-    welcome_message += "\n\n━━━━━━━━━━━━━━━━━━━━\n"
+    # Show user's star balance
+    stars = get_stars(user_id)
+    welcome_message += f"\n\n⭐ *Tu Balance: {stars} estrellas*\n"
+    welcome_message += f"💰 Costo por descarga: {STARS_PER_DOWNLOAD} ⭐\n"
+    
+    welcome_message += "\n━━━━━━━━━━━━━━━━━━━━\n"
     welcome_message += "📖 *Cómo Usar*\n\n"
     welcome_message += "🔐 *Canales Privados*\n"
     welcome_message += "   1️⃣ Envía enlace de invitación\n"
@@ -653,9 +508,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_message += "      `t.me/canal/123`\n\n"
     welcome_message += "💡 _Usa el botón Guía para más info_"
     
-    # Add buttons: Premium plans, channel, and how-to guide
+    # Add buttons: Stars info, channel, and how-to guide
     keyboard = [
-        [InlineKeyboardButton("💎 Ver Planes Premium", callback_data="view_plans")],
+        [InlineKeyboardButton("⭐ Info de Estrellas", callback_data="view_stars")],
         [InlineKeyboardButton("📖 Guía de Uso", callback_data="show_guide")],
         [InlineKeyboardButton("📢 Únete al Canal Oficial", url="https://t.me/observer_bots")]
     ]
@@ -665,57 +520,44 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def premium_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /premium command - Show subscription info and send invoice"""
+    """Handle /premium command - Show stars balance and info"""
     from datetime import datetime
     user_id = update.effective_user.id
     user = get_user(user_id)
+    stars = get_stars(user_id)
     
     message = (
-        "💎 *Planes de Suscripción* 💎\n\n"
+        "⭐ *Sistema de Estrellas* ⭐\n\n"
+        f"Tu Balance: *{stars} estrellas*\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "🆓 *GRATIS*\n"
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        "📸 Fotos: 10 cada día\n"
-        "🎬 Videos: Solo 3 totales\n"
-        "🎵 Música: ✖️ Bloqueado\n"
-        "📦 APK: ✖️ Bloqueado\n\n"
+        "📥 *Costo por Descarga*\n"
+        f"• Cada descarga: {STARS_PER_DOWNLOAD} ⭐\n"
+        f"• Fotos gratis: {FREE_PHOTO_DAILY_LIMIT} diarias\n"
+        f"• Videos sin estrellas: {FREE_DOWNLOAD_LIMIT} totales\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"💎 *PREMIUM* — {PREMIUM_PRICE_STARS} ⭐\n"
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        "📸 Fotos: Ilimitadas ✨\n"
-        "🎬 Videos: 50 cada día ✨\n"
-        "🎵 Música: 50 cada día ✨\n"
-        "📦 APK: 50 cada día ✨\n"
-        "♻️ Contador se resetea diario\n"
-        "⏰ Válido: 30 días\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "✅ *Con Premium desbloqueas:*\n"
-        "• Fotos ilimitadas sin restricción\n"
-        "• Música y APK disponibles\n"
-        "• 50 descargas diarias de cada tipo\n"
-        "• Límites se renuevan cada 24h\n\n"
-        "⭐ *Paga con Telegram Stars*\n"
-        "Usa el botón abajo para suscribirte."
+        "💡 *Cómo Obtener Estrellas*\n\n"
+        "Las estrellas son otorgadas por el administrador.\n"
+        "Contacta al soporte para obtener más estrellas.\n\n"
     )
     
     if user and user['premium']:
         if user.get('premium_until'):
             expiry = datetime.fromisoformat(user['premium_until'])
             days_left = (expiry - datetime.now()).days
-            message = (
-                "✨ *Ya eres Premium* ✨\n\n"
+            message += (
                 "━━━━━━━━━━━━━━━━━━━━\n\n"
+                "✨ *Status Premium* ✨\n\n"
                 f"📅 Expira: {expiry.strftime('%d/%m/%Y')}\n"
                 f"⏳ {days_left} días restantes\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                "💎 *Renovar Premium*\n"
-                f"Precio: *{PREMIUM_PRICE_STARS} ⭐*\n\n"
-                "Usa el botón abajo para renovar."
+                f"🎬 Videos: {user['daily_video']}/{PREMIUM_VIDEO_DAILY_LIMIT} diarios\n"
+                f"🎵 Música: {user['daily_music']}/{PREMIUM_MUSIC_DAILY_LIMIT} diarios\n"
+                f"📦 APK: {user['daily_apk']}/{PREMIUM_APK_DAILY_LIMIT} diarios\n"
+                "📸 Fotos: Ilimitadas\n\n"
             )
     
-    # Send message with payment button and channel button
+    message += "📢 Canal Oficial: @observer_bots"
+    
     keyboard = [
-        [InlineKeyboardButton("⭐ Pagar con Estrellas", callback_data="pay_premium")],
         [InlineKeyboardButton("📢 Únete al Canal Oficial", url="https://t.me/observer_bots")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -723,51 +565,66 @@ async def premium_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
 
 
-async def testpay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Test payment system - Send invoice directly"""
+async def addstars_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command to add stars to a user - Usage: /addstars <user_id> <amount>"""
     user_id = update.effective_user.id
-    logger.info(f"User {user_id} testing payment system with /testpay")
     
-    try:
-        chat_id = update.effective_chat.id
-        title = "💎 TEST - Premium"
-        description = "Prueba del sistema de pagos con Telegram Stars"
-        payload = "test_payment"
-        currency = "XTR"
-        prices = [LabeledPrice("Test Premium", PREMIUM_PRICE_STARS)]
-        
-        await context.bot.send_invoice(
-            chat_id=chat_id,
-            title=title,
-            description=description,
-            payload=payload,
-            provider_token="",
-            currency=currency,
-            prices=prices
-        )
-        
+    # Check if user is admin
+    if user_id != ADMIN_ID:
         await update.message.reply_text(
-            "✅ *Sistema de Pagos Funcionando*\n\n"
-            "La factura de prueba se envió correctamente.\n"
-            "Telegram Stars está habilitado. ✨",
+            "❌ *Acceso Denegado*\n\n"
+            "Este comando solo está disponible para administradores.",
             parse_mode='Markdown'
         )
-        logger.info(f"Test invoice sent successfully to user {user_id}")
+        return
+    
+    # Parse command arguments
+    try:
+        args = context.args
+        if len(args) != 2:
+            raise ValueError("Invalid arguments")
         
-    except Exception as e:
-        error_msg = str(e)
-        logger.error(f"Test payment failed for user {user_id}: {error_msg}")
+        target_user_id = int(args[0])
+        amount = int(args[1])
+        
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
+        
+        # Add stars to user
+        new_balance = add_stars(target_user_id, amount)
         
         await update.message.reply_text(
-            "❌ *Sistema de Pagos NO Configurado*\n\n"
-            f"Error: `{error_msg[:200]}`\n\n"
-            "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "🔧 *Solución:*\n"
-            "1. Abre @BotFather\n"
-            "2. /mybots → Selecciona tu bot\n"
-            "3. Payments → Telegram Stars\n"
-            "4. Habilita y acepta términos\n\n"
-            "📢 @observer_bots",
+            f"✅ *Estrellas Agregadas*\n\n"
+            f"👤 Usuario: `{target_user_id}`\n"
+            f"⭐ Cantidad: +{amount}\n"
+            f"💰 Nuevo balance: {new_balance} estrellas",
+            parse_mode='Markdown'
+        )
+        
+        # Notify the user
+        try:
+            await context.bot.send_message(
+                chat_id=target_user_id,
+                text=(
+                    f"🎉 *¡Recibiste Estrellas!* 🎉\n\n"
+                    f"⭐ Cantidad: +{amount}\n"
+                    f"💰 Nuevo balance: {new_balance} estrellas\n\n"
+                    f"Usa /start para ver tu balance actualizado."
+                ),
+                parse_mode='Markdown'
+            )
+        except Exception as e:
+            logger.warning(f"Could not notify user {target_user_id}: {e}")
+        
+        logger.info(f"Admin {user_id} added {amount} stars to user {target_user_id}")
+        
+    except (ValueError, IndexError) as e:
+        await update.message.reply_text(
+            "❌ *Formato Incorrecto*\n\n"
+            "Uso: `/addstars <user_id> <cantidad>`\n\n"
+            "Ejemplo: `/addstars 123456789 10`\n\n"
+            "• `user_id`: ID del usuario de Telegram\n"
+            "• `cantidad`: Número de estrellas a agregar (positivo)",
             parse_mode='Markdown'
         )
 
@@ -785,7 +642,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "━━━━━━━━━━━━━━━━━━━━\n\n"
         "📋 *Comandos Disponibles*\n\n"
         "• /start - Menú principal\n"
-        "• /premium - Ver planes y suscribirse\n"
+        "• /premium - Ver balance de estrellas\n"
         "• /stats - Ver tus estadísticas\n"
         "• /help - Esta guía de uso\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -795,18 +652,19 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✅ Música (Premium)\n"
         "✅ APK (Premium)\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "🆓 *Plan Gratis*\n"
-        "• 10 fotos diarias\n"
-        "• 3 videos totales\n"
-        "• Música y APK bloqueados\n\n"
+        "⭐ *Sistema de Estrellas*\n\n"
+        f"• Costo: {STARS_PER_DOWNLOAD} ⭐ por descarga\n"
+        f"• Fotos gratis: {FREE_PHOTO_DAILY_LIMIT} diarias\n"
+        f"• Videos gratis: {FREE_DOWNLOAD_LIMIT} totales\n"
+        "• Las estrellas las otorga el admin\n\n"
+        "━━━━━━━━━━━━━━━━━━━━\n\n"
         "💎 *Plan Premium*\n"
         "• Fotos ilimitadas\n"
         "• 50 videos diarios\n"
         "• 50 canciones diarias\n"
-        "• 50 APK diarios\n"
-        f"• Solo {PREMIUM_PRICE_STARS} estrellas por 30 días\n\n"
+        "• 50 APK diarios\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "💡 Usa /premium para mejorar tu plan\n"
+        "💡 Usa /premium para ver tu balance\n"
         "📢 Únete a @observer\\_bots"
     )
     
@@ -1196,22 +1054,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 user = get_user(user_id)  # Refresh after potential reset
                 
                 if user['daily_photo'] >= FREE_PHOTO_DAILY_LIMIT:
-                    await update.message.reply_text(
-                        "⚠️ *Límite Diario Alcanzado*\n\n"
-                        f"Has descargado {user['daily_photo']}/{FREE_PHOTO_DAILY_LIMIT} fotos hoy.\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "💎 *Con Premium obtienes:*\n"
-                        "✅ Fotos: Ilimitadas\n"
-                        "✅ Videos: 50 diarios\n"
-                        "✅ Música: 50 diarias\n"
-                        "✅ APK: 50 diarios\n"
-                        "♻️ Videos, música y APK se renuevan diario\n\n"
-                        f"💰 Solo {PREMIUM_PRICE_STARS} ⭐ por 30 días\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "⭐ Usa /premium para suscribirte",
-                        parse_mode='Markdown'
-                    )
-                    return
+                    # Check if user has stars
+                    stars = get_stars(user_id)
+                    if stars < STARS_PER_DOWNLOAD:
+                        await update.message.reply_text(
+                            "⚠️ *Límite Diario Alcanzado*\n\n"
+                            f"Has descargado {user['daily_photo']}/{FREE_PHOTO_DAILY_LIMIT} fotos hoy.\n\n"
+                            f"💰 Tu balance: {stars} ⭐\n"
+                            f"💵 Necesitas: {STARS_PER_DOWNLOAD} ⭐ para continuar\n\n"
+                            "━━━━━━━━━━━━━━━━━━━━\n\n"
+                            "💡 *Cómo obtener estrellas:*\n"
+                            "Las estrellas son otorgadas por el administrador.\n"
+                            "Contacta al soporte.\n\n"
+                            "📢 Canal: @observer_bots",
+                            parse_mode='Markdown'
+                        )
+                        return
+                    
+                    # Deduct stars
+                    if not remove_stars(user_id, STARS_PER_DOWNLOAD):
+                        await update.message.reply_text(
+                            "❌ *Error*\n\n"
+                            "No se pudieron descontar las estrellas.\n"
+                            "Intenta nuevamente.",
+                            parse_mode='Markdown'
+                        )
+                        return
             # Premium users have unlimited photos, continue
         # Music and APK blocked for FREE users
         elif content_type in ['music', 'apk'] and not user['premium']:
@@ -1224,9 +1092,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"✅ {content_name}: 50 diarias\n"
                 "✅ Videos: 50 diarios\n"
                 "✅ Todo se resetea cada día\n\n"
-                f"💰 Solo {PREMIUM_PRICE_STARS} ⭐ por 30 días\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                "⭐ Usa /premium para suscribirte",
+                "📢 Canal: @observer_bots",
                 parse_mode='Markdown'
             )
             return
@@ -1253,21 +1119,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 # Check FREE total video limit
                 if user['downloads'] >= FREE_DOWNLOAD_LIMIT:
-                    await update.message.reply_text(
-                        "⚠️ *Límite Alcanzado*\n\n"
-                        "Has usado tus 3 videos gratuitos.\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "💎 *Mejora a Premium y obtén:*\n"
-                        "✅ 50 videos cada día\n"
-                        "✅ 50 canciones cada día\n"
-                        "✅ 50 APK cada día\n"
-                        "♻️ Límites se renuevan diario\n\n"
-                        f"💰 Solo {PREMIUM_PRICE_STARS} ⭐ por 30 días\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "⭐ Usa /premium para suscribirte",
-                        parse_mode='Markdown'
-                    )
-                    return
+                    # User needs to use stars
+                    stars = get_stars(user_id)
+                    if stars < STARS_PER_DOWNLOAD:
+                        await update.message.reply_text(
+                            "⚠️ *Límite Alcanzado*\n\n"
+                            "Has usado tus 3 videos gratuitos.\n\n"
+                            f"💰 Tu balance: {stars} ⭐\n"
+                            f"💵 Necesitas: {STARS_PER_DOWNLOAD} ⭐\n\n"
+                            "━━━━━━━━━━━━━━━━━━━━\n\n"
+                            "💡 *Cómo obtener estrellas:*\n"
+                            "Las estrellas son otorgadas por el administrador.\n"
+                            "Contacta al soporte para obtener más.\n\n"
+                            "📢 Canal: @observer_bots",
+                            parse_mode='Markdown'
+                        )
+                        return
+                    
+                    # Deduct stars
+                    if not remove_stars(user_id, STARS_PER_DOWNLOAD):
+                        await update.message.reply_text(
+                            "❌ *Error*\n\n"
+                            "No se pudieron descontar las estrellas.\n"
+                            "Intenta nuevamente.",
+                            parse_mode='Markdown'
+                        )
+                        return
         # Check music limits for premium
         elif content_type == 'music' and user['premium']:
             from database import check_and_reset_daily_limits
@@ -1509,7 +1386,7 @@ async def post_init(application: Application):
     from telegram import BotCommand
     commands = [
         BotCommand("start", "🏠 Menú principal"),
-        BotCommand("premium", "💎 Información de suscripción Premium"),
+        BotCommand("premium", "⭐ Ver balance de estrellas"),
         BotCommand("stats", "📊 Ver estadísticas"),
         BotCommand("help", "📖 Guía de uso")
     ]
@@ -1529,15 +1406,11 @@ def main():
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("premium", premium_command))
     application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("testpay", testpay_command))
+    application.add_handler(CommandHandler("addstars", addstars_command))
     application.add_handler(CommandHandler("stats", stats_command))
     
     # Add callback handler for inline buttons
     application.add_handler(CallbackQueryHandler(button_callback))
-    
-    # Add payment handlers
-    application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
-    application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
     
     # Add message handler
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

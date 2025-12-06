@@ -1,29 +1,34 @@
 # 🤖 Telegram Media Downloader Bot
 
-Bot de Telegram profesional para descargar contenido multimedia de canales privados con sistema de paywall integrado usando **Telegram Stars** y **PayPal**.
+Bot de Telegram profesional para descargar contenido multimedia de canales privados con sistema de **estrellas interno** para control de acceso.
 
 ## 📋 Características
 
-### 🆓 Plan Gratis
-- ✅ 10 fotos diarias
-- ✅ 3 videos totales
-- ❌ Música bloqueada
-- ❌ APK bloqueados
+### ⭐ Sistema de Estrellas
+- Cada descarga cuesta **1 estrella** ⭐
+- Las estrellas son otorgadas por el administrador
+- Balance visible en todo momento
 
-### 💎 Plan Premium (500 ⭐ Telegram Stars o $5 USD PayPal)
+### 🆓 Límites Gratuitos
+- ✅ 10 fotos diarias (sin usar estrellas)
+- ✅ 3 videos totales (sin usar estrellas)
+- ❌ Música bloqueada (solo Premium)
+- ❌ APK bloqueados (solo Premium)
+
+### 💎 Plan Premium
 - ✅ Fotos ilimitadas
 - ✅ 50 videos diarios
 - ✅ 50 canciones diarias
 - ✅ 50 APK diarios
-- ⏰ Duración: 30 días
+- ⏰ Duración configurable por admin
 
 ### 🎯 Funcionalidades
 - Descarga de fotos, videos, música y APK de canales privados
 - Sistema de límites diarios con reseteo automático cada 24h
-- Pagos integrados con Telegram Stars (nativo)
-- Pagos alternativos con PayPal (Premium y VIP)
+- Sistema de estrellas interno (sin pagos externos)
+- Comando `/addstars` para que admin otorgue estrellas
 - Detección automática de tipo de contenido
-- Interfaz profesional con diseño simétrico
+- Interfaz profesional con diseño intuitivo
 - Estadísticas de uso personal y global
 - Guía de uso integrada
 
@@ -33,10 +38,8 @@ Bot de Telegram profesional para descargar contenido multimedia de canales priva
 
 ```
 .
-├── bot_with_paywall.py    # Bot principal de Telegram
-├── backend_paypal.py      # API FastAPI para pagos PayPal
+├── bot_with_paywall.py    # Bot principal de Telegram (ejecutar este)
 ├── database.py            # Gestión de base de datos SQLite
-├── run_backend.py         # Launcher para el backend
 ├── requirements.txt       # Dependencias Python
 ├── .gitignore            # Archivos ignorados por Git
 ├── .env.example          # Plantilla de variables de entorno
@@ -45,13 +48,12 @@ Bot de Telegram profesional para descargar contenido multimedia de canales priva
 
 ---
 
-## 🚀 Instalación Local
+## 🚀 Instalación y Ejecución
 
 ### 1. Requisitos Previos
 - Python 3.8 o superior
 - Cuenta de Telegram
 - API credentials de Telegram (Bot Token, API ID, API Hash)
-- Cuenta PayPal Developer (opcional, para pagos PayPal)
 
 ### 2. Clonar el Repositorio
 ```bash
@@ -89,217 +91,99 @@ TELEGRAM_API_HASH=tu_api_hash_de_my.telegram.org
 TELEGRAM_SESSION_STRING=tu_session_string_de_telethon
 
 # ==========================================
-# PAYPAL CREDENTIALS (Opcional)
+# ADMIN CONFIGURATION
 # ==========================================
-PAYPAL_CLIENT_ID=tu_paypal_client_id
-PAYPAL_CLIENT_SECRET=tu_paypal_client_secret
-PAYPAL_MODE=sandbox
-# PAYPAL_MODE=live  # Para producción
-PAYPAL_WEBHOOK_ID=tu_webhook_id_opcional
-
-# ==========================================
-# BACKEND URL
-# ==========================================
-# Para desarrollo local:
-BACKEND_URL=http://localhost:8000
-
-# Para producción (Railway):
-# BACKEND_URL=https://tu-backend.up.railway.app
+ADMIN_ID=123456789  # Tu user ID de Telegram (para usar /addstars)
 ```
 
-### 6. Obtener Credenciales
+### 6. Obtener Credenciales de Telegram
 
-#### Bot Token de Telegram
-1. Habla con [@BotFather](https://t.me/botfather)
-2. Usa `/newbot` y sigue las instrucciones
-3. Copia el token proporcionado
+#### A. Bot Token
+1. Abre [@BotFather](https://t.me/BotFather) en Telegram
+2. Envía `/newbot`
+3. Sigue las instrucciones
+4. Copia el **Bot Token**
 
-#### API ID y API Hash
-1. Ve a https://my.telegram.org
+#### B. API ID y API Hash
+1. Ve a [https://my.telegram.org](https://my.telegram.org)
 2. Inicia sesión con tu número de teléfono
-3. Crea una aplicación en "API Development Tools"
-4. Copia API ID y API Hash
+3. Ve a "API development tools"
+4. Crea una aplicación
+5. Copia **API ID** y **API Hash**
 
-#### Session String de Telethon
+#### C. Session String
+1. Ejecuta el generador de sesión:
 ```bash
-# Ejecuta este script una vez para generar el session string
-python -c "
-from telethon.sync import TelegramClient
-from telethon.sessions import StringSession
-
-api_id = int(input('API ID: '))
-api_hash = input('API Hash: ')
-
-with TelegramClient(StringSession(), api_id, api_hash) as client:
-    print('Session String:', client.session.save())
-"
+python -c "from telethon.sync import TelegramClient; from telethon.sessions import StringSession; import os; client = TelegramClient(StringSession(), int(os.getenv('TELEGRAM_API_ID')), os.getenv('TELEGRAM_API_HASH')); client.start(); print('Session String:', client.session.save())"
 ```
+2. Ingresa tu número de teléfono
+3. Ingresa el código de verificación
+4. Copia el **Session String**
 
-#### PayPal Credentials (Opcional)
-1. Ve a https://developer.paypal.com
-2. Crea una App en Dashboard
-3. Copia Client ID y Secret
-4. Usa "sandbox" para pruebas, "live" para producción
+#### D. Admin ID (Tu User ID)
+1. Abre [@userinfobot](https://t.me/userinfobot) en Telegram
+2. Envía `/start`
+3. El bot te mostrará tu **User ID**
+4. Usa ese número en `ADMIN_ID`
 
-### 7. Ejecutar en Local
+### 7. Ejecutar el Bot
 
-#### Opción A: Solo Bot (sin PayPal)
 ```bash
 python bot_with_paywall.py
 ```
 
-#### Opción B: Bot + Backend PayPal (2 terminales)
+El bot estará corriendo en modo polling (no necesita servidor web).
 
-**Terminal 1 - Backend:**
-```bash
-python run_backend.py
+---
+
+## 📖 Uso del Bot
+
+### Comandos Disponibles
+
+#### Para Usuarios:
+- `/start` - Menú principal y balance de estrellas
+- `/premium` - Ver balance de estrellas y información
+- `/stats` - Ver estadísticas personales y del bot
+- `/help` - Guía de uso completa
+
+#### Para Administradores:
+- `/addstars <user_id> <cantidad>` - Agregar estrellas a un usuario
+  - Ejemplo: `/addstars 123456789 10`
+
+### Flujo de Uso
+
+1. **Usuarios Nuevos**: Tienen 3 videos gratis y 10 fotos diarias
+2. **Después del límite**: Necesitan estrellas para descargar
+3. **Obtener Estrellas**: Contactar al admin, quien usa `/addstars`
+4. **Descargas**: Cada descarga después del límite consume 1 ⭐
+
+### Ejemplo de Descarga
+
+```
+Usuario: https://t.me/canal_privado/123
+Bot: 📤 Enviando...
+Bot: ✅ Descarga Completada
+     💰 Balance: 9 ⭐
 ```
 
-**Terminal 2 - Bot:**
-```bash
-python bot_with_paywall.py
+---
+
+## 🔧 Configuración Avanzada
+
+### Modificar Costos y Límites
+
+Edita `bot_with_paywall.py`:
+
+```python
+# Línea ~60-65
+STARS_PER_DOWNLOAD = 1  # Costo por descarga
+FREE_DOWNLOAD_LIMIT = 3  # Videos gratis
+FREE_PHOTO_DAILY_LIMIT = 10  # Fotos diarias gratis
 ```
 
----
+### Base de Datos
 
-## ☁️ Despliegue en Railway
-
-Railway permite desplegar fácilmente con 2 servicios independientes.
-
-### 1. Crear Proyecto en Railway
-1. Ve a https://railway.app
-2. Crea una cuenta o inicia sesión
-3. Click en "New Project"
-4. Selecciona "Deploy from GitHub repo"
-5. Conecta tu repositorio
-
-### 2. Crear Servicio para el BOT
-
-1. En tu proyecto Railway, click en "New Service"
-2. Selecciona "GitHub Repo"
-3. Elige tu repositorio
-4. Configura:
-   - **Name:** `telegram-bot`
-   - **Start Command:** `python bot_with_paywall.py`
-
-5. Agrega variables de entorno en Settings → Variables:
-   ```
-   TELEGRAM_BOT_TOKEN=tu_bot_token
-   TELEGRAM_API_ID=tu_api_id
-   TELEGRAM_API_HASH=tu_api_hash
-   TELEGRAM_SESSION_STRING=tu_session_string
-   BACKEND_URL=https://tu-backend.up.railway.app
-   ```
-
-### 3. Crear Servicio para el BACKEND
-
-1. En el mismo proyecto, click en "New Service"
-2. Selecciona "GitHub Repo"
-3. Elige tu repositorio
-4. Configura:
-   - **Name:** `paypal-backend`
-   - **Start Command:** `python run_backend.py`
-
-5. Agrega variables de entorno:
-   ```
-   PAYPAL_CLIENT_ID=tu_paypal_client_id
-   PAYPAL_CLIENT_SECRET=tu_paypal_secret
-   PAYPAL_MODE=live
-   TELEGRAM_BOT_TOKEN=tu_bot_token
-   BACKEND_URL=https://tu-backend.up.railway.app
-   ```
-
-6. En Settings → Networking:
-   - Railway generará automáticamente un dominio público
-   - Copia este dominio (ej: `https://tu-backend.up.railway.app`)
-   - Actualiza la variable `BACKEND_URL` en **ambos servicios**
-
-### 4. Configurar Webhook de PayPal (Opcional)
-
-1. Ve a PayPal Developer Dashboard
-2. Crea un Webhook apuntando a: `https://tu-backend.up.railway.app/webhook/paypal`
-3. Copia el Webhook ID
-4. Agrégalo como variable `PAYPAL_WEBHOOK_ID` en el servicio backend
-
-### 5. Habilitar Telegram Stars
-
-1. Abre [@BotFather](https://t.me/botfather)
-2. Envía `/mybots`
-3. Selecciona tu bot
-4. Toca "Payments" → "Telegram Stars"
-5. Acepta los términos
-
-### 6. Verificar Despliegue
-
-- Ambos servicios deben estar en estado "Active" (verde)
-- Revisa los logs en Railway para detectar errores
-- Prueba el bot enviando `/start`
-- Prueba pagos con `/testpay`
-
----
-
-## 📊 Comandos del Bot
-
-| Comando | Descripción |
-|---------|-------------|
-| `/start` | Menú principal con estado de cuenta |
-| `/premium` | Ver planes y suscribirse |
-| `/stats` | Ver estadísticas personales y del bot |
-| `/help` | Guía de uso completa |
-| `/testpay` | Probar sistema de pagos Telegram Stars |
-
----
-
-## 🗂️ Variables de Entorno
-
-### Para el BOT (bot_with_paywall.py)
-
-| Variable | Descripción | Requerida | Ejemplo |
-|----------|-------------|-----------|---------|
-| `TELEGRAM_BOT_TOKEN` | Token del bot de @BotFather | ✅ | `123456:ABC-DEF...` |
-| `TELEGRAM_API_ID` | API ID de my.telegram.org | ✅ | `12345678` |
-| `TELEGRAM_API_HASH` | API Hash de my.telegram.org | ✅ | `abcdef123456...` |
-| `TELEGRAM_SESSION_STRING` | Session string de Telethon | ✅ | `1BVtsOK4Bu...` |
-| `BACKEND_URL` | URL del backend PayPal | ✅ | `https://backend.railway.app` |
-
-### Para el BACKEND (backend_paypal.py)
-
-| Variable | Descripción | Requerida | Ejemplo |
-|----------|-------------|-----------|---------|
-| `PAYPAL_CLIENT_ID` | Client ID de PayPal | ✅ | `AaBbCcDd...` |
-| `PAYPAL_CLIENT_SECRET` | Secret de PayPal | ✅ | `EeFfGgHh...` |
-| `PAYPAL_MODE` | Modo de PayPal | ✅ | `sandbox` o `live` |
-| `PAYPAL_WEBHOOK_ID` | ID del webhook de PayPal | ❌ | `WH-123...` |
-| `TELEGRAM_BOT_TOKEN` | Token del bot | ✅ | `123456:ABC...` |
-| `BACKEND_URL` | URL del backend | ✅ | `https://backend.railway.app` |
-| `PORT` | Puerto del servidor | ❌ | `8000` (auto en Railway) |
-
----
-
-## 🔒 Seguridad
-
-### ⚠️ IMPORTANTE
-
-**NUNCA** subas estos archivos/datos a GitHub:
-- ❌ `.env` - Contiene todas las credenciales
-- ❌ `users.db` - Base de datos con información de usuarios
-- ❌ `*.session` - Archivos de sesión de Telethon
-- ❌ `*.log` - Archivos de logs con posibles datos sensibles
-
-### ✅ Buenas Prácticas
-
-1. **Usa el `.gitignore` proporcionado** - Ya está configurado correctamente
-2. **Variables de entorno** - Todas las credenciales en `.env` (local) o Railway (producción)
-3. **No hardcodees secrets** - Usa siempre `os.getenv()`
-4. **Backup de `users.db`** - Haz backups regulares de la base de datos en producción
-5. **Modo sandbox primero** - Prueba con PayPal sandbox antes de usar live
-6. **HTTPS obligatorio** - Usa siempre HTTPS en producción (Railway lo proporciona)
-
----
-
-## 🛠️ Base de Datos
-
-El bot usa SQLite (`users.db`) con la siguiente estructura:
+El bot usa SQLite (`users.db`). Esquema:
 
 ```sql
 CREATE TABLE users (
@@ -312,123 +196,116 @@ CREATE TABLE users (
     daily_video INTEGER DEFAULT 0,
     daily_music INTEGER DEFAULT 0,
     daily_apk INTEGER DEFAULT 0,
+    stars INTEGER DEFAULT 0,
     last_reset TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-```
-
-### Consultas Útiles
-
-```bash
-# Ver todos los usuarios
-sqlite3 users.db "SELECT * FROM users;"
-
-# Ver usuarios Premium activos
-sqlite3 users.db "SELECT user_id, premium_until FROM users WHERE premium = 1;"
-
-# Dar Premium manualmente (30 días)
-sqlite3 users.db "UPDATE users SET premium = 1, premium_until = datetime('now', '+30 days') WHERE user_id = 123456789;"
-
-# Resetear contadores de un usuario
-sqlite3 users.db "UPDATE users SET daily_video = 0, daily_music = 0, daily_apk = 0, daily_photo = 0 WHERE user_id = 123456789;"
+);
 ```
 
 ---
 
 ## 🐛 Solución de Problemas
 
-### El bot no arranca
+### Error: "Missing required environment variables"
+- Verifica que `.env` existe y tiene todas las variables
+- Asegúrate de que los valores no tengan espacios extras
 
-```bash
-# Verificar variables de entorno
-python -c "import os; print('BOT_TOKEN:', bool(os.getenv('TELEGRAM_BOT_TOKEN')))"
+### Error: Session String inválido
+- Regenera el Session String con el script del paso 6C
+- Asegúrate de usar el mismo API_ID y API_HASH
 
-# Ver logs detallados
-python bot_with_paywall.py
-```
+### Bot no responde
+- Verifica que el bot esté corriendo (`python bot_with_paywall.py`)
+- Revisa los logs en consola para ver errores
 
-### Telegram Stars no funciona
-
-1. Verifica que esté habilitado en @BotFather → Payments → Telegram Stars
-2. Prueba con `/testpay` en el bot
-3. Revisa los logs del bot
-
-### PayPal no funciona
-
-1. Verifica que `BACKEND_URL` sea correcto y accesible
-2. Revisa logs del backend: `tail -f backend.log`
-3. Verifica credenciales de PayPal
-4. Usa `PAYPAL_MODE=sandbox` para pruebas
-
-### Railway no arranca
-
-1. Verifica que todas las variables estén configuradas
-2. Revisa logs en Railway dashboard
-3. Verifica que `requirements.txt` tenga todas las dependencias
-4. Asegúrate de que los comandos de inicio sean correctos
+### Usuario no puede descargar
+- Verifica su balance con `/addstars <user_id> 0` (no agrega, solo verifica)
+- El admin puede agregar estrellas con `/addstars <user_id> <cantidad>`
 
 ---
 
-## 📝 Estructura de Archivos para Subir a GitHub
+## 📦 Estructura de Archivos
 
 ```
-✅ Subir a GitHub:
-├── bot_with_paywall.py
-├── backend_paypal.py
-├── database.py
-├── run_backend.py
-├── requirements.txt
-├── .gitignore
-├── .env.example          # Plantilla SIN credenciales reales
-└── README.md
-
-❌ NO subir (ya están en .gitignore):
-├── .env                  # Credenciales reales
-├── users.db              # Base de datos
-├── *.session             # Sesiones de Telethon
-├── *.log                 # Logs
-├── __pycache__/          # Python cache
-└── .venv/                # Entorno virtual
+bot-descargar-contenido/
+│
+├── bot_with_paywall.py      # 🤖 Bot principal (EJECUTAR ESTE)
+├── database.py               # 💾 Funciones de base de datos
+├── requirements.txt          # 📋 Dependencias Python
+├── .env                      # 🔒 Variables de entorno (NO SUBIR A GIT)
+├── .env.example              # 📄 Plantilla de variables
+├── .gitignore                # 🚫 Archivos ignorados por Git
+├── users.db                  # 💾 Base de datos (generado automáticamente)
+└── README.md                 # 📖 Esta documentación
 ```
 
 ---
 
-## 📞 Soporte
+## 🔐 Seguridad
 
-**Canal Oficial:** [@observer_bots](https://t.me/observer_bots)
+- **NUNCA** subas `.env` a GitHub
+- **NUNCA** subas `users.db` a GitHub  
+- `.gitignore` ya los protege
+- Guarda backups de `users.db` regularmente
 
-### Reportar Problemas
+---
 
-Incluye:
-1. Descripción detallada del problema
-2. Logs relevantes (sin credenciales)
-3. Versión de Python: `python --version`
-4. Sistema operativo
-5. Comando que causó el error
+## 📝 Cambios Respecto a Versión Anterior
+
+### ❌ Eliminado:
+- ❌ Sistema de pagos PayPal
+- ❌ Sistema de pagos Telegram Stars (nativo)
+- ❌ Backend FastAPI (`backend_paypal.py`, `run_backend.py`)
+- ❌ Servidor web HTTP
+- ❌ Dependencias: `fastapi`, `uvicorn`, `requests`
+
+### ✅ Agregado:
+- ✅ Sistema de estrellas interno (SQLite)
+- ✅ Comando `/addstars` para administradores
+- ✅ Balance de estrellas visible en `/start` y `/premium`
+- ✅ Funciones: `get_stars()`, `add_stars()`, `remove_stars()`
+- ✅ Bot 100% autónomo (solo polling, sin servidor)
+
+---
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto es privado. No distribuir sin autorización.
+Este proyecto es de código abierto bajo licencia MIT.
 
 ---
 
-## 🙏 Créditos
+## 💬 Soporte
 
-Desarrollado con:
-- [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) - Framework del bot
-- [Telethon](https://github.com/LonamiWebs/Telethon) - Cliente de Telegram
-- [FastAPI](https://fastapi.tiangolo.com/) - Backend web
-- [PayPal REST API](https://developer.paypal.com/) - Procesamiento de pagos
+Si tienes problemas o preguntas:
+
+- 📢 Canal oficial: [@observer_bots](https://t.me/observer_bots)
+- 🐛 Reporta bugs en GitHub Issues
+- 💡 Sugiere features en GitHub Discussions
 
 ---
 
-**¿Listo para desplegar? 🚀**
+## ⭐ Roadmap Futuro
 
-1. ✅ Configura tus credenciales en `.env` (local) o Railway (producción)
-2. ✅ Habilita Telegram Stars en @BotFather
-3. ✅ Despliega en Railway siguiendo la guía
-4. ✅ Prueba con `/testpay`
-5. ✅ ¡Empieza a recibir suscripciones!
+- [ ] Comando `/mystars` para usuarios ver su balance
+- [ ] Historial de transacciones de estrellas
+- [ ] Sistema de referidos (ganar estrellas)
+- [ ] Panel web de administración
+- [ ] Backup automático de base de datos
+- [ ] Soporte multi-idioma
+
+---
+
+**Hecho con ❤️ por la comunidad de Telegram**

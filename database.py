@@ -29,6 +29,7 @@ def init_database():
             daily_music INTEGER DEFAULT 0,
             daily_apk INTEGER DEFAULT 0,
             last_reset TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            stars INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -62,6 +63,11 @@ def init_database():
     
     try:
         cursor.execute("ALTER TABLE users ADD COLUMN last_reset TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN stars INTEGER DEFAULT 0")
     except sqlite3.OperationalError:
         pass
     
@@ -347,3 +353,93 @@ def get_user_stats() -> Dict:
         "free_users": total_users - premium_users,
         "total_downloads": total_downloads
     }
+
+
+def get_stars(user_id: int) -> int:
+    """
+    Get user's star balance
+    
+    Args:
+        user_id: Telegram user ID
+        
+    Returns:
+        Number of stars the user has
+    """
+    user = get_user(user_id)
+    if not user:
+        create_user(user_id)
+        return 0
+    
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT stars FROM users WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    
+    conn.close()
+    
+    return row[0] if row else 0
+
+
+def add_stars(user_id: int, amount: int) -> int:
+    """
+    Add stars to user's balance
+    
+    Args:
+        user_id: Telegram user ID
+        amount: Number of stars to add
+        
+    Returns:
+        New star balance
+    """
+    if not get_user(user_id):
+        create_user(user_id)
+    
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "UPDATE users SET stars = stars + ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
+        (amount, user_id)
+    )
+    
+    cursor.execute("SELECT stars FROM users WHERE user_id = ?", (user_id,))
+    new_balance = cursor.fetchone()[0]
+    
+    conn.commit()
+    conn.close()
+    
+    logger.info(f"User {user_id} stars: +{amount} -> {new_balance}")
+    return new_balance
+
+
+def remove_stars(user_id: int, amount: int) -> bool:
+    """
+    Remove stars from user's balance
+    
+    Args:
+        user_id: Telegram user ID
+        amount: Number of stars to remove
+        
+    Returns:
+        True if successful, False if insufficient balance
+    """
+    current_balance = get_stars(user_id)
+    
+    if current_balance < amount:
+        logger.warning(f"User {user_id} insufficient stars: {current_balance} < {amount}")
+        return False
+    
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "UPDATE users SET stars = stars - ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
+        (amount, user_id)
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    logger.info(f"User {user_id} stars: -{amount} -> {current_balance - amount}")
+    return True
