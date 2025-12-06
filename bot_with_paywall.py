@@ -668,7 +668,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• 50 APK diarios\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
         "💡 Usa /premium para ver tu balance\n"
-        "📢 Únete a @observer\\_bots"
+        "📢 Únete a @observer_bots"
     )
     
     await update.message.reply_text(message, parse_mode='Markdown')
