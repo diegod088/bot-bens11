@@ -1053,6 +1053,11 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer()
         await panel_command(update, context)
         return
+
+    if query.data == "panel_refresh":
+        await query.answer("🔄 Actualizando...")
+        await panel_command(update, context)
+        return
         
     if query.data == "disconnect_account":
         await query.answer()
@@ -2190,38 +2195,102 @@ async def testpay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /panel command - Show user control panel"""
+    """Handle /panel command - Show user control panel with detailed stats"""
     user_id = update.effective_user.id
-    user_name = update.effective_user.first_name
     user = get_user(user_id)
     lang = get_user_language(user)
     
-    # Check connection status
+    # Get usage stats
+    stats = get_user_usage_stats(user_id)
+    if not stats:
+        # Fallback if user not found (shouldn't happen usually)
+        await update.message.reply_text("Error loading profile.")
+        return
+
+    # 1. Header & Plan Info
+    message = get_msg("panel_title", lang)
+    
+    if stats['is_premium']:
+        message += get_msg("panel_plan_premium", lang)
+        # Calculate days left
+        if user.get('premium_until'):
+            try:
+                expiry_dt = datetime.fromisoformat(user['premium_until'])
+                days_left = (expiry_dt - datetime.now()).days
+                expiry_str = expiry_dt.strftime("%d/%m/%Y")
+                message += get_msg("panel_expires", lang, expiry=expiry_str, days_left=days_left)
+            except:
+                pass
+    else:
+        message += get_msg("panel_plan_free", lang)
+
+    # 2. Usage Statistics
+    message += "\n" + get_msg("panel_stats_row", lang)
+    
+    # Photos
+    p_used = stats['photos']['used']
+    p_limit = "∞" if stats['photos']['unlimited'] else stats['photos']['limit']
+    message += get_msg("panel_photos", lang, count=p_used, limit=p_limit)
+    
+    # Videos
+    v_used = stats['videos']['used']
+    v_limit = "∞" if stats['videos']['unlimited'] else stats['videos']['limit']
+    message += get_msg("panel_videos", lang, count=v_used, limit=v_limit)
+    
+    # Music
+    m_used = stats['music']['used']
+    m_limit = stats['music']['limit']
+    message += get_msg("panel_music", lang, count=m_used, limit=m_limit)
+    
+    # APK
+    a_used = stats['apk']['used']
+    a_limit = stats['apk']['limit']
+    message += get_msg("panel_apk", lang, count=a_used, limit=a_limit)
+
+    # 3. Connection Status
+    message += get_msg("panel_connection_title", lang)
     session_string = get_user_session(user_id)
     is_connected = bool(session_string)
     
-    status_text = get_msg("panel_connected", lang) if is_connected else get_msg("panel_disconnected", lang)
-    desc_text = get_msg("panel_desc_connected", lang) if is_connected else get_msg("panel_desc_disconnected", lang)
-    
-    message = get_msg("panel_title", lang, user_name=user_name, user_id=user_id, status=status_text)
-    message += desc_text
+    if is_connected:
+        message += get_msg("panel_connection_ok", lang)
+    else:
+        message += get_msg("panel_connection_fail", lang)
+        
+    # Footer
+    if not stats['is_premium']:
+        message += get_msg("panel_footer", lang)
     
     # Buttons
     keyboard = []
     
-    # Connect/Disconnect button
+    # Row 1: Refresh & Plans
+    keyboard.append([
+        InlineKeyboardButton(get_msg("btn_refresh_stats", lang), callback_data="panel_refresh"),
+        InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
+    ])
+    
+    # Row 2: Connect/Disconnect
     if is_connected:
         keyboard.append([InlineKeyboardButton(get_msg("btn_disconnect", lang), callback_data="disconnect_account")])
     else:
         keyboard.append([InlineKeyboardButton(get_msg("btn_connect", lang), callback_data="connect_account")])
         
-    # Back button
-    keyboard.append([InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")])
+    # Row 3: Support & Back
+    keyboard.append([
+        InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots"),
+        InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")
+    ])
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     if update.callback_query:
-        await update.callback_query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+        # If called from callback (e.g. refresh button)
+        try:
+            await update.callback_query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+        except Exception:
+            # If message content is same, ignore error
+            pass
     else:
         await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
 

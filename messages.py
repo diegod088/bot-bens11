@@ -30,14 +30,22 @@ MESSAGES = {
         "start_cta": "",
         
         # Panel
-        "panel_title": "⚙️ *Panel de Control*\n\n👤 *Usuario:* {user_name}\n\n",
+        "panel_title": "⚙️ *PANEL DE CONTROL*\n👤 *Usuario:* {user_name}\n\n",
+        "panel_plan_free": "💎 *Plan:* Gratuito\n",
+        "panel_plan_premium": "💎 *Plan:* Premium\n📅 *Vence:* {expiry} ({days_left} días)\n",
+        "panel_stats_title": "\n📊 *Uso Diario:*\n",
+        "panel_stats_row": "{icon} {label}: {used}/{limit}\n",
+        "panel_stats_unlimited": "{icon} {label}: Ilimitado ✨\n",
+        "panel_connection_title": "\n🔐 *Conexión Telegram:*\n",
         "panel_connected": "✅ Conectado",
         "panel_disconnected": "❌ No conectado",
-        "panel_desc_connected": "✅ *Tu cuenta está conectada*\n\nAhora puedes descargar contenido de canales privados y restringidos sin problemas.\n\n",
-        "panel_desc_disconnected": "⚠️ *Cuenta no conectada*\n\nPara descargar de canales privados o restringidos, necesitas conectar tu cuenta.\n\n",
+        "panel_desc_connected": "_(Puedes descargar de canales privados)_\n\n",
+        "panel_desc_disconnected": "_(Conecta tu cuenta para canales privados)_\n\n",
         "btn_panel": "⚙️ Mi Cuenta",
         "btn_connect": "🔐 Conectar Cuenta",
         "btn_disconnect": "👋 Desconectar",
+        "btn_renew": "💎 Renovar Premium",
+        "btn_upgrade": "💎 Mejorar a Premium",
         
         # Buttons
         "btn_download_now": "📥 Empezar a Descargar",
@@ -282,6 +290,21 @@ MESSAGES = {
         "success_music": "🎵 Music today: {count}/{limit}\n♻️ Resets in 24h",
         "success_apk": "📦 APK today: {count}/{limit}\n♻️ Resets in 24h",
         "success_auto_joined": "\n\n🔗 Channel joined automatically",
+        
+        # Panel
+        "panel_title": "⚙️ *Control Panel*\n\n",
+        "panel_plan_free": "👤 *Plan:* Free\n",
+        "panel_plan_premium": "💎 *Plan:* Premium\n",
+        "panel_expires": "📅 *Expires:* {expiry} ({days_left} days)\n",
+        "panel_stats_row": "📊 *Your Stats:*\n",
+        "panel_photos": "• Photos: {count}/{limit}\n",
+        "panel_videos": "• Videos: {count}/{limit}\n",
+        "panel_music": "• Music: {count}/{limit}\n",
+        "panel_apk": "• APK: {count}/{limit}\n",
+        "panel_connection_title": "\n🔌 *Connection Status:*\n",
+        "panel_connection_ok": "✅ *Bot:* Online & Connected\n",
+        "panel_connection_fail": "⚠️ *Bot:* Connection Issues\n",
+        "panel_footer": "\n💡 *Tip:* Upgrade to Premium for higher limits!",
         
         # Stats
         "stats_title": "📊 *Your Statistics*\n\n",
