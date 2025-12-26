@@ -1,9 +1,5 @@
-# Telegram Bot Libraries
 python-telegram-bot==20.7
 telethon==1.36.0
-
-# Environment Variables
 python-dotenv==1.0.0
-
-# Utilities
 cryptography>=41.0.0
+
