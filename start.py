@@ -16,6 +16,11 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Initialize database
+from database import init_database
+init_database()
+logger.info("✅ Database initialized")
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
