@@ -17,9 +17,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize database
-from database import init_database
-init_database()
-logger.info("✅ Database initialized")
+try:
+    from database import init_database
+    init_database()
+    logger.info("✅ Database initialized")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize database: {e}")
+    # Continue anyway to start the server
 
 # Configure logging
 logging.basicConfig(
