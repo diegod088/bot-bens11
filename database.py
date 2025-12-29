@@ -59,6 +59,7 @@ def get_db_connection():
 
 def init_database():
     """Initialize the SQLite database with users table"""
+    logger.info("Initializing database...")
     with get_db_connection() as conn:
         cursor = conn.cursor()
         
