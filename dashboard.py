@@ -62,7 +62,7 @@ def health_check():
     try:
         # Check database connection
         conn = get_db_connection()
-        conn.execute("SELECT 1")
+        conn.execute("SELECT 1 FROM users LIMIT 1")  # Check if users table exists
         conn.close()
         
         return jsonify({
