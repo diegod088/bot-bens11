@@ -56,10 +56,14 @@ from database import (
 # Import messages module for multi-language support
 from messages import get_msg, get_user_language
 
-# Configure logging
+# Configure logging - escribir a archivo para debug
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('bot.log'),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 
@@ -1304,47 +1308,92 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if query.data == "start_download":
-        # Mensaje simple y directo
-        await query.answer()
+        logger.info(f"start_download callback triggered by user {query.from_user.id}")
+        
+        # Primero responder al callback para quitar el "loading"
+        try:
+            await query.answer("✅ Listo para descargar")
+        except Exception as e:
+            logger.warning(f"Error answering callback: {e}")
+        
         try:
             user_id = query.from_user.id
             user = get_user(user_id)
             lang = get_user_language(user)
             
+            # Verificar si el usuario tiene sesión configurada
+            if not has_active_session(user_id):
+                config_message = (
+                    "⚠️ *Configuración Requerida*\n\n"
+                    "Para descargar contenido, necesitas configurar tu cuenta de Telegram primero.\n\n"
+                    "👉 Presiona el botón de abajo para configurar."
+                )
+                keyboard = [
+                    [InlineKeyboardButton("⚙️ Configurar Cuenta", callback_data="connect_account")],
+                    [InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                try:
+                    await query.edit_message_text(config_message, parse_mode='Markdown', reply_markup=reply_markup)
+                except Exception:
+                    await query.message.reply_text(config_message, parse_mode='Markdown', reply_markup=reply_markup)
+                return
+            
             if lang == 'es':
                 message = (
-                    "📥 *Envíame el enlace del mensaje*\n\n"
-                    "Ejemplo: `https://t.me/canal/123`\n\n"
-                    "💡 Copia el enlace del mensaje en Telegram y pégalo aquí."
+                    "📥 *¡Listo para descargar!*\n\n"
+                    "Ahora envíame el enlace del mensaje de Telegram que quieres descargar.\n\n"
+                    "📎 *Ejemplo:*\n"
+                    "`https://t.me/canal/123`\n\n"
+                    "💡 *Tip:* Copia el enlace desde Telegram y pégalo aquí."
                 )
             elif lang == 'en':
                 message = (
-                    "📥 *Send me the message link*\n\n"
-                    "Example: `https://t.me/channel/123`\n\n"
-                    "💡 Copy the message link from Telegram and paste it here."
+                    "📥 *Ready to download!*\n\n"
+                    "Now send me the Telegram message link you want to download.\n\n"
+                    "📎 *Example:*\n"
+                    "`https://t.me/channel/123`\n\n"
+                    "💡 *Tip:* Copy the link from Telegram and paste it here."
                 )
             elif lang == 'pt':
                 message = (
-                    "📥 *Envie-me o link da mensagem*\n\n"
-                    "Exemplo: `https://t.me/canal/123`\n\n"
-                    "💡 Copie o link da mensagem no Telegram e cole aqui."
+                    "📥 *Pronto para baixar!*\n\n"
+                    "Agora envie-me o link da mensagem do Telegram que você quer baixar.\n\n"
+                    "📎 *Exemplo:*\n"
+                    "`https://t.me/canal/123`\n\n"
+                    "💡 *Dica:* Copie o link do Telegram e cole aqui."
                 )
             else:  # Italian
                 message = (
-                    "📥 *Inviami il link del messaggio*\n\n"
-                    "Esempio: `https://t.me/canale/123`\n\n"
-                    "💡 Copia il link del messaggio da Telegram e incollalo qui."
+                    "📥 *Pronto per scaricare!*\n\n"
+                    "Ora inviami il link del messaggio di Telegram che vuoi scaricare.\n\n"
+                    "📎 *Esempio:*\n"
+                    "`https://t.me/canale/123`\n\n"
+                    "💡 *Suggerimento:* Copia il link da Telegram e incollalo qui."
                 )
             
             keyboard = [[InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
-            await query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
-        except Exception as e:
-            logger.error(f"Error handling start_download callback: {e}")
-            # Fallback: send a new message if edit fails
+            # Intentar editar el mensaje, si falla enviar uno nuevo
             try:
-                await query.message.reply_text("📥 Envía el enlace del mensaje que quieres descargar", parse_mode='Markdown')
+                await query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+                logger.info(f"Successfully edited message for user {user_id}")
+            except Exception as edit_error:
+                logger.warning(f"Could not edit message: {edit_error}, sending new message")
+                await query.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+                
+        except Exception as e:
+            logger.error(f"Error handling start_download callback: {e}", exc_info=True)
+            # Fallback: enviar mensaje nuevo con información útil
+            try:
+                fallback_msg = (
+                    "📥 *Modo Descarga*\n\n"
+                    "Envía el enlace del mensaje que quieres descargar.\n\n"
+                    "Ejemplo: `https://t.me/canal/123`"
+                )
+                await query.message.reply_text(fallback_msg, parse_mode='Markdown')
             except Exception as e2:
                 logger.error(f"Error sending fallback message: {e2}")
         return
@@ -1434,7 +1483,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
             ],
             [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots")],
+            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
             [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -1766,7 +1815,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
             ],
             [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots")],
+            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
             [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -1820,7 +1869,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
             ],
             [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots")],
+            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
             [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -1867,7 +1916,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
             ],
             [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots")],
+            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
             [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -1914,7 +1963,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
             ],
             [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots")],
+            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
             [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -2446,7 +2495,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
         ],
         [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-        [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots")]
+        [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -2719,7 +2768,7 @@ async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     # Row 3: Support & Back
     keyboard.append([
-        InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots"),
+        InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11"),
         InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")
     ])
     
@@ -4088,6 +4137,28 @@ async def post_shutdown(application: Application):
             pass
 
 
+async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle errors caused by Updates."""
+    from telegram.error import BadRequest, TimedOut, NetworkError
+    
+    error = context.error
+    
+    # Ignorar errores de callbacks expirados (normales después de reiniciar el bot)
+    if isinstance(error, BadRequest):
+        if "Query is too old" in str(error) or "query id is invalid" in str(error):
+            logger.debug(f"Callback query expirado (normal después de reinicio): {error}")
+            return
+        if "Message is not modified" in str(error):
+            logger.debug(f"Mensaje no modificado (contenido idéntico): {error}")
+            return
+    
+    # Log otros errores
+    if isinstance(error, (TimedOut, NetworkError)):
+        logger.warning(f"Error de red (recuperable): {error}")
+    else:
+        logger.error(f"Error no manejado: {error}", exc_info=context.error)
+
+
 def main():
     """Start the bot (sync, compatible con PTB v20+)"""
     from telegram.request import HTTPXRequest
@@ -4139,6 +4210,9 @@ def main():
 
     # Add diagnostic command for Railway troubleshooting
     application.add_handler(CommandHandler("diagnostic", diagnostic_command))
+
+    # Registrar el manejador de errores global
+    application.add_error_handler(error_handler)
 
     logger.info("Bot started. Waiting for messages...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
