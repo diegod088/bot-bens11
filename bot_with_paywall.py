@@ -4225,13 +4225,15 @@ if __name__ == "__main__":
 async def async_main():
     """Start the bot asynchronously (for use in non-main threads)"""
     from telegram.request import HTTPXRequest
-
+    from telegram.error import TimedOut, NetworkError
+    
+    # Configuración de timeouts más robusta para Railway
     request = HTTPXRequest(
-        connection_pool_size=20,  # Aumentado para mejor concurrencia
-        connect_timeout=60.0,     # 1 minuto para conectar (antes 30s)
-        read_timeout=900.0,       # 15 minutos para leer (antes 30s) - crucial para archivos grandes
-        write_timeout=900.0,      # 15 minutos para escribir (antes 30s)
-        pool_timeout=120.0        # 2 minutos para pool (antes 30s)
+        connection_pool_size=20,
+        connect_timeout=120.0,    # 2 minutos para conectar (Railway puede ser lento)
+        read_timeout=900.0,       # 15 minutos para leer
+        write_timeout=900.0,      # 15 minutos para escribir
+        pool_timeout=120.0        # 2 minutos para pool
     )
 
     application = (
@@ -4273,8 +4275,23 @@ async def async_main():
 
     logger.info("Bot started. Waiting for messages...")
     
-    # Initialize the application
-    await application.initialize()
+    # Initialize the application with retries (Railway puede tener latencia inicial)
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"Initializing bot (attempt {attempt + 1}/{max_retries})...")
+            await application.initialize()
+            logger.info("Bot initialized successfully!")
+            break
+        except (TimedOut, NetworkError) as e:
+            if attempt < max_retries - 1:
+                wait_time = (attempt + 1) * 10  # 10s, 20s, 30s, 40s
+                logger.warning(f"Initialization failed: {e}. Retrying in {wait_time}s...")
+                await asyncio.sleep(wait_time)
+            else:
+                logger.error(f"Failed to initialize bot after {max_retries} attempts")
+                raise
+    
     await application.start()
     
     # Start polling without signal handlers (they don't work in non-main threads)
