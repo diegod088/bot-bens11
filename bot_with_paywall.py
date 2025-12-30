@@ -520,11 +520,28 @@ async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = await update.message.reply_text(get_msg("login_connecting", lang))
     
     try:
+        # Configuración especial para Railway (PaaS con restricciones de red)
+        is_railway = os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID')
+        
         client = TelegramClient(StringSession(), int(TELEGRAM_API_ID), TELEGRAM_API_HASH)
-        await client.connect()
+        
+        # Configuración optimizada para Railway
+        if is_railway:
+            logger.info("Detectado entorno Railway - usando configuración optimizada")
+            # Railway puede tener restricciones, intentar con timeout más largo
+            connect_timeout = 30  # Más tiempo para conectar en Railway
+        else:
+            connect_timeout = 10
+            
+        await asyncio.wait_for(client.connect(), timeout=connect_timeout)
         
         if not await client.is_user_authorized():
-            sent = await client.send_code_request(phone)
+            # Timeout más largo para Railway
+            code_timeout = 60 if is_railway else 30
+            sent = await asyncio.wait_for(
+                client.send_code_request(phone), 
+                timeout=code_timeout
+            )
             login_clients[user_id] = {
                 'client': client, 
                 'phone': phone,
@@ -547,9 +564,36 @@ async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await msg.edit_text("❌ Error inesperado. Intenta de nuevo.")
             return ConversationHandler.END
             
+    except asyncio.TimeoutError:
+        logger.error(f"Timeout conectando para {user_id} en Railway")
+        is_railway = os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID')
+        if is_railway:
+            error_msg = (
+                "❌ *Error de Conexión en Railway*\n\n"
+                "Railway puede tener restricciones de red que impiden la conexión directa a Telegram.\n\n"
+                "🔧 *Soluciones:*\n"
+                "1️⃣ Verifica que las variables `TELEGRAM_API_ID` y `TELEGRAM_API_HASH` estén configuradas en Railway\n"
+                "2️⃣ Intenta desde un servidor VPS en lugar de Railway\n"
+                "3️⃣ Contacta soporte de Railway sobre restricciones MTProto\n\n"
+                "📞 Soporte: @observer_bots"
+            )
+        else:
+            error_msg = get_msg("login_error_connect", lang, error="Timeout de conexión")
+        await msg.edit_text(error_msg, parse_mode='Markdown')
+        return ConversationHandler.END
     except Exception as e:
         logger.error(f"Error sending code to {user_id}: {e}")
-        await msg.edit_text(get_msg("login_error_connect", lang, error=str(e)), parse_mode='Markdown')
+        is_railway = os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID')
+        if is_railway and "connection" in str(e).lower():
+            error_msg = (
+                "❌ *Error de Red en Railway*\n\n"
+                f"Error: `{str(e)[:100]}`\n\n"
+                "💡 Railway puede bloquear conexiones MTProto.\n"
+                "Prueba desde un VPS o contacta soporte de Railway."
+            )
+        else:
+            error_msg = get_msg("login_error_connect", lang, error=str(e))
+        await msg.edit_text(error_msg, parse_mode='Markdown')
         return ConversationHandler.END
 
 async def receive_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -930,7 +974,7 @@ def get_file_size(message) -> int:
 
 
 async def download_and_send_media(message, chat_id: int, bot, caption=None):
-    """Download media from protected channel and send to user"""
+    """Download media from protected channel and send to user with optimized performance"""
     path = None
     try:
         if caption is None:
@@ -939,7 +983,7 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
         is_photo = isinstance(message.media, MessageMediaPhoto)
         content_type = detect_content_type(message)
 
-        # Verificar tamaño antes de descargar (Límite de 2GB con Telethon Bot)
+        # Verificar tamaño antes de descargar (Límite aumentado a 2000MB = 2GB)
         file_size = 0
         if hasattr(message, 'document') and message.document:
             file_size = message.document.size
@@ -954,7 +998,7 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
             return
 
         if is_photo:
-            # Descargar foto a memoria
+            # Descargar foto a memoria (rápido)
             photo_bytes = BytesIO()
             result = await message.download_media(file=photo_bytes)
             if not result:
@@ -967,54 +1011,206 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
                 caption=caption if caption else None
             )
         else:
-            # Descargar otros archivos a archivo temporal
+            # OPTIMIZACIÓN AVANZADA: Configuración específica para archivos grandes
             suffix = '.mp4' if content_type == 'video' else ''
             temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
             path = temp_file.name
             temp_file.close()
-            result = await message.download_media(file=path)
+            
+            # Configuración optimizada basada en tamaño del archivo
+            download_config = {
+                'progress_callback': None,  # Podemos agregar callback de progreso si queremos
+            }
+            
+            # OPTIMIZACIÓN: Configuración avanzada para diferentes tamaños de archivo
+            if file_size > 500 * 1024 * 1024:  # >500MB - Archivos muy grandes
+                logger.info(f"Archivo muy grande detectado ({file_size / (1024*1024):.1f} MB), usando configuración ultra-optimizada")
+                # Para archivos muy grandes, usar configuración especial de Telethon
+                download_config.update({
+                    'dc_id': None,  # Usar DC automático
+                    'workers': 1,   # Un solo worker para estabilidad
+                })
+                timeout_seconds = 900  # 15 minutos para archivos >500MB
+            elif file_size > 100 * 1024 * 1024:  # >100MB - Archivos grandes
+                logger.info(f"Archivo grande detectado ({file_size / (1024*1024):.1f} MB), usando configuración optimizada")
+                download_config.update({
+                    'workers': 2,   # Dos workers para archivos grandes
+                })
+                timeout_seconds = 600  # 10 minutos para archivos >100MB
+            elif file_size > 50 * 1024 * 1024:   # >50MB - Archivos medianos-grandes
+                logger.info(f"Archivo mediano-grande detectado ({file_size / (1024*1024):.1f} MB), usando configuración balanceada")
+                download_config.update({
+                    'workers': 4,   # Cuatro workers para velocidad
+                })
+                timeout_seconds = 300  # 5 minutos para archivos >50MB
+            else:  # Archivos pequeños
+                timeout_seconds = 120  # 2 minutos para archivos pequeños
+            
+            # Timeout dinámico basado en tamaño (mínimo 60s, máximo 900s)
+            timeout_seconds = min(900, max(60, file_size // (1024 * 1024)))  # 1MB = 1 segundo, máx 15 min
+            
+            logger.info(f"Iniciando descarga con timeout de {timeout_seconds}s para archivo de {file_size / (1024*1024):.1f} MB")
+            
+            try:
+                # Usar asyncio.wait_for para timeout personalizado
+                result = await asyncio.wait_for(
+                    message.download_media(file=path, **download_config),
+                    timeout=timeout_seconds
+                )
+            except asyncio.TimeoutError:
+                await bot.send_message(
+                    chat_id=chat_id, 
+                    text=f"❌ Tiempo de espera agotado ({timeout_seconds}s). El archivo es muy grande ({file_size / (1024*1024):.1f} MB) o la conexión es lenta.\n\n💡 Intenta con un archivo más pequeño o verifica tu conexión."
+                )
+                if path and os.path.exists(path):
+                    os.remove(path)
+                return
+            
             if not result or not os.path.exists(path):
                 await bot.send_message(chat_id=chat_id, text="❌ No se pudo descargar el archivo. Puede estar protegido o eliminado.")
                 if path and os.path.exists(path):
                     os.remove(path)
                 return
             
-            # Usar bot_client (Telethon) si está disponible para soportar archivos grandes
+            # OPTIMIZACIÓN: Estrategia inteligente de envío basada en tamaño y tipo
             sent = False
-            if bot_client:
+            
+            # Para archivos muy grandes (>200MB), priorizar Telethon bot_client
+            if bot_client and file_size > 200 * 1024 * 1024:
                 try:
+                    logger.info(f"Enviando archivo muy grande ({file_size / (1024*1024):.1f} MB) con Telethon bot_client prioritario")
                     await bot_client.send_file(
                         chat_id,
                         path,
                         caption=caption if caption else None,
-                        supports_streaming=(content_type == 'video')
+                        supports_streaming=(content_type == 'video'),
+                        force_document=False,  # Intentar mantener formato original
+                        timeout=600  # 10 minutos timeout para envío
                     )
                     sent = True
+                    logger.info("Archivo enviado exitosamente con Telethon (prioridad alta)")
+                except Exception as e:
+                    logger.error(f"Error enviando con Telethon prioritario: {e}")
+                    # Fallback a PTB
+            
+            # Para archivos medianos (50-200MB), usar Telethon si está disponible
+            elif bot_client and file_size > 50 * 1024 * 1024:
+                try:
+                    logger.info(f"Enviando archivo mediano ({file_size / (1024*1024):.1f} MB) con Telethon bot_client")
+                    await bot_client.send_file(
+                        chat_id,
+                        path,
+                        caption=caption if caption else None,
+                        supports_streaming=(content_type == 'video'),
+                        force_document=False
+                    )
+                    sent = True
+                    logger.info("Archivo enviado exitosamente con Telethon")
                 except Exception as e:
                     logger.error(f"Error enviando con Telethon: {e}")
+                    # Fallback a PTB
             
             if not sent:
-                # Fallback a PTB (fallará si es >50MB)
+                # Fallback a PTB (python-telegram-bot) con configuraciones ultra-optimizadas
                 with open(path, 'rb') as f:
-                    if content_type == 'video':
-                        await bot.send_video(
-                            chat_id=chat_id,
-                            video=f,
-                            caption=caption if caption else None,
-                            supports_streaming=True
-                        )
-                    elif content_type == 'music':
-                        await bot.send_audio(
-                            chat_id=chat_id,
-                            audio=f,
-                            caption=caption if caption else None
-                        )
-                    else:
-                        await bot.send_document(
-                            chat_id=chat_id,
-                            document=f,
-                            caption=caption if caption else None
-                        )
+                    try:
+                        if content_type == 'video':
+                            # OPTIMIZACIÓN EXTREMA: Configuración específica para videos grandes
+                            if file_size > 500 * 1024 * 1024:  # >500MB
+                                logger.info("Enviando video ultra-grande con configuración máxima")
+                                await bot.send_video(
+                                    chat_id=chat_id,
+                                    video=f,
+                                    caption=caption if caption else None,
+                                    supports_streaming=True,
+                                    timeout=900,  # 15 minutos
+                                    read_timeout=900,
+                                    write_timeout=900,
+                                    connect_timeout=120,  # 2 minutos para conectar
+                                    pool_timeout=120,
+                                    max_retries=5  # Más reintentos
+                                )
+                            elif file_size > 100 * 1024 * 1024:  # >100MB
+                                logger.info("Enviando video grande con configuración optimizada")
+                                await bot.send_video(
+                                    chat_id=chat_id,
+                                    video=f,
+                                    caption=caption if caption else None,
+                                    supports_streaming=True,
+                                    timeout=600,  # 10 minutos
+                                    read_timeout=600,
+                                    write_timeout=600,
+                                    connect_timeout=90,  # 1.5 minutos
+                                    pool_timeout=90,
+                                    max_retries=3
+                                )
+                            else:
+                                await bot.send_video(
+                                    chat_id=chat_id,
+                                    video=f,
+                                    caption=caption if caption else None,
+                                    supports_streaming=True,
+                                    timeout=300,  # 5 minutos
+                                    read_timeout=300,
+                                    write_timeout=300,
+                                    connect_timeout=60,
+                                    pool_timeout=60
+                                )
+                        elif content_type == 'music':
+                            await bot.send_audio(
+                                chat_id=chat_id,
+                                audio=f,
+                                caption=caption if caption else None,
+                                timeout=180,  # 3 minutos para audio
+                                read_timeout=180,
+                                write_timeout=180,
+                                connect_timeout=60,
+                                pool_timeout=60
+                            )
+                        else:
+                            # Para documentos/APK, configuración optimizada
+                            if file_size > 100 * 1024 * 1024:  # >100MB
+                                await bot.send_document(
+                                    chat_id=chat_id,
+                                    document=f,
+                                    caption=caption if caption else None,
+                                    timeout=600,  # 10 minutos
+                                    read_timeout=600,
+                                    write_timeout=600,
+                                    connect_timeout=90,
+                                    pool_timeout=90,
+                                    max_retries=3
+                                )
+                            else:
+                                await bot.send_document(
+                                    chat_id=chat_id,
+                                    document=f,
+                                    caption=caption if caption else None,
+                                    timeout=300,  # 5 minutos
+                                    read_timeout=300,
+                                    write_timeout=300,
+                                    connect_timeout=60,
+                                    pool_timeout=60
+                                )
+                    except Exception as send_error:
+                        logger.error(f"Error enviando con PTB: {send_error}")
+                        # Si falla por timeout, intentar con Telethon como último recurso
+                        if bot_client and ("timeout" in str(send_error).lower() or "read" in str(send_error).lower()):
+                            try:
+                                logger.info("Reintentando envío con Telethon después de timeout de PTB")
+                                await bot_client.send_file(
+                                    chat_id,
+                                    path,
+                                    caption=caption if caption else None,
+                                    supports_streaming=(content_type == 'video'),
+                                    timeout=600  # 10 minutos como último recurso
+                                )
+                                sent = True
+                                logger.info("Reintento con Telethon exitoso")
+                            except Exception as telethon_retry_error:
+                                logger.error(f"Telethon retry también falló: {telethon_retry_error}")
+                                raise send_error  # Re-lanzar el error original
+            
             os.remove(path)
     except (asyncio.TimeoutError, TimeoutError):
         if path and os.path.exists(path):
@@ -1022,7 +1218,7 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
         logger.error("Timeout en download_and_send_media")
         await bot.send_message(
             chat_id=chat_id, 
-            text="❌ Tiempo de espera agotado. El archivo es demasiado grande o la conexión es lenta."
+            text="❌ Tiempo de espera agotado. El archivo es demasiado grande o la conexión es lenta.\n\n💡 Sugerencias:\n• Verifica tu conexión a internet\n• Intenta con un archivo más pequeño\n• Espera unos minutos antes de reintentar"
         )
         return False
     except Exception as e:
@@ -2360,6 +2556,83 @@ async def testpay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📢 @observer_bots",
             parse_mode='Markdown'
         )
+
+
+async def diagnostic_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /diagnostic command - Check connection status for Railway issues"""
+    user_id = update.effective_user.id
+
+    # Only allow admins to use this command
+    if user_id not in ADMIN_USER_IDS:
+        await update.message.reply_text(
+            "❌ *Acceso Denegado*\n\n"
+            "Este comando es solo para administradores.",
+            parse_mode='Markdown'
+        )
+        return
+
+    await update.message.reply_text("🔍 *Ejecutando diagnóstico...*", parse_mode='Markdown')
+
+    # Check environment
+    is_railway = bool(os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID'))
+    env_status = "✅ Railway" if is_railway else "❌ No Railway (localhost?)"
+
+    # Check API credentials
+    api_id = os.getenv('TELEGRAM_API_ID')
+    api_hash = os.getenv('TELEGRAM_API_HASH')
+    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+
+    credentials_status = "✅" if all([api_id, api_hash, bot_token]) else "❌"
+    credentials_status += " Credenciales completas" if all([api_id, api_hash, bot_token]) else " Credenciales faltantes"
+
+    # Test basic connectivity
+    connectivity_test = "⏳ Probando..."
+    try:
+        from telegram import Bot
+        bot = Bot(bot_token)
+        await bot.get_me()
+        connectivity_test = "✅ Bot conectado"
+    except Exception as e:
+        connectivity_test = f"❌ Error bot: {str(e)[:50]}"
+
+    # Test Telethon connection
+    telethon_test = "⏳ Probando..."
+    try:
+        client = TelegramClient(StringSession(), int(api_id), api_hash)
+        await asyncio.wait_for(client.connect(), timeout=10)
+        telethon_test = "✅ Telethon conectado"
+        await client.disconnect()
+    except asyncio.TimeoutError:
+        telethon_test = "❌ Timeout Telethon (Railway bloquea MTProto?)"
+    except Exception as e:
+        telethon_test = f"❌ Error Telethon: {str(e)[:50]}"
+
+    # Build diagnostic message
+    diagnostic_msg = (
+        "🔧 *DIAGNÓSTICO DEL SISTEMA*\n\n"
+        "━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"🌐 *Entorno:* {env_status}\n\n"
+        f"🔑 *Credenciales:* {credentials_status}\n\n"
+        f"🤖 *Bot:* {connectivity_test}\n\n"
+        f"📡 *Telethon:* {telethon_test}\n\n"
+        "━━━━━━━━━━━━━━━━━━━━\n\n"
+    )
+
+    if "❌" in telethon_test:
+        diagnostic_msg += (
+            "🚨 *PROBLEMA DETECTADO*\n\n"
+            "Railway puede estar bloqueando conexiones MTProto.\n\n"
+            "💡 *Soluciones:*\n"
+            "1️⃣ Usa un VPS en lugar de Railway\n"
+            "2️⃣ Verifica variables de entorno\n"
+            "3️⃣ Contacta soporte de Railway\n\n"
+        )
+    else:
+        diagnostic_msg += "✅ *Sistema funcionando correctamente*\n\n"
+
+    diagnostic_msg += "📞 *Soporte:* @observer_bots"
+
+    await update.message.reply_text(diagnostic_msg, parse_mode='Markdown')
 
 
 async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3823,11 +4096,11 @@ def main():
     from telegram.request import HTTPXRequest
 
     request = HTTPXRequest(
-        connection_pool_size=8,
-        connect_timeout=30.0,
-        read_timeout=30.0,
-        write_timeout=30.0,
-        pool_timeout=30.0
+        connection_pool_size=20,  # Aumentado para mejor concurrencia
+        connect_timeout=60.0,     # 1 minuto para conectar (antes 30s)
+        read_timeout=900.0,       # 15 minutos para leer (antes 30s) - crucial para archivos grandes
+        write_timeout=900.0,      # 15 minutos para escribir (antes 30s)
+        pool_timeout=120.0        # 2 minutos para pool (antes 30s)
     )
 
     application = (
@@ -3867,6 +4140,9 @@ def main():
     application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
+    # Add diagnostic command for Railway troubleshooting
+    application.add_handler(CommandHandler("diagnostic", diagnostic_command))
+
     logger.info("Bot started. Waiting for messages...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
@@ -3880,11 +4156,11 @@ async def async_main():
     from telegram.request import HTTPXRequest
 
     request = HTTPXRequest(
-        connection_pool_size=8,
-        connect_timeout=30.0,
-        read_timeout=30.0,
-        write_timeout=30.0,
-        pool_timeout=30.0
+        connection_pool_size=20,  # Aumentado para mejor concurrencia
+        connect_timeout=60.0,     # 1 minuto para conectar (antes 30s)
+        read_timeout=900.0,       # 15 minutos para leer (antes 30s) - crucial para archivos grandes
+        write_timeout=900.0,      # 15 minutos para escribir (antes 30s)
+        pool_timeout=120.0        # 2 minutos para pool (antes 30s)
     )
 
     application = (

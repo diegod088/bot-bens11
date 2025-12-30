@@ -208,8 +208,87 @@ Per un bot Telegram leggero, il piano Hobby è più che sufficiente.
 
 ---
 
+## � Problemi Comuni e Soluzioni
+
+### ❌ "No me llega el SMS para conectar la cuenta"
+
+**Problema**: Railway tiene restricciones de red que pueden impedir conexiones MTProto (usadas por Telethon).
+
+**Soluciones**:
+
+#### 1. Verificar Variables de Entorno
+```bash
+# En Railway Dashboard → Variables
+TELEGRAM_API_ID=tu_api_id
+TELEGRAM_API_HASH=tu_api_hash
+TELEGRAM_BOT_TOKEN=tu_bot_token
+```
+
+#### 2. Ejecutar Diagnóstico
+```bash
+# Conecta a tu app Railway
+railway connect
+
+# Ejecuta el script de diagnóstico
+python3 railway_diagnostic.py
+```
+
+#### 3. Soluciones Alternativas
+
+**Opción A: Usar VPS (Recomendado)**
+```bash
+# DigitalOcean, Linode, Vultr, etc.
+# Instalar Python 3.8+
+pip install -r requirements.txt
+python3 bot_with_paywall.py
+```
+
+**Opción B: Modificar el Código**
+Si quieres mantener Railway, modifica el código para usar un approach diferente:
+
+```python
+# En bot_with_paywall.py, línea ~520
+# Agregar configuración especial para Railway
+is_railway = os.getenv('RAILWAY_ENVIRONMENT')
+if is_railway:
+    # Usar proxy o configuración alternativa
+    client = TelegramClient(
+        StringSession(),
+        int(TELEGRAM_API_ID),
+        TELEGRAM_API_HASH,
+        # Agregar proxy si es necesario
+    )
+```
+
+#### 4. Verificar Logs
+```bash
+# Ver logs en Railway
+railway logs
+
+# Buscar errores de conexión
+# "Timeout" o "Connection refused"
+```
+
+### 🔍 Otros Problemas Comunes
+
+#### Bot no responde
+- Verificar que el token sea correcto
+- Revisar logs por errores de conexión
+
+#### Error 403 Forbidden
+- El bot está bloqueado por el usuario
+- Desbloquear el bot en Telegram
+
+#### Database errors
+- Verificar que Railway tenga PostgreSQL configurado
+- Revisar la variable `DATABASE_URL`
+
+---
+
 ## 📞 Supporto
 
 Per problemi con Railway, consulta la [documentazione ufficiale](https://docs.railway.app/).
 
 Per problemi con il bot, controlla i log e verifica le variabili d'ambiente.
+
+**Contacto**: @observer_bots
