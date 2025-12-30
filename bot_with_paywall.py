@@ -1045,10 +1045,10 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
                 })
                 timeout_seconds = 300  # 5 minutos para archivos >50MB
             else:  # Archivos pequeños
-                timeout_seconds = 120  # 2 minutos para archivos pequeños
+                timeout_seconds = 300  # 5 minutos para archivos pequeños
             
-            # Timeout dinámico basado en tamaño (mínimo 60s, máximo 900s)
-            timeout_seconds = min(900, max(60, file_size // (1024 * 1024)))  # 1MB = 1 segundo, máx 15 min
+            # Timeout dinámico basado en tamaño (mínimo 300s, máximo 900s)
+            timeout_seconds = min(900, max(300, file_size // (1024 * 1024)))  # 1MB = 1 segundo, mín 5 min
             
             logger.info(f"Iniciando descarga con timeout de {timeout_seconds}s para archivo de {file_size / (1024*1024):.1f} MB")
             
