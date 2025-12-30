@@ -1319,39 +1319,47 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "start_download":
         # Mensaje simple y directo
         await query.answer()
-        user_id = query.from_user.id
-        user = get_user(user_id)
-        lang = get_user_language(user)
-        
-        if lang == 'es':
-            message = (
-                "📥 *Envíame el enlace del mensaje*\n\n"
-                "Ejemplo: `https://t.me/canal/123`\n\n"
-                "💡 Copia el enlace del mensaje en Telegram y pégalo aquí."
-            )
-        elif lang == 'en':
-            message = (
-                "📥 *Send me the message link*\n\n"
-                "Example: `https://t.me/channel/123`\n\n"
-                "💡 Copy the message link from Telegram and paste it here."
-            )
-        elif lang == 'pt':
-            message = (
-                "📥 *Envie-me o link da mensagem*\n\n"
-                "Exemplo: `https://t.me/canal/123`\n\n"
-                "💡 Copie o link da mensagem no Telegram e cole aqui."
-            )
-        else:  # Italian
-            message = (
-                "📥 *Inviami il link del messaggio*\n\n"
-                "Esempio: `https://t.me/canale/123`\n\n"
-                "💡 Copia il link del messaggio da Telegram e incollalo qui."
-            )
-        
-        keyboard = [[InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+        try:
+            user_id = query.from_user.id
+            user = get_user(user_id)
+            lang = get_user_language(user)
+            
+            if lang == 'es':
+                message = (
+                    "📥 *Envíame el enlace del mensaje*\n\n"
+                    "Ejemplo: `https://t.me/canal/123`\n\n"
+                    "💡 Copia el enlace del mensaje en Telegram y pégalo aquí."
+                )
+            elif lang == 'en':
+                message = (
+                    "📥 *Send me the message link*\n\n"
+                    "Example: `https://t.me/channel/123`\n\n"
+                    "💡 Copy the message link from Telegram and paste it here."
+                )
+            elif lang == 'pt':
+                message = (
+                    "📥 *Envie-me o link da mensagem*\n\n"
+                    "Exemplo: `https://t.me/canal/123`\n\n"
+                    "💡 Copie o link da mensagem no Telegram e cole aqui."
+                )
+            else:  # Italian
+                message = (
+                    "📥 *Inviami il link del messaggio*\n\n"
+                    "Esempio: `https://t.me/canale/123`\n\n"
+                    "💡 Copia il link del messaggio da Telegram e incollalo qui."
+                )
+            
+            keyboard = [[InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+        except Exception as e:
+            logger.error(f"Error handling start_download callback: {e}")
+            # Fallback: send a new message if edit fails
+            try:
+                await query.message.reply_text("📥 Envía el enlace del mensaje que quieres descargar", parse_mode='Markdown')
+            except Exception as e2:
+                logger.error(f"Error sending fallback message: {e2}")
         return
     
     if query.data == "view_plans":
