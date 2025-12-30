@@ -4138,8 +4138,8 @@ async def post_shutdown(application: Application):
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle errors caused by Updates."""
-    from telegram.error import BadRequest, TimedOut, NetworkError
+    """Handle errors caused by Updates - maneja errores comunes silenciosamente."""
+    from telegram.error import BadRequest, TimedOut, NetworkError, Forbidden
     
     error = context.error
     
@@ -4152,11 +4152,22 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             logger.debug(f"Mensaje no modificado (contenido idéntico): {error}")
             return
     
-    # Log otros errores
+    # Ignorar errores cuando el usuario bloqueó el bot (muy común)
+    if isinstance(error, Forbidden):
+        if "bot was blocked by the user" in str(error):
+            logger.debug(f"Usuario bloqueó el bot (normal): {error}")
+            return
+        if "user is deactivated" in str(error):
+            logger.debug(f"Usuario desactivado: {error}")
+            return
+    
+    # Errores de red - solo warning (son recuperables)
     if isinstance(error, (TimedOut, NetworkError)):
         logger.warning(f"Error de red (recuperable): {error}")
-    else:
-        logger.error(f"Error no manejado: {error}", exc_info=context.error)
+        return
+    
+    # Log otros errores no manejados
+    logger.error(f"Error no manejado: {error}", exc_info=context.error)
 
 
 def main():
@@ -4272,6 +4283,9 @@ async def async_main():
     application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
     application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    # Registrar el manejador de errores global
+    application.add_error_handler(error_handler)
 
     logger.info("Bot started. Waiting for messages...")
     
