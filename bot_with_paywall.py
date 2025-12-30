@@ -1141,13 +1141,7 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
                                         chat_id=chat_id,
                                         video=f,
                                         caption=caption if caption else None,
-                                        supports_streaming=True,
-                                        timeout=900,  # 15 minutos
-                                        read_timeout=900,
-                                        write_timeout=900,
-                                        connect_timeout=120,  # 2 minutos para conectar
-                                        pool_timeout=120,
-                                        max_retries=5  # Más reintentos
+                                        supports_streaming=True
                                     )
                                 elif file_size > 100 * 1024 * 1024:  # >100MB
                                     logger.info("Enviando video grande con configuración optimizada")
@@ -1155,36 +1149,20 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
                                         chat_id=chat_id,
                                         video=f,
                                         caption=caption if caption else None,
-                                        supports_streaming=True,
-                                        timeout=600,  # 10 minutos
-                                        read_timeout=600,
-                                        write_timeout=600,
-                                        connect_timeout=90,  # 1.5 minutos
-                                        pool_timeout=90,
-                                        max_retries=3
+                                        supports_streaming=True
                                     )
                                 else:
                                     await bot.send_video(
                                         chat_id=chat_id,
                                         video=f,
                                         caption=caption if caption else None,
-                                        supports_streaming=True,
-                                        timeout=300,  # 5 minutos
-                                        read_timeout=300,
-                                        write_timeout=300,
-                                        connect_timeout=60,
-                                        pool_timeout=60
+                                        supports_streaming=True
                                     )
                             elif content_type == 'music':
                                 await bot.send_audio(
                                     chat_id=chat_id,
                                     audio=f,
-                                    caption=caption if caption else None,
-                                    timeout=180,  # 3 minutos para audio
-                                    read_timeout=180,
-                                    write_timeout=180,
-                                    connect_timeout=60,
-                                    pool_timeout=60
+                                    caption=caption if caption else None
                                 )
                             else:
                                 # Para documentos/APK, configuración optimizada
@@ -1192,24 +1170,13 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
                                     await bot.send_document(
                                         chat_id=chat_id,
                                         document=f,
-                                        caption=caption if caption else None,
-                                        timeout=600,  # 10 minutos
-                                        read_timeout=600,
-                                        write_timeout=600,
-                                        connect_timeout=90,
-                                        pool_timeout=90,
-                                        max_retries=3
+                                        caption=caption if caption else None
                                     )
                                 else:
                                     await bot.send_document(
                                         chat_id=chat_id,
                                         document=f,
-                                        caption=caption if caption else None,
-                                        timeout=300,  # 5 minutos
-                                        read_timeout=300,
-                                        write_timeout=300,
-                                        connect_timeout=60,
-                                        pool_timeout=60
+                                        caption=caption if caption else None
                                     )
                         except Exception as send_error:
                             logger.error(f"Error enviando con PTB: {send_error}")
