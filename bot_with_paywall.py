@@ -975,6 +975,7 @@ def get_file_size(message) -> int:
 
 async def download_and_send_media(message, chat_id: int, bot, caption=None):
     """Download media from protected channel and send to user with optimized performance"""
+    logger.info(f"Iniciando download_and_send_media para chat_id {chat_id}")
     path = None
     try:
         if caption is None:
@@ -1112,7 +1113,25 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
             
             if not sent:
                 # Fallback a PTB (python-telegram-bot) con configuraciones ultra-optimizadas
-                with open(path, 'rb') as f:
+                # Para videos, intentar primero con bot_client si está disponible
+                if content_type == 'video' and bot_client:
+                    try:
+                        logger.info("Intentando enviar video con Telethon bot_client primero")
+                        await bot_client.send_file(
+                            chat_id,
+                            path,
+                            caption=caption if caption else None,
+                            supports_streaming=True,
+                            timeout=600  # 10 minutos
+                        )
+                        sent = True
+                        logger.info("Video enviado exitosamente con Telethon")
+                    except Exception as telethon_error:
+                        logger.error(f"Error enviando video con Telethon: {telethon_error}")
+                        # Fallback a PTB
+                
+                if not sent:
+                    with open(path, 'rb') as f:
                     try:
                         if content_type == 'video':
                             # OPTIMIZACIÓN EXTREMA: Configuración específica para videos grandes
@@ -1228,6 +1247,7 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
         await bot.send_message(chat_id=chat_id, text=f"❌ Error: {str(e)}")
         return False
     
+    logger.info(f"download_and_send_media completado exitosamente para chat_id {chat_id}")
     return True
 
 
@@ -2295,7 +2315,9 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
         final_caption = f"{caption_prefix}{original_caption}"
         
         # Usar la función optimizada para descargar y enviar
+        logger.info(f"Iniciando envío de {content_type} para usuario {user_id}")
         success = await download_and_send_media(message, user_id, context.bot, caption=final_caption)
+        logger.info(f"Resultado del envío: {success} para usuario {user_id}")
         
         if success:
             # Incrementar contadores
