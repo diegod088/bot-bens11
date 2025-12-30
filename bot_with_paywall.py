@@ -1132,103 +1132,103 @@ async def download_and_send_media(message, chat_id: int, bot, caption=None):
                 
                 if not sent:
                     with open(path, 'rb') as f:
-                    try:
-                        if content_type == 'video':
-                            # OPTIMIZACIÓN EXTREMA: Configuración específica para videos grandes
-                            if file_size > 500 * 1024 * 1024:  # >500MB
-                                logger.info("Enviando video ultra-grande con configuración máxima")
-                                await bot.send_video(
+                        try:
+                            if content_type == 'video':
+                                # Configuración específica para videos grandes
+                                if file_size > 500 * 1024 * 1024:  # >500MB
+                                    logger.info("Enviando video ultra-grande con configuración máxima")
+                                    await bot.send_video(
+                                        chat_id=chat_id,
+                                        video=f,
+                                        caption=caption if caption else None,
+                                        supports_streaming=True,
+                                        timeout=900,  # 15 minutos
+                                        read_timeout=900,
+                                        write_timeout=900,
+                                        connect_timeout=120,  # 2 minutos para conectar
+                                        pool_timeout=120,
+                                        max_retries=5  # Más reintentos
+                                    )
+                                elif file_size > 100 * 1024 * 1024:  # >100MB
+                                    logger.info("Enviando video grande con configuración optimizada")
+                                    await bot.send_video(
+                                        chat_id=chat_id,
+                                        video=f,
+                                        caption=caption if caption else None,
+                                        supports_streaming=True,
+                                        timeout=600,  # 10 minutos
+                                        read_timeout=600,
+                                        write_timeout=600,
+                                        connect_timeout=90,  # 1.5 minutos
+                                        pool_timeout=90,
+                                        max_retries=3
+                                    )
+                                else:
+                                    await bot.send_video(
+                                        chat_id=chat_id,
+                                        video=f,
+                                        caption=caption if caption else None,
+                                        supports_streaming=True,
+                                        timeout=300,  # 5 minutos
+                                        read_timeout=300,
+                                        write_timeout=300,
+                                        connect_timeout=60,
+                                        pool_timeout=60
+                                    )
+                            elif content_type == 'music':
+                                await bot.send_audio(
                                     chat_id=chat_id,
-                                    video=f,
+                                    audio=f,
                                     caption=caption if caption else None,
-                                    supports_streaming=True,
-                                    timeout=900,  # 15 minutos
-                                    read_timeout=900,
-                                    write_timeout=900,
-                                    connect_timeout=120,  # 2 minutos para conectar
-                                    pool_timeout=120,
-                                    max_retries=5  # Más reintentos
-                                )
-                            elif file_size > 100 * 1024 * 1024:  # >100MB
-                                logger.info("Enviando video grande con configuración optimizada")
-                                await bot.send_video(
-                                    chat_id=chat_id,
-                                    video=f,
-                                    caption=caption if caption else None,
-                                    supports_streaming=True,
-                                    timeout=600,  # 10 minutos
-                                    read_timeout=600,
-                                    write_timeout=600,
-                                    connect_timeout=90,  # 1.5 minutos
-                                    pool_timeout=90,
-                                    max_retries=3
-                                )
-                            else:
-                                await bot.send_video(
-                                    chat_id=chat_id,
-                                    video=f,
-                                    caption=caption if caption else None,
-                                    supports_streaming=True,
-                                    timeout=300,  # 5 minutos
-                                    read_timeout=300,
-                                    write_timeout=300,
+                                    timeout=180,  # 3 minutos para audio
+                                    read_timeout=180,
+                                    write_timeout=180,
                                     connect_timeout=60,
                                     pool_timeout=60
                                 )
-                        elif content_type == 'music':
-                            await bot.send_audio(
-                                chat_id=chat_id,
-                                audio=f,
-                                caption=caption if caption else None,
-                                timeout=180,  # 3 minutos para audio
-                                read_timeout=180,
-                                write_timeout=180,
-                                connect_timeout=60,
-                                pool_timeout=60
-                            )
-                        else:
-                            # Para documentos/APK, configuración optimizada
-                            if file_size > 100 * 1024 * 1024:  # >100MB
-                                await bot.send_document(
-                                    chat_id=chat_id,
-                                    document=f,
-                                    caption=caption if caption else None,
-                                    timeout=600,  # 10 minutos
-                                    read_timeout=600,
-                                    write_timeout=600,
-                                    connect_timeout=90,
-                                    pool_timeout=90,
-                                    max_retries=3
-                                )
                             else:
-                                await bot.send_document(
-                                    chat_id=chat_id,
-                                    document=f,
-                                    caption=caption if caption else None,
-                                    timeout=300,  # 5 minutos
-                                    read_timeout=300,
-                                    write_timeout=300,
-                                    connect_timeout=60,
-                                    pool_timeout=60
-                                )
-                    except Exception as send_error:
-                        logger.error(f"Error enviando con PTB: {send_error}")
-                        # Si falla por timeout, intentar con Telethon como último recurso
-                        if bot_client and ("timeout" in str(send_error).lower() or "read" in str(send_error).lower()):
-                            try:
-                                logger.info("Reintentando envío con Telethon después de timeout de PTB")
-                                await bot_client.send_file(
-                                    chat_id,
-                                    path,
-                                    caption=caption if caption else None,
-                                    supports_streaming=(content_type == 'video'),
-                                    timeout=600  # 10 minutos como último recurso
-                                )
-                                sent = True
-                                logger.info("Reintento con Telethon exitoso")
-                            except Exception as telethon_retry_error:
-                                logger.error(f"Telethon retry también falló: {telethon_retry_error}")
-                                raise send_error  # Re-lanzar el error original
+                                # Para documentos/APK, configuración optimizada
+                                if file_size > 100 * 1024 * 1024:  # >100MB
+                                    await bot.send_document(
+                                        chat_id=chat_id,
+                                        document=f,
+                                        caption=caption if caption else None,
+                                        timeout=600,  # 10 minutos
+                                        read_timeout=600,
+                                        write_timeout=600,
+                                        connect_timeout=90,
+                                        pool_timeout=90,
+                                        max_retries=3
+                                    )
+                                else:
+                                    await bot.send_document(
+                                        chat_id=chat_id,
+                                        document=f,
+                                        caption=caption if caption else None,
+                                        timeout=300,  # 5 minutos
+                                        read_timeout=300,
+                                        write_timeout=300,
+                                        connect_timeout=60,
+                                        pool_timeout=60
+                                    )
+                        except Exception as send_error:
+                            logger.error(f"Error enviando con PTB: {send_error}")
+                            # Si falla por timeout, intentar con Telethon como último recurso
+                            if bot_client and ("timeout" in str(send_error).lower() or "read" in str(send_error).lower()):
+                                try:
+                                    logger.info("Reintentando envío con Telethon después de timeout de PTB")
+                                    await bot_client.send_file(
+                                        chat_id,
+                                        path,
+                                        caption=caption if caption else None,
+                                        supports_streaming=(content_type == 'video'),
+                                        timeout=600  # 10 minutos como último recurso
+                                    )
+                                    sent = True
+                                    logger.info("Reintento con Telethon exitoso")
+                                except Exception as telethon_retry_error:
+                                    logger.error(f"Telethon retry también falló: {telethon_retry_error}")
+                                    raise send_error  # Re-lanzar el error original
             
             os.remove(path)
     except (asyncio.TimeoutError, TimeoutError):
