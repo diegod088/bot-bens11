@@ -93,7 +93,7 @@ PHONE, CODE, PASSWORD = range(10, 13)
 # Constants
 FREE_DOWNLOAD_LIMIT = 3  # Free users: 3 videos PERMANENTES (sin reset)
 FREE_PHOTO_LIMIT = 10  # Free users: 10 fotos PERMANENTES (sin reset)
-PREMIUM_PRICE_STARS = 399  # Price in Telegram Stars (⭐)
+PREMIUM_PRICE_STARS = 199  # Price in Telegram Stars (⭐)
 
 # Premium daily limits (unlimited photos, 50 daily for others)
 PREMIUM_VIDEO_DAILY_LIMIT = 50
@@ -2619,6 +2619,73 @@ async def diagnostic_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     await update.message.reply_text("🔍 *Ejecutando diagnóstico...*", parse_mode='Markdown')
 
+
+async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /miniapp command - Open the MiniApp"""
+    user_id = update.effective_user.id
+    user = get_user(user_id)
+    lang = get_user_language(user)
+    
+    # Get the MiniApp URL from environment or use default
+    miniapp_url = os.getenv('MINIAPP_URL', os.getenv('DASHBOARD_URL', ''))
+    
+    if not miniapp_url:
+        if lang == 'es':
+            await update.message.reply_text(
+                "⚠️ *MiniApp no configurada*\n\n"
+                "La MiniApp no está disponible en este momento.\n"
+                "Usa /panel para ver tu información.",
+                parse_mode='Markdown'
+            )
+        else:
+            await update.message.reply_text(
+                "⚠️ *MiniApp not configured*\n\n"
+                "The MiniApp is not available at this time.\n"
+                "Use /panel to view your information.",
+                parse_mode='Markdown'
+            )
+        return
+    
+    # Add /miniapp path to the URL
+    if not miniapp_url.endswith('/'):
+        miniapp_url += '/'
+    miniapp_url += 'miniapp'
+    
+    keyboard = [
+        [InlineKeyboardButton(
+            "📱 Abrir MiniApp" if lang == 'es' else "📱 Open MiniApp", 
+            web_app={"url": miniapp_url}
+        )],
+        [InlineKeyboardButton(
+            "⭐ Premium 199 Stars", 
+            callback_data="pay_premium"
+        )]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    if lang == 'es':
+        message = (
+            "📱 *MiniApp Premium Downloads*\n\n"
+            "Accede a tu panel personal:\n\n"
+            "• 📊 Ver estadísticas de uso\n"
+            "• ⭐ Comprar Premium\n"
+            "• 📜 Historial de descargas\n"
+            "• ⚙️ Configuración\n\n"
+            "Toca el botón para abrir 👇"
+        )
+    else:
+        message = (
+            "📱 *Premium Downloads MiniApp*\n\n"
+            "Access your personal panel:\n\n"
+            "• 📊 View usage statistics\n"
+            "• ⭐ Buy Premium\n"
+            "• 📜 Download history\n"
+            "• ⚙️ Settings\n\n"
+            "Tap the button to open 👇"
+        )
+    
+    await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+
     # Check environment
     is_railway = bool(os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID'))
     env_status = "✅ Railway" if is_railway else "❌ No Railway (localhost?)"
@@ -3262,6 +3329,44 @@ async def handle_message_logic(update, context, client, link, parsed, user_id, u
     except Exception as e:
         logger.error(f"Error in handle_message_logic: {e}")
         await update.message.reply_text("❌ *Error Inesperado*", parse_mode='Markdown')
+
+
+async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle data received from the MiniApp WebApp"""
+    import json
+    
+    user_id = update.effective_user.id
+    data = update.effective_message.web_app_data.data
+    
+    try:
+        webapp_data = json.loads(data)
+        action = webapp_data.get('action')
+        
+        if action == 'buy_premium':
+            # Trigger premium payment
+            logger.info(f"User {user_id} initiated premium purchase from MiniApp")
+            
+            chat_id = update.effective_chat.id
+            title = "💎 Premium - 30 días"
+            description = "Desbloquea videos ilimitados, música y más por 30 días"
+            payload = f"miniapp_premium_{user_id}"
+            currency = "XTR"
+            prices = [LabeledPrice("Premium 30 días", PREMIUM_PRICE_STARS)]
+            
+            await context.bot.send_invoice(
+                chat_id=chat_id,
+                title=title,
+                description=description,
+                payload=payload,
+                provider_token="",
+                currency=currency,
+                prices=prices
+            )
+            
+    except json.JSONDecodeError:
+        logger.error(f"Invalid JSON from MiniApp: {data}")
+    except Exception as e:
+        logger.error(f"Error handling MiniApp data: {e}")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4113,7 +4218,8 @@ async def post_init(application: Application):
     from telegram import BotCommand
     commands = [
         BotCommand("start", "🏠 Inicio"),
-        BotCommand("premium", "💎 Premium")
+        BotCommand("premium", "💎 Premium"),
+        BotCommand("miniapp", "📱 Abrir MiniApp")
     ]
     await application.bot.set_my_commands(commands)
     # Limpiar comandos anteriores si existen
@@ -4211,12 +4317,14 @@ def main():
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("panel", panel_command))
     application.add_handler(CommandHandler("premium", premium_command))
+    application.add_handler(CommandHandler("miniapp", miniapp_command))
     application.add_handler(CommandHandler("testpay", testpay_command))
     application.add_handler(CommandHandler("adminstats", adminstats_command))
     application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
     application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
+    application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Add diagnostic command for Railway troubleshooting
@@ -4276,12 +4384,14 @@ async def async_main():
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("panel", panel_command))
     application.add_handler(CommandHandler("premium", premium_command))
+    application.add_handler(CommandHandler("miniapp", miniapp_command))
     application.add_handler(CommandHandler("testpay", testpay_command))
     application.add_handler(CommandHandler("adminstats", adminstats_command))
     application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
     application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
+    application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Registrar el manejador de errores global

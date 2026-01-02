@@ -1056,6 +1056,117 @@ def filter_users():
         return jsonify({'error': str(e)}), 500
 
 
+# ============================================================
+# MiniApp API Endpoints
+# ============================================================
+
+@app.route('/miniapp')
+def miniapp():
+    """Serve the Telegram MiniApp"""
+    return send_file('miniapp/index.html')
+
+
+@app.route('/api/miniapp/user', methods=['POST'])
+def miniapp_get_user():
+    """API endpoint for MiniApp to get user data"""
+    try:
+        data = request.get_json() or {}
+        user_info = data.get('user', {})
+        user_id = user_info.get('id')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT user_id, first_name, username, downloads, premium, premium_until,
+                   daily_photo, daily_video, daily_music, daily_apk, created_at
+            FROM users WHERE user_id = ?
+        """, (user_id,))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        if not row:
+            # Return default data for new users
+            return jsonify({
+                'user_id': user_id,
+                'first_name': user_info.get('first_name', 'Usuario'),
+                'username': user_info.get('username', ''),
+                'premium': False,
+                'premium_until': None,
+                'downloads': 0,
+                'daily_video': 0,
+                'daily_photo': 0,
+                'daily_music': 0,
+                'daily_apk': 0,
+                'limits': {
+                    'video': {'used': 0, 'max': 3},
+                    'photo': {'used': 0, 'max': 10},
+                    'music': {'used': 0, 'max': 0},
+                    'apk': {'used': 0, 'max': 0}
+                }
+            })
+        
+        user = dict(row)
+        is_premium = bool(user['premium'])
+        
+        # Calculate limits based on premium status
+        limits = {
+            'video': {
+                'used': user['daily_video'] or 0,
+                'max': 50 if is_premium else 3
+            },
+            'photo': {
+                'used': user['daily_photo'] or 0,
+                'max': 999 if is_premium else 10
+            },
+            'music': {
+                'used': user['daily_music'] or 0,
+                'max': 50 if is_premium else 0
+            },
+            'apk': {
+                'used': user['daily_apk'] or 0,
+                'max': 50 if is_premium else 0
+            }
+        }
+        
+        return jsonify({
+            'user_id': user['user_id'],
+            'first_name': user['first_name'] or user_info.get('first_name', 'Usuario'),
+            'username': user['username'] or user_info.get('username', ''),
+            'premium': is_premium,
+            'premium_until': user['premium_until'],
+            'downloads': user['downloads'] or 0,
+            'daily_video': user['daily_video'] or 0,
+            'daily_photo': user['daily_photo'] or 0,
+            'daily_music': user['daily_music'] or 0,
+            'daily_apk': user['daily_apk'] or 0,
+            'limits': limits
+        })
+        
+    except Exception as e:
+        logger.error(f"MiniApp user API error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/miniapp/stats')
+def miniapp_stats():
+    """Get global stats for miniapp (public endpoint)"""
+    try:
+        stats = get_user_stats()
+        return jsonify({
+            'total_users': stats['total_users'],
+            'premium_users': stats['premium_users'],
+            'total_downloads': stats['total_downloads']
+        })
+    except Exception as e:
+        logger.error(f"MiniApp stats error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     # Get port from environment (Railway provides PORT)
     port = int(os.environ.get('PORT', 5000))

@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Premium Downloads</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Colores oficiales de Telegram */
+            --tg-theme-bg: var(--tg-theme-bg-color, #17212B);
+            --tg-theme-secondary: var(--tg-theme-secondary-bg-color, #232E3C);
+            --tg-theme-text: var(--tg-theme-text-color, #FFFFFF);
+            --tg-theme-hint: var(--tg-theme-hint-color, #708499);
+            --tg-theme-link: var(--tg-theme-link-color, #6AB2F2);
+            --tg-theme-button: var(--tg-theme-button-color, #2AABEE);
+            --tg-theme-button-text: var(--tg-theme-button-text-color, #FFFFFF);
+            
+            --bg-deep: #17212B;
+            --bg-primary: #232E3C;
+            --bg-card: #2B3945;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8B9AA5;
+            --text-muted: #708499;
+            --accent-blue: #2AABEE;
+            --accent-video: #5EBAEC;
+            --accent-photo: #6DC26D;
+            --accent-music: #E5A958;
+            --accent-apk: #E57EB5;
+            --accent-green: #6DC26D;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 100%;
+            padding: 16px;
+            padding-bottom: 100px;
+        }
+
+        /* App Header */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0 16px;
+            margin-bottom: 8px;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), #1E96D1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .app-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .app-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .header-badge {
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: rgba(42, 171, 238, 0.1);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        /* Staggered Animations */
+        .animate-in {
+            animation: slideUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.1s; }
+        .delay-3 { animation-delay: 0.15s; }
+        .delay-4 { animation-delay: 0.2s; }
+        .delay-5 { animation-delay: 0.25s; }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Achievements Section */
+        .achievements-wrap {
+            margin-bottom: 16px;
+        }
+
+        .achievements-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .achievements-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .achievement {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            min-width: 80px;
+            transition: transform 0.2s ease;
+        }
+
+        .achievement:active {
+            transform: scale(0.95);
+        }
+
+        .achievement-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .achievement-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .achievement.locked {
+            opacity: 0.5;
+        }
+
+        .achievement.locked .achievement-icon {
+            filter: grayscale(1);
+        }
+
+        /* Cards estilo Telegram */
+        .card {
+            background: var(--bg-primary);
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .card-inner {
+            padding: 16px;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            margin-bottom: 16px;
+        }
+
+        .profile-card-inner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .avatar-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-inner {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .avatar-inner.premium {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .profile-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-free {
+            background: rgba(42, 171, 238, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .status-premium {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        /* Navigation */
+        .nav-container {
+            display: flex;
+            gap: 6px;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            background: var(--bg-primary);
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px 6px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .nav-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .nav-btn:not(.active):active {
+            background: rgba(42, 171, 238, 0.1);
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .stat-box {
+            background: var(--bg-primary);
+            border-radius: 12px;
+        }
+
+        .stat-content {
+            padding: 14px;
+            height: 100%;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .stat-video .stat-icon { background: rgba(94, 186, 236, 0.15); }
+        .stat-photo .stat-icon { background: rgba(109, 194, 109, 0.15); }
+        .stat-music .stat-icon { background: rgba(229, 169, 88, 0.15); }
+        .stat-apk .stat-icon { background: rgba(229, 126, 181, 0.15); }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .stat-video .stat-value { color: var(--accent-video); }
+        .stat-photo .stat-value { color: var(--accent-photo); }
+        .stat-music .stat-value { color: var(--accent-music); }
+        .stat-apk .stat-value { color: var(--accent-apk); }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Section Header */
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 0 2px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+        }
+
+        .section-chip {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(42, 171, 238, 0.15);
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Usage List */
+        .usage-box {
+            margin-bottom: 16px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+        }
+
+        .usage-content {
+            padding: 14px;
+        }
+
+        .usage-item {
+            margin-bottom: 14px;
+        }
+
+        .usage-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .usage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .usage-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .usage-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: var(--bg-card);
+        }
+
+        .usage-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .usage-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .progress-track {
+            height: 4px;
+            background: var(--bg-card);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-video { background: var(--accent-video); }
+        .progress-photo { background: var(--accent-photo); }
+        .progress-music { background: var(--accent-music); }
+        .progress-apk { background: var(--accent-apk); }
+
+        /* Premium Section */
+        .premium-wrapper {
+            background: var(--bg-primary);
+            border-radius: 14px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .premium-body {
+            padding: 20px;
+        }
+
+        .premium-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .premium-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: var(--accent-blue);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .premium-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .premium-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .feature-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .feature-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(109, 194, 109, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-green);
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .price-num {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .price-star {
+            font-size: 20px;
+        }
+
+        .price-time {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--accent-blue);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .buy-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* Premium Active */
+        .premium-active-wrap {
+            background: var(--bg-primary);
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+
+        .premium-active-body {
+            padding: 24px 16px;
+            text-align: center;
+        }
+
+        .days-num {
+            font-size: 52px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+            color: var(--accent-blue);
+        }
+
+        .days-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Loading */
+        .loader-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 85vh;
+            gap: 20px;
+        }
+
+        .loader-ring {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--bg-card);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Hint */
+        .hint-section {
+            text-align: center;
+            padding: 30px 16px;
+        }
+
+        .hint-emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .hint-msg {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .app-footer {
+            margin-top: 24px;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid var(--bg-card);
+        }
+
+        .footer-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .footer-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Quick Stats Banner */
+        .quick-stats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .quick-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .quick-stat-icon {
+            font-size: 16px;
+        }
+
+        .quick-stat-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .quick-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Pulse animation for premium badge */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 340px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .features-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Loading -->
+    <div id="loading" class="loader-screen">
+        <div class="loader-ring"></div>
+        <p class="loader-text">Cargando...</p>
+    </div>
+
+    <!-- App -->
+    <div id="app" class="container" style="display: none;">
+        
+        <!-- App Header -->
+        <div class="app-header animate-in">
+            <div class="app-brand">
+                <div class="app-logo">📥</div>
+                <div>
+                    <div class="app-title">Download Bot</div>
+                    <div class="app-subtitle">Tu asistente de descargas</div>
+                </div>
+            </div>
+            <div class="header-badge" id="memberSince">Nuevo</div>
+        </div>
+
+        <!-- Profile -->
+        <div class="profile-header animate-in delay-1">
+            <div class="card">
+                <div class="card-inner profile-card-inner">
+                    <div class="avatar-wrap">
+                        <div class="avatar-inner" id="avatar">
+                            <span id="avatarLetter">U</span>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <h1 class="profile-name" id="userName">Usuario</h1>
+                        <span class="status-badge status-free" id="statusBadge">
+                            🆓 FREE
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats animate-in delay-2">
+            <div class="quick-stat">
+                <span class="quick-stat-icon">📦</span>
+                <span class="quick-stat-value" id="totalDownloads">0</span>
+                <span class="quick-stat-label">total</span>
+            </div>
+            <div class="quick-stat">
+                <span class="quick-stat-icon">🔥</span>
+                <span class="quick-stat-value" id="streakDays">0</span>
+                <span class="quick-stat-label">días activo</span>
+            </div>
+            <div class="quick-stat">
+                <span class="quick-stat-icon">⭐</span>
+                <span class="quick-stat-value" id="userRank">-</span>
+                <span class="quick-stat-label">rango</span>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="achievements-wrap animate-in delay-3">
+            <div class="achievements-scroll" id="achievementsList">
+                <div class="achievement" title="Primera descarga">
+                    <span class="achievement-icon">🎯</span>
+                    <span class="achievement-label">Iniciado</span>
+                </div>
+                <div class="achievement locked" title="10 descargas">
+                    <span class="achievement-icon">🌟</span>
+                    <span class="achievement-label">10 desc.</span>
+                </div>
+                <div class="achievement locked" title="50 descargas">
+                    <span class="achievement-icon">💫</span>
+                    <span class="achievement-label">50 desc.</span>
+                </div>
+                <div class="achievement locked" title="100 descargas">
+                    <span class="achievement-icon">🏆</span>
+                    <span class="achievement-label">Pro</span>
+                </div>
+                <div class="achievement locked" title="Usuario Premium">
+                    <span class="achievement-icon">👑</span>
+                    <span class="achievement-label">Premium</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nav -->
+        <div class="nav-container animate-in delay-4">
+            <button class="nav-btn active" data-tab="stats">
+                <span>📊</span> Stats
+            </button>
+            <button class="nav-btn" data-tab="premium">
+                <span>⭐</span> Premium
+            </button>
+            <button class="nav-btn" data-tab="limits">
+                <span>📈</span> Límites
+            </button>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="stats-tab" class="tab-panel active">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-content stat-video">
+                        <div class="stat-icon">🎬</div>
+                        <div class="stat-value" id="totalVideos">0</div>
+                        <div class="stat-label">Videos</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content stat-photo">
+                        <div class="stat-icon">📸</div>
+                        <div class="stat-value" id="totalPhotos">0</div>
+                        <div class="stat-label">Fotos</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content stat-music">
+                        <div class="stat-icon">🎵</div>
+                        <div class="stat-value" id="totalMusic">0</div>
+                        <div class="stat-label">Música</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-content stat-apk">
+                        <div class="stat-icon">📱</div>
+                        <div class="stat-value" id="totalApk">0</div>
+                        <div class="stat-label">APKs</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-head">
+                <h2 class="section-title">
+                    <span>📅</span> Uso de hoy
+                </h2>
+            </div>
+
+            <div class="usage-box">
+                <div class="usage-content">
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">🎬</div>
+                                <span class="usage-name">Videos</span>
+                            </div>
+                            <span class="usage-count" id="videoUsage">0 / 3</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-video" id="videoProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">📸</div>
+                                <span class="usage-name">Fotos</span>
+                            </div>
+                            <span class="usage-count" id="photoUsage">0 / 10</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-photo" id="photoProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">🎵</div>
+                                <span class="usage-name">Música</span>
+                            </div>
+                            <span class="usage-count" id="musicUsage">🔒</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-music" id="musicProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">📱</div>
+                                <span class="usage-name">APKs</span>
+                            </div>
+                            <span class="usage-count" id="apkUsage">🔒</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-apk" id="apkProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Premium Tab -->
+        <div id="premium-tab" class="tab-panel">
+            <!-- Premium Active -->
+            <div id="premiumActive" class="premium-active-wrap" style="display: none;">
+                <div class="premium-active-body">
+                    <div class="days-num" id="daysLeft">0</div>
+                    <div class="days-text">días de Premium restantes</div>
+                </div>
+            </div>
+
+            <!-- Premium Offer -->
+            <div class="premium-wrapper" id="premiumOffer">
+                <div class="premium-body">
+                    <div class="premium-content">
+                        <div class="premium-tag">
+                            <span>⭐</span> PREMIUM
+                        </div>
+                        
+                        <h2 class="premium-title">Desbloquea todo el potencial</h2>
+                        <p class="premium-desc">Descarga sin límites durante 30 días con acceso completo.</p>
+
+                        <div class="features-list">
+                            <div class="feature-row">
+                                <div class="feature-check">✓</div>
+                                <span>50 videos/día</span>
+                            </div>
+                            <div class="feature-row">
+                                <div class="feature-check">✓</div>
+                                <span>Fotos ilimitadas</span>
+                            </div>
+                            <div class="feature-row">
+                                <div class="feature-check">✓</div>
+                                <span>50 canciones/día</span>
+                            </div>
+                            <div class="feature-row">
+                                <div class="feature-check">✓</div>
+                                <span>50 APKs/día</span>
+                            </div>
+                            <div class="feature-row">
+                                <div class="feature-check">✓</div>
+                                <span>Sin anuncios</span>
+                            </div>
+                            <div class="feature-row">
+                                <div class="feature-check">✓</div>
+                                <span>Soporte VIP</span>
+                            </div>
+                        </div>
+
+                        <div class="price-row">
+                            <span class="price-num">199</span>
+                            <span class="price-star">⭐</span>
+                            <span class="price-time">/ 30 días</span>
+                        </div>
+
+                        <button class="buy-btn" id="buyButton" onclick="buyPremium()">
+                            <span>⭐</span> Obtener Premium
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Limits Tab -->
+        <div id="limits-tab" class="tab-panel">
+            <div class="section-head">
+                <h2 class="section-title">
+                    <span>📊</span> Tus límites
+                </h2>
+                <span class="section-chip" id="planBadge">FREE</span>
+            </div>
+
+            <div class="usage-box">
+                <div class="usage-content">
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">🎬</div>
+                                <span class="usage-name">Videos</span>
+                            </div>
+                            <span class="usage-count" id="videoLimit2">0 / 3</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-video" id="videoProgress2" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">📸</div>
+                                <span class="usage-name">Fotos</span>
+                            </div>
+                            <span class="usage-count" id="photoLimit2">0 / 10</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-photo" id="photoProgress2" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">🎵</div>
+                                <span class="usage-name">Música</span>
+                            </div>
+                            <span class="usage-count" id="musicLimit2">🔒</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-music" id="musicProgress2" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-item">
+                        <div class="usage-header">
+                            <div class="usage-left">
+                                <div class="usage-icon">📱</div>
+                                <span class="usage-name">APKs</span>
+                            </div>
+                            <span class="usage-count" id="apkLimit2">🔒</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar progress-apk" id="apkProgress2" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hint-section" id="upgradeHint">
+                <div class="hint-emoji">🚀</div>
+                <p class="hint-msg">¡Obtén Premium para desbloquear música y APKs!</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="app-footer animate-in delay-5">
+            <div class="footer-icon">📥</div>
+            <p class="footer-text">
+                Hecho con ❤️ para la comunidad<br>
+                <a href="#" class="footer-link" onclick="tg.openTelegramLink('https://t.me/tu_canal')">@tu_canal</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        if (tg.setHeaderColor) tg.setHeaderColor('#17212B');
+        if (tg.setBackgroundColor) tg.setBackgroundColor('#17212B');
+
+        const API_BASE = window.location.origin;
+        const PREMIUM_PRICE = 199;
+        let userData = null;
+
+        // Tab switching
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
+                
+                if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            });
+        });
+
+        async function loadUserData() {
+            try {
+                const initData = tg.initData || '';
+                const response = await fetch(`${API_BASE}/api/miniapp/user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        initData: initData,
+                        user: tg.initDataUnsafe?.user || {}
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed');
+                userData = await response.json();
+            } catch (e) {
+                userData = {
+                    user_id: tg.initDataUnsafe?.user?.id || 12345,
+                    first_name: tg.initDataUnsafe?.user?.first_name || 'Usuario',
+                    premium: false,
+                    premium_until: null,
+                    daily_video: 2,
+                    daily_photo: 5,
+                    daily_music: 0,
+                    daily_apk: 0,
+                    limits: {
+                        video: { used: 2, max: 3 },
+                        photo: { used: 5, max: 10 },
+                        music: { used: 0, max: 0 },
+                        apk: { used: 0, max: 0 }
+                    }
+                };
+            }
+            setTimeout(updateUI, 600);
+        }
+
+        function updateUI() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+
+            const firstName = userData.first_name || 'Usuario';
+            document.getElementById('userName').textContent = firstName;
+            document.getElementById('avatarLetter').textContent = firstName.charAt(0).toUpperCase();
+
+            const avatar = document.getElementById('avatar');
+            const statusBadge = document.getElementById('statusBadge');
+            const planBadge = document.getElementById('planBadge');
+            const upgradeHint = document.getElementById('upgradeHint');
+
+            if (userData.premium) {
+                avatar.classList.add('premium');
+                statusBadge.className = 'status-badge status-premium';
+                statusBadge.innerHTML = '<span>👑</span> PREMIUM';
+                planBadge.textContent = 'PREMIUM';
+                planBadge.style.background = 'var(--gradient-main)';
+                planBadge.style.color = 'white';
+                upgradeHint.style.display = 'none';
+            }
+
+            document.getElementById('totalVideos').textContent = userData.daily_video || 0;
+            document.getElementById('totalPhotos').textContent = userData.daily_photo || 0;
+            document.getElementById('totalMusic').textContent = userData.daily_music || 0;
+            document.getElementById('totalApk').textContent = userData.daily_apk || 0;
+
+            const limits = userData.limits || {
+                video: { used: userData.daily_video || 0, max: userData.premium ? 50 : 3 },
+                photo: { used: userData.daily_photo || 0, max: userData.premium ? 999 : 10 },
+                music: { used: userData.daily_music || 0, max: userData.premium ? 50 : 0 },
+                apk: { used: userData.daily_apk || 0, max: userData.premium ? 50 : 0 }
+            };
+
+            updateLimit('video', limits.video);
+            updateLimit('photo', limits.photo);
+            updateLimit('music', limits.music);
+            updateLimit('apk', limits.apk);
+
+            // Calculate total downloads and update quick stats
+            const totalDownloads = (userData.daily_video || 0) + (userData.daily_photo || 0) + 
+                                   (userData.daily_music || 0) + (userData.daily_apk || 0);
+            document.getElementById('totalDownloads').textContent = totalDownloads;
+            
+            // Calculate user rank based on downloads
+            let rank = 'Nuevo';
+            if (totalDownloads >= 100) rank = 'Pro';
+            else if (totalDownloads >= 50) rank = 'Experto';
+            else if (totalDownloads >= 10) rank = 'Regular';
+            else if (totalDownloads >= 1) rank = 'Novato';
+            document.getElementById('userRank').textContent = rank;
+            
+            // Update achievements
+            updateAchievements(totalDownloads, userData.premium);
+
+            // Member since badge
+            if (userData.created_at) {
+                const days = Math.floor((new Date() - new Date(userData.created_at)) / (1000 * 60 * 60 * 24));
+                document.getElementById('memberSince').textContent = days > 0 ? `${days}d` : 'Nuevo';
+            }
+
+            if (userData.premium && userData.premium_until) {
+                const daysLeft = Math.ceil((new Date(userData.premium_until) - new Date()) / (1000 * 60 * 60 * 24));
+                if (daysLeft > 0) {
+                    document.getElementById('premiumActive').style.display = 'block';
+                    document.getElementById('daysLeft').textContent = daysLeft;
+                    document.getElementById('buyButton').innerHTML = '<span>⭐</span> Extender Premium';
+                }
+            }
+
+            if (tg.MainButton) {
+                tg.MainButton.setText('⭐ Premium - 199 Stars');
+                tg.MainButton.color = '#2AABEE';
+                tg.MainButton.textColor = '#ffffff';
+                tg.MainButton.show();
+                tg.MainButton.onClick(buyPremium);
+            }
+        }
+
+        function updateAchievements(totalDownloads, isPremium) {
+            const achievements = document.querySelectorAll('.achievement');
+            
+            // Iniciado - Primera descarga
+            if (totalDownloads >= 1) achievements[0].classList.remove('locked');
+            
+            // 10 descargas
+            if (totalDownloads >= 10) achievements[1].classList.remove('locked');
+            
+            // 50 descargas
+            if (totalDownloads >= 50) achievements[2].classList.remove('locked');
+            
+            // 100 descargas - Pro
+            if (totalDownloads >= 100) achievements[3].classList.remove('locked');
+            
+            // Premium
+            if (isPremium) achievements[4].classList.remove('locked');
+        }
+
+        function updateLimit(type, data) {
+            const maxDisplay = data.max === 999 ? '∞' : (data.max === 0 ? '🔒' : data.max);
+            const usageText = data.max === 0 ? '🔒' : `${data.used} / ${maxDisplay}`;
+            
+            document.getElementById(`${type}Usage`).textContent = usageText;
+            document.getElementById(`${type}Limit2`).textContent = usageText;
+            
+            const pct = data.max === 0 || data.max === 999 ? 0 : Math.min((data.used / data.max) * 100, 100);
+            document.getElementById(`${type}Progress`).style.width = `${pct}%`;
+            document.getElementById(`${type}Progress2`).style.width = `${pct}%`;
+        }
+
+        function buyPremium() {
+            if (tg.sendData) {
+                tg.sendData(JSON.stringify({ action: 'buy_premium', price: PREMIUM_PRICE }));
+            }
+            if (tg.showAlert) {
+                tg.showAlert('¡Redirigiendo al pago! 💎');
+            }
+            setTimeout(() => { if (tg.close) tg.close(); }, 1000);
+        }
+
+        loadUserData();
+    </script>
+</body>
+</html>
