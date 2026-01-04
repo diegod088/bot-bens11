@@ -3362,6 +3362,39 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 currency=currency,
                 prices=prices
             )
+        
+        elif action == 'download':
+            # Handle download request from MiniApp
+            link = webapp_data.get('link', '')
+            if link and 't.me/' in link:
+                logger.info(f"User {user_id} requested download from MiniApp: {link}")
+                await update.message.reply_text(f"📥 Procesando descarga...\n\n🔗 {link}")
+                # Create a fake message update to process the link
+                update.message.text = link
+                await handle_message(update, context)
+            else:
+                await update.message.reply_text("❌ Enlace no válido")
+        
+        elif action == 'configure':
+            # Send user to configure account
+            logger.info(f"User {user_id} requested account config from MiniApp")
+            await update.message.reply_text(
+                "⚙️ *Configuración de cuenta*\n\n"
+                "Usa /configurar para vincular tu cuenta de Telegram y poder descargar contenido de canales privados.",
+                parse_mode='Markdown'
+            )
+        
+        elif action == 'disconnect':
+            # Disconnect user session
+            logger.info(f"User {user_id} requested disconnect from MiniApp")
+            # Remove session file if exists
+            session_file = f"sessions/session_{user_id}"
+            if os.path.exists(f"{session_file}.session"):
+                os.remove(f"{session_file}.session")
+                db.update_session_status(user_id, False)
+                await update.message.reply_text("✅ Tu cuenta ha sido desconectada correctamente.")
+            else:
+                await update.message.reply_text("ℹ️ No tienes ninguna cuenta conectada.")
             
     except json.JSONDecodeError:
         logger.error(f"Invalid JSON from MiniApp: {data}")
