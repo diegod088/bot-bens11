@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Premium Downloads</title>
+    <title>Descargas Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -755,8 +755,8 @@
             <div class="app-brand">
                 <div class="app-logo">📥</div>
                 <div>
-                    <div class="app-title">Download Bot</div>
-                    <div class="app-subtitle">Tu asistente de descargas</div>
+                    <div class="app-title">Bot de Descargas</div>
+                    <div class="app-subtitle">Tu asistente multimedia</div>
                 </div>
             </div>
             <div class="header-badge" id="memberSince">Nuevo</div>
@@ -781,12 +781,12 @@
             </div>
         </div>
 
-        <!-- Quick Stats -->
+        <!-- Estadísticas Rápidas -->
         <div class="quick-stats animate-in delay-2">
             <div class="quick-stat">
                 <span class="quick-stat-icon">📦</span>
                 <span class="quick-stat-value" id="totalDownloads">0</span>
-                <span class="quick-stat-label">total</span>
+                <span class="quick-stat-label">descargas</span>
             </div>
             <div class="quick-stat">
                 <span class="quick-stat-icon">🔥</span>
@@ -796,7 +796,7 @@
             <div class="quick-stat">
                 <span class="quick-stat-icon">⭐</span>
                 <span class="quick-stat-value" id="userRank">-</span>
-                <span class="quick-stat-label">rango</span>
+                <span class="quick-stat-label">nivel</span>
             </div>
         </div>
 
@@ -826,10 +826,10 @@
             </div>
         </div>
 
-        <!-- Nav -->
+        <!-- Navegación -->
         <div class="nav-container animate-in delay-4">
             <button class="nav-btn active" data-tab="stats">
-                <span>📊</span> Stats
+                <span>📊</span> Resumen
             </button>
             <button class="nav-btn" data-tab="premium">
                 <span>⭐</span> Premium
@@ -1072,8 +1072,8 @@
         <div class="app-footer animate-in delay-5">
             <div class="footer-icon">📥</div>
             <p class="footer-text">
-                Hecho con ❤️ para la comunidad<br>
-                <a href="#" class="footer-link" onclick="tg.openTelegramLink('https://t.me/tu_canal')">@tu_canal</a>
+                Hecho con ❤️ para ti<br>
+                <span style="color: var(--accent-blue);">Bot de Descargas v2.0</span>
             </p>
         </div>
     </div>
@@ -1118,18 +1118,21 @@
                 if (!response.ok) throw new Error('Failed');
                 userData = await response.json();
             } catch (e) {
+                // Datos de demostración para ver cómo se ve
                 userData = {
                     user_id: tg.initDataUnsafe?.user?.id || 12345,
                     first_name: tg.initDataUnsafe?.user?.first_name || 'Usuario',
                     premium: false,
                     premium_until: null,
+                    downloads: 47,
                     daily_video: 2,
-                    daily_photo: 5,
+                    daily_photo: 7,
                     daily_music: 0,
                     daily_apk: 0,
+                    created_at: '2025-12-15T10:00:00',
                     limits: {
                         video: { used: 2, max: 3 },
-                        photo: { used: 5, max: 10 },
+                        photo: { used: 7, max: 10 },
                         music: { used: 0, max: 0 },
                         apk: { used: 0, max: 0 }
                     }
@@ -1179,14 +1182,14 @@
             updateLimit('apk', limits.apk);
 
             // Calculate total downloads and update quick stats
-            const totalDownloads = (userData.daily_video || 0) + (userData.daily_photo || 0) + 
-                                   (userData.daily_music || 0) + (userData.daily_apk || 0);
+            const totalDownloads = userData.downloads || ((userData.daily_video || 0) + (userData.daily_photo || 0) + 
+                                   (userData.daily_music || 0) + (userData.daily_apk || 0));
             document.getElementById('totalDownloads').textContent = totalDownloads;
             
-            // Calculate user rank based on downloads
+            // Calculate user rank based on downloads (en español)
             let rank = 'Nuevo';
-            if (totalDownloads >= 100) rank = 'Pro';
-            else if (totalDownloads >= 50) rank = 'Experto';
+            if (totalDownloads >= 100) rank = 'Experto';
+            else if (totalDownloads >= 50) rank = 'Avanzado';
             else if (totalDownloads >= 10) rank = 'Regular';
             else if (totalDownloads >= 1) rank = 'Novato';
             document.getElementById('userRank').textContent = rank;
@@ -1210,7 +1213,7 @@
             }
 
             if (tg.MainButton) {
-                tg.MainButton.setText('⭐ Premium - 199 Stars');
+                tg.MainButton.setText('⭐ Premium - 199 Estrellas');
                 tg.MainButton.color = '#2AABEE';
                 tg.MainButton.textColor = '#ffffff';
                 tg.MainButton.show();
@@ -1277,19 +1280,19 @@
                             tg.showAlert('¡Gracias por tu compra! Tu Premium se activará en unos segundos. ✨');
                             setTimeout(() => { tg.close(); }, 2000);
                         } else if (status === 'cancelled') {
-                            tg.showAlert('Pago cancelado.');
+                            tg.showAlert('Pago cancelado. Puedes intentarlo de nuevo cuando quieras.');
                         } else {
-                            tg.showAlert('Hubo un problema con el pago.');
+                            tg.showAlert('Hubo un problema con el pago. Inténtalo de nuevo.');
                         }
                         btn.disabled = false;
                         btn.innerHTML = originalText;
                     });
                 } else {
-                    throw new Error(result.error || 'Error al crear factura');
+                    throw new Error(result.error || 'Error al crear la factura');
                 }
             } catch (e) {
                 console.error(e);
-                tg.showAlert('Error: No se pudo iniciar el pago. Inténtalo de nuevo.');
+                tg.showAlert('Error: No se pudo iniciar el pago. Inténtalo de nuevo más tarde.');
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
