@@ -1249,14 +1249,50 @@
             document.getElementById(`${type}Progress2`).style.width = `${pct}%`;
         }
 
-        function buyPremium() {
-            if (tg.sendData) {
-                tg.sendData(JSON.stringify({ action: 'buy_premium', price: PREMIUM_PRICE }));
+        async function buyPremium() {
+            const btn = document.getElementById('buyButton');
+            const originalText = btn.innerHTML;
+            
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳</span> Procesando...';
+                
+                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+
+                // 1. Solicitar link de factura al backend
+                const response = await fetch(`${API_BASE}/api/miniapp/create-invoice`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: tg.initDataUnsafe?.user?.id || userData?.user_id
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.ok && result.invoice_link) {
+                    // 2. Abrir factura nativa de Telegram
+                    tg.openInvoice(result.invoice_link, function(status) {
+                        if (status === 'paid') {
+                            tg.showAlert('¡Gracias por tu compra! Tu Premium se activará en unos segundos. ✨');
+                            setTimeout(() => { tg.close(); }, 2000);
+                        } else if (status === 'cancelled') {
+                            tg.showAlert('Pago cancelado.');
+                        } else {
+                            tg.showAlert('Hubo un problema con el pago.');
+                        }
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    });
+                } else {
+                    throw new Error(result.error || 'Error al crear factura');
+                }
+            } catch (e) {
+                console.error(e);
+                tg.showAlert('Error: No se pudo iniciar el pago. Inténtalo de nuevo.');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
-            if (tg.showAlert) {
-                tg.showAlert('¡Redirigiendo al pago! 💎');
-            }
-            setTimeout(() => { if (tg.close) tg.close(); }, 1000);
         }
 
         loadUserData();

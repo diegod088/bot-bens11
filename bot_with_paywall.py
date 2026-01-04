@@ -4215,13 +4215,31 @@ async def post_init(application: Application):
         logger.error(f"Failed to start Telethon Bot Client: {e}")
 
     # Set bot commands menu
-    from telegram import BotCommand
+    from telegram import BotCommand, MenuButtonWebApp, WebAppInfo
     commands = [
         BotCommand("start", "🏠 Inicio"),
         BotCommand("premium", "💎 Premium"),
         BotCommand("miniapp", "📱 Abrir MiniApp")
     ]
     await application.bot.set_my_commands(commands)
+    
+    # Set Menu Button to open MiniApp
+    miniapp_url = os.getenv('MINIAPP_URL', os.getenv('DASHBOARD_URL', ''))
+    if miniapp_url:
+        if not miniapp_url.endswith('/'):
+            miniapp_url += '/'
+        full_miniapp_url = miniapp_url + 'miniapp'
+        try:
+            await application.bot.set_chat_menu_button(
+                menu_button=MenuButtonWebApp(
+                    text="Abrir App",
+                    web_app=WebAppInfo(url=full_miniapp_url)
+                )
+            )
+            logger.info(f"Menu button set to: {full_miniapp_url}")
+        except Exception as e:
+            logger.error(f"Failed to set menu button: {e}")
+    
     # Limpiar comandos anteriores si existen
     # await application.bot.delete_my_commands()
 

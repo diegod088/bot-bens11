@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 import sqlite3
 from database import get_user_stats
 import logging
+import requests
 
 load_dotenv()
 
@@ -31,6 +32,7 @@ app.secret_key = os.getenv("DASHBOARD_SECRET_KEY", "cambiar-esta-clave-en-produc
 
 # Token de administrador desde variables de entorno
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "admin123")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 DB_FILE = "users.db"
 
@@ -1164,6 +1166,42 @@ def miniapp_stats():
         })
     except Exception as e:
         logger.error(f"MiniApp stats error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/miniapp/create-invoice', methods=['POST'])
+def create_invoice():
+    """Create a Telegram Stars invoice link"""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+            
+        # Telegram API createInvoiceLink
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/createInvoiceLink"
+        
+        payload = {
+            "title": "Premium 30 días",
+            "description": "Acceso ilimitado a descargas de video, música y APKs por 30 días.",
+            "payload": f"premium_30_{user_id}",
+            "provider_token": "", # Empty for Stars
+            "currency": "XTR",
+            "prices": [{"label": "Premium", "amount": 199}]
+        }
+        
+        response = requests.post(url, json=payload)
+        result = response.json()
+        
+        if result.get('ok'):
+            return jsonify({'ok': True, 'invoice_link': result['result']})
+        else:
+            logger.error(f"Telegram API error: {result}")
+            return jsonify({'error': 'Failed to create invoice'}), 500
+            
+    except Exception as e:
+        logger.error(f"Create invoice error: {e}")
         return jsonify({'error': str(e)}), 500
 
 
