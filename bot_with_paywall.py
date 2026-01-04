@@ -2649,7 +2649,7 @@ async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Add /miniapp path to the URL
     if not miniapp_url.endswith('/'):
         miniapp_url += '/'
-    miniapp_url += 'miniapp'
+    miniapp_url += 'miniapp?v=2'
     
     keyboard = [
         [InlineKeyboardButton(
@@ -4228,7 +4228,7 @@ async def post_init(application: Application):
     if miniapp_url:
         if not miniapp_url.endswith('/'):
             miniapp_url += '/'
-        full_miniapp_url = miniapp_url + 'miniapp'
+        full_miniapp_url = miniapp_url + 'miniapp?v=2'
         try:
             await application.bot.set_chat_menu_button(
                 menu_button=MenuButtonWebApp(
