@@ -39,6 +39,7 @@ from database import (
     init_database,
     get_user,
     create_user,
+    add_user,
     increment_total_downloads,
     increment_daily_counter,
     increment_counters,
@@ -2483,12 +2484,15 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
             # Incrementar contadores
             if content_type == 'photo':
                 increment_daily_counter(user_id, 'photo')
+                increment_total_downloads(user_id)  # Contar fotos para referidos
             elif content_type == 'video':
                 increment_total_downloads(user_id)
                 increment_daily_counter(user_id, 'video')
             elif content_type == 'music':
+                increment_total_downloads(user_id)  # Contar música para referidos
                 increment_daily_counter(user_id, 'music')
             elif content_type == 'apk':
+                increment_total_downloads(user_id)  # Contar APKs para referidos
                 increment_daily_counter(user_id, 'apk')
             
             # SISTEMA DE REFERIDOS: Confirmar referido si cumple requisitos
@@ -2619,8 +2623,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         create_user(user_id, first_name=first_name, username=username)
         # Registrar referido PENDIENTE (no cuenta hasta que descargue)
         if referred_by:
-            from database import add_user
-            add_user(user_id, referred_by=referred_by)
+            add_user(user_id, language='es', referred_by=referred_by)
     
     # Ensure admins have premium
     ensure_admin_premium(user_id)
