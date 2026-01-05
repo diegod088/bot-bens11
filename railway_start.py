@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🚂 Railway Startup Script - BOT + DASHBOARD (SINGLE EVENT LOOP)
+🚂 Railway Startup Script - BOT + HEALTH CHECK
 """
 
 import os
@@ -9,13 +9,12 @@ import logging
 import threading
 import asyncio
 from dotenv import load_dotenv
+from flask import Flask, jsonify
 
 # Necesario para threads con asyncio
 try:
     import nest_asyncio
     nest_asyncio.apply()
-    logger_temp = logging.getLogger(__name__)
-    logger_temp.info("✅ nest_asyncio applied")
 except ImportError:
     pass
 
@@ -27,6 +26,29 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+
+# Simple Flask app for health checks
+app = Flask(__name__)
+
+@app.route('/health', methods=['GET'])
+def health():
+    """Health check endpoint for Railway"""
+    return jsonify({'status': 'healthy', 'service': 'telegram-bot'}), 200
+
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint"""
+    return jsonify({'status': 'ok', 'message': 'Telegram Bot is running'}), 200
+
+def run_health_server():
+    """Run Flask health check server in background"""
+    try:
+        port = int(os.environ.get('PORT', 8080))
+        logger.info(f"🌐 Starting health check server on port {port}...")
+        from waitress import serve
+        serve(app, host='0.0.0.0', port=port, threads=2)
+    except Exception as e:
+        logger.error(f"❌ Health server error: {e}", exc_info=True)
 
 def init_database():
     """Inicializar base de datos"""
@@ -70,10 +92,10 @@ async def run_bot_async():
         raise
 
 def main():
-    """Ejecutar BOT (priority) o DASHBOARD (fallback)"""
+    """Ejecutar BOT + HEALTH CHECK SERVER"""
     
     logger.info("=" * 70)
-    logger.info("🚂 RAILWAY DEPLOYMENT")
+    logger.info("🚂 RAILWAY DEPLOYMENT - BOT")
     logger.info("=" * 70)
     logger.info("")
     
@@ -81,6 +103,19 @@ def main():
     if not init_database():
         logger.error("Failed to initialize database")
         sys.exit(1)
+    
+    logger.info("")
+    
+    # Start health check server in background thread
+    logger.info("📍 Starting health check server...")
+    health_thread = threading.Thread(
+        target=run_health_server,
+        daemon=True,
+        name="HealthCheckThread"
+    )
+    health_thread.start()
+    logger.info("✅ Health check server started")
+    logger.info("")
     
     # Check for bot token
     telegram_token = os.environ.get('TELEGRAM_TOKEN')
@@ -98,9 +133,15 @@ def main():
             sys.exit(1)
     else:
         logger.error("❌ TELEGRAM_TOKEN not found")
-        logger.info("Starting DASHBOARD only...")
-        logger.info("")
-        run_dashboard()
+        logger.info("Health check server is running on /health")
+        logger.info("Keeping process alive...")
+        try:
+            while True:
+                import time
+                time.sleep(3600)
+        except KeyboardInterrupt:
+            logger.info("🛑 Shutdown")
+            sys.exit(0)
 
 if __name__ == '__main__':
     main()
