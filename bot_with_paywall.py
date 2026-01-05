@@ -4696,11 +4696,11 @@ async def async_main():
     except asyncio.CancelledError:
         pass
     finally:
-        global _bot_instance_running
         logger.info("🛑 Bot shutting down...")
         await application.stop()
         await application.shutdown()
         # Reset flag to allow restart if needed
+        global _bot_instance_running
         with _bot_instance_lock:
             _bot_instance_running = False
         logger.info("✅ Bot stopped cleanly")
