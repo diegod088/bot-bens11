@@ -2119,10 +2119,14 @@
             document.getElementById('referralLink').textContent = referralData.referral_link;
         }
 
-        function copyReferralLink() {
+        async function copyReferralLink() {
             if (!referralData || !referralData.referral_link) {
                 showToast('Cargando enlace...');
-                return;
+                await loadReferralStats();
+                if (!referralData || !referralData.referral_link) {
+                    showToast('❌ Error al cargar enlace');
+                    return;
+                }
             }
             
             navigator.clipboard.writeText(referralData.referral_link)
@@ -2135,10 +2139,14 @@
                 });
         }
 
-        function shareReferralLink() {
+        async function shareReferralLink() {
             if (!referralData || !referralData.referral_link) {
                 showToast('Cargando enlace...');
-                return;
+                await loadReferralStats();
+                if (!referralData || !referralData.referral_link) {
+                    showToast('❌ Error al cargar enlace');
+                    return;
+                }
             }
             
             const text = `¡Descarga contenido de Telegram con este bot! 🚀\n\n${referralData.referral_link}`;
@@ -2146,7 +2154,7 @@
             if (tg.openTelegramLink) {
                 tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralData.referral_link)}&text=${encodeURIComponent('¡Descarga contenido de Telegram con este bot! 🚀')}`);
             } else {
-                copyReferralLink();
+                await copyReferralLink();
             }
         }
 
