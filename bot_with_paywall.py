@@ -97,7 +97,45 @@ PHONE, CODE, PASSWORD = range(10, 13)
 # Constants
 FREE_DOWNLOAD_LIMIT = 3  # Free users: 3 videos PERMANENTES (sin reset)
 FREE_PHOTO_LIMIT = 10  # Free users: 10 fotos PERMANENTES (sin reset)
-PREMIUM_PRICE_STARS = 199  # Price in Telegram Stars (⭐)
+
+# Premium Plans (Telegram Stars) - Estrategia de Precios Optimizada
+PREMIUM_PLANS = {
+    'trial': {
+        'stars': 25,
+        'days': 3,
+        'name': '🎁 Prueba',
+        'label': 'Premium 3 días',
+        'badge': '✨ PRUEBA',
+        'description': 'Perfecto para probar'
+    },
+    'weekly': {
+        'stars': 75,
+        'days': 7,
+        'name': '🔥 Semanal',
+        'label': 'Premium 7 días',
+        'badge': '🔥 MÁS POPULAR',
+        'description': 'Mejor precio por día'
+    },
+    'monthly': {
+        'stars': 149,
+        'days': 30,
+        'name': '💎 Mensual',
+        'label': 'Premium 30 días',
+        'badge': '⭐ RECOMENDADO',
+        'description': 'El más elegido'
+    },
+    'quarterly': {
+        'stars': 399,
+        'days': 90,
+        'name': '👑 Trimestral',
+        'label': 'Premium 90 días',
+        'badge': '💰 MEJOR VALOR',
+        'description': 'Ahorra hasta 50%'
+    }
+}
+
+# Backward compatibility (default to monthly plan)
+PREMIUM_PRICE_STARS = PREMIUM_PLANS['monthly']['stars']
 
 # Premium daily limits (unlimited photos, 50 daily for others)
 PREMIUM_VIDEO_DAILY_LIMIT = 50
@@ -1732,19 +1770,38 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await query.answer("📄 Procesando...", show_alert=False)
     
-    if query.data == "pay_premium":
-        # Send the invoice when button is pressed
+    # Handle premium payment callbacks for all plans
+    if query.data.startswith("pay_premium"):
         user_id = update.effective_user.id
         user = get_user(user_id)
         lang = get_user_language(user)
-        logger.info(f"User {user_id} requested payment invoice")
+        
+        # Determine which plan was selected
+        plan_key = 'monthly'  # default
+        if query.data == "pay_premium_trial":
+            plan_key = 'trial'
+        elif query.data == "pay_premium_weekly":
+            plan_key = 'weekly'
+        elif query.data == "pay_premium_monthly":
+            plan_key = 'monthly'
+        elif query.data == "pay_premium_quarterly":
+            plan_key = 'quarterly'
+        
+        plan = PREMIUM_PLANS[plan_key]
+        logger.info(f"User {user_id} requested payment invoice for plan: {plan_key} ({plan['stars']}⭐ / {plan['days']}d)")
         
         try:
-            await send_premium_invoice_callback(update, context)
-            logger.info(f"Invoice sent successfully to user {user_id}")
+            # Send the invoice with the selected plan
+            await send_premium_invoice_callback(update, context, plan_key=plan_key)
+            logger.info(f"Invoice sent successfully to user {user_id} for plan {plan_key}")
             
-            # Just answer the callback, invoice is already sent
-            await query.answer(get_msg("invoice_sent", lang).replace('*', '').replace('\\n', ' ')[:200], show_alert=True)
+            # Answer callback with plan info
+            if lang == 'es':
+                callback_msg = f"✅ Factura enviada: {plan['name']} - {plan['stars']}⭐ por {plan['days']} días"
+            else:
+                callback_msg = f"✅ Invoice sent: {plan['name']} - {plan['stars']}⭐ for {plan['days']} days"
+            
+            await query.answer(callback_msg[:200], show_alert=True)
             
         except Exception as e:
             error_msg = str(e)
@@ -1985,16 +2042,35 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
 
-async def send_premium_invoice_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def send_premium_invoice_callback(update: Update, context: ContextTypes.DEFAULT_TYPE, plan_key='monthly'):
     """Send invoice for Premium subscription when callback button is pressed"""
     chat_id = update.effective_chat.id
-    title = "💎 Suscripción Premium"
-    description = "50 Videos + 50 Música + 50 APK diarios | Fotos Ilimitadas | 30 días de acceso"
-    payload = "premium_30_days"
+    
+    # Get plan details
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['monthly'])
+    
+    # Build title and description based on plan
+    if plan_key == 'trial':
+        title = f"{plan['badge']} Suscripción Premium"
+        description = f"Prueba Premium por {plan['days']} días | Descargas ilimitadas | Ideal para conocer el servicio"
+    elif plan_key == 'weekly':
+        title = f"{plan['badge']} Suscripción Premium"
+        description = f"Premium por {plan['days']} días | Mejor precio por día | Descargas ilimitadas"
+    elif plan_key == 'monthly':
+        title = f"{plan['badge']} Suscripción Premium"
+        description = f"Premium por {plan['days']} días (1 mes) | El más popular | Descargas ilimitadas"
+    elif plan_key == 'quarterly':
+        title = f"{plan['badge']} Suscripción Premium"
+        description = f"Premium por {plan['days']} días (3 meses) | Ahorra hasta 50% | Descargas ilimitadas"
+    else:
+        title = "💎 Suscripción Premium"
+        description = f"Premium por {plan['days']} días | Descargas ilimitadas"
+    
+    payload = f"premium_{plan['days']}_days_{plan_key}"
     currency = "XTR"  # Telegram Stars currency code
     
     # Price in Telegram Stars
-    prices = [LabeledPrice("Premium 30 días", PREMIUM_PRICE_STARS)]
+    prices = [LabeledPrice(f"Premium {plan['days']} días", plan['stars'])]
     
     try:
         await context.bot.send_invoice(
@@ -2006,7 +2082,7 @@ async def send_premium_invoice_callback(update: Update, context: ContextTypes.DE
             currency=currency,
             prices=prices
         )
-        logger.info(f"Invoice successfully sent to chat {chat_id}")
+        logger.info(f"Invoice successfully sent to chat {chat_id} for plan {plan_key} ({plan['stars']}⭐ / {plan['days']}d)")
     except Exception as e:
         logger.error(f"Failed to send invoice to chat {chat_id}: {e}")
         # Send informative error message
@@ -2029,29 +2105,84 @@ async def send_premium_invoice_callback(update: Update, context: ContextTypes.DE
 
 
 async def successful_payment_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle successful payment with Telegram Stars"""
+    """Handle successful payment with Telegram Stars - Support all plans"""
     user_id = update.effective_user.id
     payment_info = update.message.successful_payment
     
     logger.info(f"Payment received from user {user_id}: {payment_info.total_amount} {payment_info.currency}")
     
-    # Activate Premium for 30 days
-    set_premium(user_id, months=1)
+    # Extract plan key from payload (format: premium_{days}_days_{plan_key})
+    payload = payment_info.invoice_payload
+    days = 30  # default
+    plan_name = "Premium"
+    
+    try:
+        # Parse payload to get days
+        if "_days_" in payload:
+            parts = payload.split("_")
+            days = int(parts[1])
+            plan_key = parts[3] if len(parts) > 3 else 'monthly'
+            
+            # Get plan details
+            plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['monthly'])
+            plan_name = plan['name']
+            
+            logger.info(f"Detected plan: {plan_key} with {days} days")
+        else:
+            logger.warning(f"Could not parse payload: {payload}, using default 30 days")
+    except Exception as e:
+        logger.error(f"Error parsing payment payload: {e}, using default 30 days")
+    
+    # Activate Premium for the purchased duration
+    set_premium(user_id, days=days)
     
     from datetime import datetime, timedelta
-    expiry = datetime.now() + timedelta(days=30)
+    expiry = datetime.now() + timedelta(days=days)
     
-    await update.message.reply_text(
-        "🎉 *Premium Activado*\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "✅ Pago recibido exitosamente\n"
-        "💎 Suscripción Premium activada\n\n"
-        f"📅 Válido hasta: {expiry.strftime('%d/%m/%Y')}\n"
-        "⏰ Duración: 30 días\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "🚀 Usa /start para comenzar",
-        parse_mode='Markdown'
-    )
+    # Get user language
+    user = get_user(user_id)
+    lang = get_user_language(user)
+    
+    if lang == 'es':
+        await update.message.reply_text(
+            f"🎉 *{plan_name} Activado* 🎉\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "✅ Pago recibido exitosamente\n"
+            "💎 Suscripción Premium activada\n\n"
+            f"📅 Válido hasta: {expiry.strftime('%d/%m/%Y')}\n"
+            f"⏰ Duración: {days} días\n"
+            f"⭐ Estrellas: {payment_info.total_amount}\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "✨ *Beneficios Desbloqueados:*\n"
+            "• Fotos ilimitadas\n"
+            "• 50 videos/día\n"
+            "• 50 canciones/día\n"
+            "• Sin anuncios\n"
+            "• Prioridad en soporte\n\n"
+            "🚀 Usa /start para comenzar\n"
+            "📊 Usa /panel para ver tu estado",
+            parse_mode='Markdown'
+        )
+    else:
+        await update.message.reply_text(
+            f"🎉 *{plan_name} Activated* 🎉\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "✅ Payment received successfully\n"
+            "💎 Premium subscription activated\n\n"
+            f"📅 Valid until: {expiry.strftime('%m/%d/%Y')}\n"
+            f"⏰ Duration: {days} days\n"
+            f"⭐ Stars: {payment_info.total_amount}\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "✨ *Unlocked Benefits:*\n"
+            "• Unlimited photos\n"
+            "• 50 videos/day\n"
+            "• 50 songs/day\n"
+            "• No ads\n"
+            "• Priority support\n\n"
+            "🚀 Use /start to begin\n"
+            "📊 Use /panel to check your status",
+            parse_mode='Markdown'
+        )
 
 
 # ==================== FLUJO GUIADO ====================
@@ -2567,48 +2698,200 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def premium_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /premium command - Show subscription info and send invoice"""
+    """Handle /premium command - Show ALL subscription plans with referral bonus"""
     from datetime import datetime
     user_id = update.effective_user.id
     user = get_user(user_id)
     lang = get_user_language(user)
     
-    message = get_msg("plans_title", lang)
-    message += get_msg("plans_premium", lang, price=PREMIUM_PRICE_STARS)
-    message += get_msg("plans_benefits", lang)
-    message += get_msg("plans_warning", lang)
-    message += get_msg("plans_payment", lang)
+    # Check current premium status
+    if user and user['premium'] and user.get('premium_until'):
+        expiry = datetime.fromisoformat(user['premium_until'])
+        days_left = (expiry - datetime.now()).days
+        
+        if lang == 'es':
+            status_msg = (
+                "✨ *Ya eres Premium* ✨\n\n"
+                "━━━━━━━━━━━━━━━━━━━━\n\n"
+                f"📅 Expira: {expiry.strftime('%d/%m/%Y')}\n"
+                f"⏳ *Quedan:* {days_left} días\n\n"
+                "━━━━━━━━━━━━━━━━━━━━\n\n"
+                "💎 *Renovar o Extender Premium*\n\n"
+            )
+        else:
+            status_msg = (
+                "✨ *You're already Premium* ✨\n\n"
+                "━━━━━━━━━━━━━━━━━━━━\n\n"
+                f"📅 Expires: {expiry.strftime('%m/%d/%Y')}\n"
+                f"⏳ *{days_left} days remaining*\n\n"
+                "━━━━━━━━━━━━━━━━━━━━\n\n"
+                "💎 *Renew or Extend Premium*\n\n"
+            )
+    else:
+        status_msg = ""
     
-    if user and user['premium']:
-        if user.get('premium_until'):
-            expiry = datetime.fromisoformat(user['premium_until'])
-            days_left = (expiry - datetime.now()).days
-            if lang == 'es':
-                message = (
-                    "✨ *Ya eres Premium* ✨\n\n"
-                    "━━━━━━━━━━━━━━━━━━━━\n\n"
-                    f"📅 Expira: {expiry.strftime('%d/%m/%Y')}\n"
-                    f"⏳ *Quedan:* {days_left} días\n\n"
-                    "━━━━━━━━━━━━━━━━━━━━\n\n"
-                    "💎 *Renovar Premium*\n"
-                    f"Precio: *{PREMIUM_PRICE_STARS} ⭐*\n\n"
-                    "Usa el botón abajo para renovar."
-                )
-            else:
-                message = (
-                    "✨ *You're already Premium* ✨\n\n"
-                    "━━━━━━━━━━━━━━━━━━━━\n\n"
-                    f"📅 Expires: {expiry.strftime('%m/%d/%Y')}\n"
-                    f"⏳ *{days_left} days remaining*\n\n"
-                    "━━━━━━━━━━━━━━━━━━━━\n\n"
-                    "💎 *Renew Premium*\n"
-                    f"Price: *{PREMIUM_PRICE_STARS} ⭐*\n\n"
-                    "Use the button below to renew."
-                )
+    # Build pricing tiers message
+    if lang == 'es':
+        message = status_msg + (
+            "🌟 *PLANES PREMIUM DISPONIBLES* 🌟\n\n"
+            "Elige el plan que mejor se adapte a ti:\n\n"
+        )
+        
+        # Trial Plan
+        trial = PREMIUM_PLANS['trial']
+        message += (
+            f"{trial['badge']}\n"
+            f"*{trial['name']}* - {trial['stars']} ⭐ Stars\n"
+            f"⏰ Duración: {trial['days']} días\n"
+            f"💡 {trial['description']}\n"
+            f"💵 ~${trial['stars']/100:.2f} USD\n\n"
+        )
+        
+        # Weekly Plan
+        weekly = PREMIUM_PLANS['weekly']
+        price_per_day_w = weekly['stars'] / weekly['days']
+        message += (
+            f"{weekly['badge']}\n"
+            f"*{weekly['name']}* - {weekly['stars']} ⭐ Stars\n"
+            f"⏰ Duración: {weekly['days']} días\n"
+            f"💡 {weekly['description']} ({price_per_day_w:.1f}⭐/día)\n"
+            f"💵 ~${weekly['stars']/100:.2f} USD\n\n"
+        )
+        
+        # Monthly Plan
+        monthly = PREMIUM_PLANS['monthly']
+        price_per_day_m = monthly['stars'] / monthly['days']
+        message += (
+            f"{monthly['badge']}\n"
+            f"*{monthly['name']}* - {monthly['stars']} ⭐ Stars\n"
+            f"⏰ Duración: {monthly['days']} días (1 mes)\n"
+            f"💡 {monthly['description']} ({price_per_day_m:.1f}⭐/día)\n"
+            f"💵 ~${monthly['stars']/100:.2f} USD\n\n"
+        )
+        
+        # Quarterly Plan
+        quarterly = PREMIUM_PLANS['quarterly']
+        price_per_day_q = quarterly['stars'] / quarterly['days']
+        savings = int((1 - (quarterly['stars'] / (monthly['stars'] * 3))) * 100)
+        message += (
+            f"{quarterly['badge']}\n"
+            f"*{quarterly['name']}* - {quarterly['stars']} ⭐ Stars\n"
+            f"⏰ Duración: {quarterly['days']} días (3 meses)\n"
+            f"💡 {quarterly['description']} ({price_per_day_q:.1f}⭐/día)\n"
+            f"💵 ~${quarterly['stars']/100:.2f} USD\n"
+            f"📊 Ahorras {savings}% vs 3 meses individuales\n\n"
+        )
+        
+        message += (
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "🎁 *BONUS REFERIDOS GRATIS* 🎁\n\n"
+            "Por cada *15 referidos confirmados* recibes:\n"
+            "➕ *1 día Premium GRATIS*\n"
+            "📊 Máximo acumulable: 15 días\n\n"
+            "Usa /referidos para ver tu progreso\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "✨ *Beneficios Premium:*\n"
+            "• Descargas ilimitadas de fotos\n"
+            "• 50 videos/día\n"
+            "• 50 canciones/día\n"
+            "• Sin anuncios\n"
+            "• Prioridad en soporte\n\n"
+            "Selecciona tu plan abajo 👇"
+        )
+    else:
+        message = status_msg + (
+            "🌟 *PREMIUM PLANS AVAILABLE* 🌟\n\n"
+            "Choose the plan that fits you best:\n\n"
+        )
+        
+        # Trial Plan (English)
+        trial = PREMIUM_PLANS['trial']
+        message += (
+            f"{trial['badge']}\n"
+            f"*{trial['name']}* - {trial['stars']} ⭐ Stars\n"
+            f"⏰ Duration: {trial['days']} days\n"
+            f"💡 Perfect for testing\n"
+            f"💵 ~${trial['stars']/100:.2f} USD\n\n"
+        )
+        
+        # Weekly Plan
+        weekly = PREMIUM_PLANS['weekly']
+        price_per_day_w = weekly['stars'] / weekly['days']
+        message += (
+            f"{weekly['badge']}\n"
+            f"*{weekly['name']}* - {weekly['stars']} ⭐ Stars\n"
+            f"⏰ Duration: {weekly['days']} days\n"
+            f"💡 Best price per day ({price_per_day_w:.1f}⭐/day)\n"
+            f"💵 ~${weekly['stars']/100:.2f} USD\n\n"
+        )
+        
+        # Monthly Plan
+        monthly = PREMIUM_PLANS['monthly']
+        price_per_day_m = monthly['stars'] / monthly['days']
+        message += (
+            f"{monthly['badge']}\n"
+            f"*{monthly['name']}* - {monthly['stars']} ⭐ Stars\n"
+            f"⏰ Duration: {monthly['days']} days (1 month)\n"
+            f"💡 Most popular ({price_per_day_m:.1f}⭐/day)\n"
+            f"💵 ~${monthly['stars']/100:.2f} USD\n\n"
+        )
+        
+        # Quarterly Plan
+        quarterly = PREMIUM_PLANS['quarterly']
+        price_per_day_q = quarterly['stars'] / quarterly['days']
+        savings = int((1 - (quarterly['stars'] / (monthly['stars'] * 3))) * 100)
+        message += (
+            f"{quarterly['badge']}\n"
+            f"*{quarterly['name']}* - {quarterly['stars']} ⭐ Stars\n"
+            f"⏰ Duration: {quarterly['days']} days (3 months)\n"
+            f"💡 Save up to {savings}% ({price_per_day_q:.1f}⭐/day)\n"
+            f"💵 ~${quarterly['stars']/100:.2f} USD\n"
+            f"📊 Save {savings}% vs 3 individual months\n\n"
+        )
+        
+        message += (
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "🎁 *FREE REFERRAL BONUS* 🎁\n\n"
+            "For every *15 confirmed referrals* you get:\n"
+            "➕ *1 day Premium FREE*\n"
+            "📊 Max accumulation: 15 days\n\n"
+            "Use /referidos to check your progress\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "✨ *Premium Benefits:*\n"
+            "• Unlimited photo downloads\n"
+            "• 50 videos/day\n"
+            "• 50 songs/day\n"
+            "• No ads\n"
+            "• Priority support\n\n"
+            "Select your plan below 👇"
+        )
     
-    # Send message with payment button and channel button
+    # Create keyboard with all plan options
     keyboard = [
-        [InlineKeyboardButton(get_msg("btn_pay_stars", lang), callback_data="pay_premium")],
+        [
+            InlineKeyboardButton(
+                f"{PREMIUM_PLANS['trial']['badge']} {PREMIUM_PLANS['trial']['stars']}⭐ ({PREMIUM_PLANS['trial']['days']}d)",
+                callback_data="pay_premium_trial"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                f"{PREMIUM_PLANS['weekly']['badge']} {PREMIUM_PLANS['weekly']['stars']}⭐ ({PREMIUM_PLANS['weekly']['days']}d)",
+                callback_data="pay_premium_weekly"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                f"{PREMIUM_PLANS['monthly']['badge']} {PREMIUM_PLANS['monthly']['stars']}⭐ ({PREMIUM_PLANS['monthly']['days']}d)",
+                callback_data="pay_premium_monthly"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                f"{PREMIUM_PLANS['quarterly']['badge']} {PREMIUM_PLANS['quarterly']['stars']}⭐ ({PREMIUM_PLANS['quarterly']['days']}d)",
+                callback_data="pay_premium_quarterly"
+            )
+        ],
         [InlineKeyboardButton(get_msg("btn_join_channel", lang), url="https://t.me/observer_bots")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

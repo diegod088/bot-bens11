@@ -651,16 +651,27 @@ def increment_counters(user_id: int, total: bool = False, **daily_counters) -> D
 
 # ==================== PREMIUM ====================
 
-def set_premium(user_id: int, months: int = 1, level: int = 1):
+def set_premium(user_id: int, months: int = None, days: int = None, level: int = 1):
     """
-    Set user as premium/vip for specified months
+    Set user as premium/vip for specified duration
     
     Args:
         user_id: Telegram user ID
-        months: Number of months to add (default 1)
+        months: Number of months to add (optional, converts to days)
+        days: Number of days to add directly (optional)
         level: Premium level (1 = premium, 2 = vip)
+    
+    Note: If both months and days are provided, days takes priority
     """
     ensure_user_exists(user_id)
+    
+    # Calculate total days to add
+    if days is not None:
+        total_days = days
+    elif months is not None:
+        total_days = 30 * months
+    else:
+        total_days = 30  # default to 1 month
     
     with get_db_connection() as conn:
         cursor = conn.cursor()
@@ -674,11 +685,11 @@ def set_premium(user_id: int, months: int = 1, level: int = 1):
         if current_until:
             current_expiry = datetime.fromisoformat(current_until)
             if current_expiry > datetime.now():
-                new_expiry = current_expiry + timedelta(days=30 * months)
+                new_expiry = current_expiry + timedelta(days=total_days)
             else:
-                new_expiry = datetime.now() + timedelta(days=30 * months)
+                new_expiry = datetime.now() + timedelta(days=total_days)
         else:
-            new_expiry = datetime.now() + timedelta(days=30 * months)
+            new_expiry = datetime.now() + timedelta(days=total_days)
         
         cursor.execute(
             """UPDATE users 
