@@ -227,26 +227,39 @@
             right: 0;
             background: var(--bg-primary);
             border-top: 1px solid var(--bg-card);
-            display: flex;
+            display: flex !important;
             justify-content: space-around;
-            padding: 10px 0;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            align-items: stretch;
+            padding: 8px 0;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
             z-index: 100;
+            height: 70px;
+            min-height: 70px;
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: 8px 20px;
+            justify-content: center;
+            gap: 2px;
+            padding: 6px 12px;
+            min-width: 60px;
             border: none;
             background: none;
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 10px;
+            font-weight: 500;
             font-family: inherit;
             cursor: pointer;
             transition: all 0.2s;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
         }
 
         .nav-item.active {
@@ -254,7 +267,29 @@
         }
 
         .nav-item .nav-icon {
-            font-size: 22px;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        /* Responsive nav */
+        @media (max-width: 480px) {
+            .bottom-nav {
+                height: 65px;
+                min-height: 65px;
+                padding: 6px 0;
+                padding-bottom: calc(6px + env(safe-area-inset-bottom));
+            }
+            
+            .nav-item {
+                min-width: 50px;
+                padding: 4px 8px;
+                font-size: 9px;
+                gap: 2px;
+            }
+            
+            .nav-item .nav-icon {
+                font-size: 20px;
+            }
         }
 
         /* ========== CARDS ========== */
@@ -1817,9 +1852,12 @@
 
         // ========== UPDATE UI ==========
         function updateUI() {
+            console.log('updateUI called');
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             document.getElementById('bottomNav').style.display = 'flex';
+            
+            console.log('bottomNav visibility:', document.getElementById('bottomNav').style.display);
 
             // User info
             const name = userData.first_name || 'Usuario';
