@@ -135,6 +135,20 @@ def init_database():
         except sqlite3.OperationalError:
             pass
 
+        # Add first_name column
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN first_name TEXT DEFAULT NULL")
+            logger.info("Added first_name column to users table")
+        except sqlite3.OperationalError:
+            pass
+
+        # Add username column
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN username TEXT DEFAULT NULL")
+            logger.info("Added username column to users table")
+        except sqlite3.OperationalError:
+            pass
+
         # Create referrals tracking table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS referrals (
