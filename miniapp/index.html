@@ -1284,8 +1284,23 @@
 
         // ========== ONBOARDING ==========
         function checkOnboarding() {
-            const seen = localStorage.getItem('onboarding_seen');
-            if (!seen) {
+            try {
+                const seen = localStorage.getItem('onboarding_seen');
+                const onboardingEl = document.getElementById('onboarding');
+                const loadingEl = document.getElementById('loading');
+                
+                if (!seen) {
+                    console.log('Mostrando onboarding (primera vez)');
+                    onboardingEl.style.display = 'flex';
+                    loadingEl.style.display = 'none';
+                } else {
+                    console.log('Onboarding ya visto, cargando app...');
+                    onboardingEl.style.display = 'none';
+                    loadingEl.style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error checking onboarding:', error);
+                // Si falla, mostrar onboarding por seguridad
                 document.getElementById('onboarding').style.display = 'flex';
                 document.getElementById('loading').style.display = 'none';
             }
@@ -1312,7 +1327,13 @@
         }
 
         function finishOnboarding() {
-            localStorage.setItem('onboarding_seen', 'true');
+            try {
+                localStorage.setItem('onboarding_seen', 'true');
+                console.log('Onboarding completado y guardado');
+            } catch (error) {
+                console.error('Error saving onboarding state:', error);
+            }
+            
             document.getElementById('onboarding').style.display = 'none';
             document.getElementById('loading').style.display = 'flex';
             loadUserData();

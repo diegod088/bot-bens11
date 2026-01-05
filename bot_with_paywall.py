@@ -4448,11 +4448,19 @@ async def post_init(application: Application):
     # Set bot commands menu
     from telegram import BotCommand, MenuButtonWebApp, WebAppInfo
     commands = [
-        BotCommand("start", "🏠 Inicio"),
-        BotCommand("premium", "💎 Premium"),
+        BotCommand("start", "🏠 Inicio - Menú principal"),
+        BotCommand("panel", "📊 Panel de usuario"),
+        BotCommand("premium", "💎 Hacerse Premium"),
+        BotCommand("configurar", "⚙️ Configurar cuenta"),
+        BotCommand("stats", "📈 Mis estadísticas"),
+        BotCommand("referidos", "👥 Sistema de referidos"),
         BotCommand("miniapp", "📱 Abrir MiniApp")
     ]
-    await application.bot.set_my_commands(commands)
+    try:
+        await application.bot.set_my_commands(commands)
+        logger.info(f"✅ Bot commands configured: {len(commands)} commands")
+    except Exception as e:
+        logger.error(f"❌ Failed to set bot commands: {e}")
     
     # Set Menu Button to open MiniApp
     miniapp_url = os.getenv('MINIAPP_URL', os.getenv('DASHBOARD_URL', ''))
