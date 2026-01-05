@@ -8,15 +8,18 @@ import sys
 import logging
 import threading
 import asyncio
-from dotenv import load_dotenv
-from flask import Flask, jsonify
 
-# Necesario para threads con asyncio
+# CRITICAL: Apply nest_asyncio FIRST before any asyncio operations
 try:
     import nest_asyncio
     nest_asyncio.apply()
+    NEST_ASYNCIO_APPLIED = True
 except ImportError:
-    pass
+    NEST_ASYNCIO_APPLIED = False
+    print("⚠️  WARNING: nest_asyncio not installed - may cause event loop conflicts", file=sys.stderr)
+
+from dotenv import load_dotenv
+from flask import Flask, jsonify
 
 logging.basicConfig(
     level=logging.INFO,
