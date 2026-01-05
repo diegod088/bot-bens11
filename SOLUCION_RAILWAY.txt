@@ -1,0 +1,98 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║  🚨 SOLUCIÓN AL ERROR DE HEALTHCHECK EN RAILWAY 🚨           ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+PROBLEMA:
+---------
+El healthcheck falla con "service unavailable" porque FALTAN
+las variables de entorno obligatorias.
+
+SOLUCIÓN RÁPIDA:
+----------------
+
+1️⃣ Ve a Railway Dashboard:
+   https://railway.app/dashboard
+
+2️⃣ Selecciona tu proyecto/servicio
+
+3️⃣ Click en la pestaña "Variables"
+
+4️⃣ Agrega estas 7 VARIABLES OBLIGATORIAS:
+
+┌─────────────────────────────────────────────────────────────┐
+│ Variable                 │ Dónde obtenerla                  │
+├─────────────────────────────────────────────────────────────┤
+│ TELEGRAM_BOT_TOKEN       │ @BotFather en Telegram           │
+│ TELEGRAM_API_ID          │ my.telegram.org                  │
+│ TELEGRAM_API_HASH        │ my.telegram.org                  │
+│ ADMIN_TOKEN              │ Tu contraseña (inventa una)      │
+│ ADMIN_ID                 │ @userinfobot en Telegram         │
+│ ENCRYPTION_KEY           │ Ver comando abajo                │
+│ DASHBOARD_SECRET_KEY     │ Ver comando abajo                │
+└─────────────────────────────────────────────────────────────┘
+
+GENERAR CLAVES DE SEGURIDAD:
+-----------------------------
+
+# Para ENCRYPTION_KEY:
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+# Para DASHBOARD_SECRET_KEY:
+python -c "import secrets; print(secrets.token_hex(32))"
+
+
+EJEMPLO DE CONFIGURACIÓN:
+--------------------------
+
+TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
+TELEGRAM_API_ID=12345678
+TELEGRAM_API_HASH=abcdef1234567890abcdef1234567890
+ADMIN_TOKEN=MiPasswordSuperSegura123!
+ADMIN_ID=123456789
+ENCRYPTION_KEY=abc123XYZ789def456GHI...
+DASHBOARD_SECRET_KEY=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6...
+
+
+VERIFICACIÓN:
+-------------
+
+Después de configurar las variables:
+
+1. Railway automáticamente redesplegará
+2. Espera 2-3 minutos
+3. Verifica los logs:
+   
+   railway logs -f
+   
+4. Deberías ver:
+   
+   ✅ All required environment variables found
+   🤖 Starting Telegram Bot...
+   🌐 Starting Dashboard...
+
+
+ACCEDER AL DASHBOARD:
+----------------------
+
+Una vez desplegado:
+
+1. Railway te asigna un dominio automático
+2. Encuéntralo en: Settings > Domains
+3. Accede: https://tu-servicio.up.railway.app/
+4. Login con la contraseña de ADMIN_TOKEN
+
+
+¿SIGUES CON PROBLEMAS?
+-----------------------
+
+1. Lee el archivo completo: RAILWAY_VARIABLES.md
+2. Verifica tus variables con: ./verify_railway_vars.sh
+3. Revisa los logs: railway logs
+4. Asegúrate de que el token del bot sea válido
+
+
+╔═══════════════════════════════════════════════════════════════╗
+║  ⚠️ NO OLVIDES: Necesitas las 7 variables configuradas      ║
+╚═══════════════════════════════════════════════════════════════╝

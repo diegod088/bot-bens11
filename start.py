@@ -129,8 +129,16 @@ def main():
     
     if missing_vars:
         logger.error(f"❌ Missing required environment variables: {missing_vars}")
-        logger.error("Please set these in your Railway project settings")
-        sys.exit(1)
+        logger.error("Please set these in your Railway project settings:")
+        for var in missing_vars:
+            logger.error(f"   - {var}")
+        logger.error("")
+        logger.error("See RAILWAY_VARIABLES.md for more information")
+        logger.error("")
+        logger.warning("⚠️ Starting dashboard only (bot will not work)")
+        # Start dashboard anyway so healthcheck can pass
+        run_dashboard()
+        return
     
     logger.info("✅ All required environment variables found")
     

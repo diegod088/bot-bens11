@@ -164,7 +164,103 @@ python bot_with_paywall.py
 
 ## ☁️ Despliegue en Railway
 
-Railway permite desplegar fácilmente con 2 servicios independientes.
+> 🚨 **NOTA IMPORTANTE:** Para desplegar en Railway, necesitas configurar **7 variables de entorno obligatorias**.
+> 
+> 📚 **Guías disponibles:**
+> - **[RAILWAY_CHECKLIST.md](RAILWAY_CHECKLIST.md)** - Paso a paso completo ✅
+> - **[RAILWAY_VARIABLES.md](RAILWAY_VARIABLES.md)** - Detalles de todas las variables 📝
+> - **[SOLUCION_RAILWAY.txt](SOLUCION_RAILWAY.txt)** - Solución rápida a errores 🔧
+>
+> 🔑 **Genera tus claves:** `python3 generate_keys.py`
+
+Railway permite desplegar fácilmente el bot + dashboard en un solo servicio.
+
+### Opción 1: Despliegue Rápido (Recomendado)
+
+Sigue la guía completa en **[RAILWAY_CHECKLIST.md](RAILWAY_CHECKLIST.md)**.
+
+**Resumen:**
+
+1. **Obtén tus credenciales:**
+   - Token del bot: [@BotFather](https://t.me/BotFather)
+   - API ID/Hash: [my.telegram.org](https://my.telegram.org)
+   - Tu User ID: [@userinfobot](https://t.me/userinfobot)
+
+2. **Genera claves de seguridad:**
+   ```bash
+   python3 generate_keys.py
+   ```
+
+3. **Configura en Railway:**
+   - Ve a [Railway Dashboard](https://railway.app/dashboard)
+   - Crea un nuevo proyecto desde tu repositorio GitHub
+   - Agrega estas **7 variables** en Settings → Variables:
+     ```
+     TELEGRAM_BOT_TOKEN=tu_token
+     TELEGRAM_API_ID=tu_api_id
+     TELEGRAM_API_HASH=tu_api_hash
+     ADMIN_TOKEN=tu_password
+     ADMIN_ID=tu_user_id
+     ENCRYPTION_KEY=clave_generada
+     DASHBOARD_SECRET_KEY=clave_generada
+     ```
+
+4. **¡Listo!** Railway desplegará automáticamente.
+
+### Opción 2: Despliegue Manual con Railway CLI
+
+```bash
+# Instalar Railway CLI
+npm install -g @railway/cli
+
+# Login
+railway login
+
+# Inicializar proyecto
+railway init
+
+# Configurar variables (usa las tuyas)
+railway variables set TELEGRAM_BOT_TOKEN=tu_token
+railway variables set TELEGRAM_API_ID=tu_api_id
+railway variables set TELEGRAM_API_HASH=tu_api_hash
+railway variables set ADMIN_TOKEN=tu_password
+railway variables set ADMIN_ID=tu_user_id
+railway variables set ENCRYPTION_KEY=tu_encryption_key
+railway variables set DASHBOARD_SECRET_KEY=tu_secret_key
+
+# Deploy
+railway up
+```
+
+### Verificación del Despliegue
+
+1. **Revisa los logs:**
+   ```bash
+   railway logs -f
+   ```
+
+2. **Verifica el healthcheck:**
+   - Abre: `https://tu-servicio.up.railway.app/health`
+   - Deberías ver: `{"status": "healthy", ...}`
+
+3. **Accede al dashboard:**
+   - URL en Settings → Domains
+   - Login con tu `ADMIN_TOKEN`
+
+### Solución de Problemas
+
+Si el healthcheck falla con "service unavailable":
+
+1. ❌ **Problema:** Faltan variables de entorno
+2. ✅ **Solución:** Lee **[SOLUCION_RAILWAY.txt](SOLUCION_RAILWAY.txt)**
+3. 🔍 **Verifica:** `./verify_railway_vars.sh`
+
+---
+
+### Despliegue Antiguo (2 Servicios: Bot + Backend PayPal)
+
+<details>
+<summary>Click para ver la configuración antigua (no recomendado)</summary>
 
 ### 1. Crear Proyecto en Railway
 1. Ve a https://railway.app
@@ -218,6 +314,10 @@ Railway permite desplegar fácilmente con 2 servicios independientes.
 
 1. Ve a PayPal Developer Dashboard
 2. Crea un Webhook apuntando a: `https://tu-backend.up.railway.app/webhook/paypal`
+
+</details>
+
+---
 3. Copia el Webhook ID
 4. Agrégalo como variable `PAYPAL_WEBHOOK_ID` en el servicio backend
 
