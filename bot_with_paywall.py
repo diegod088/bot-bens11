@@ -14,7 +14,7 @@ import logging
 import threading
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice, WebAppInfo
 from contextlib import asynccontextmanager
 
 # Load environment variables from .env file
@@ -1323,6 +1323,7 @@ async def show_premium_plans(query, context: ContextTypes.DEFAULT_TYPE, lang="es
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle button callbacks"""
     query = update.callback_query
+    logger.info(f"🔘 BUTTON CALLBACK: data={query.data}, user={query.from_user.id}")
     
     if query.data == "cancel_login":
         await query.answer()
@@ -2041,6 +2042,69 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         await query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
         return
+    
+    # Handle settings button
+    if query.data == "settings":
+        logger.info(f"⚙️ Settings button clicked by user {query.from_user.id}")
+        await query.answer("🔧 Abriendo configuración...")
+        user_id = query.from_user.id
+        user = get_user(user_id)
+        lang = get_user_language(user)
+        
+        # Build settings message
+        settings_msg = "⚙️ *CONFIGURACIÓN*\n\n"
+        settings_msg += f"👤 *Usuario:* @{user.get('username', 'N/A')}\n"
+        settings_msg += f"🌐 *Idioma:* {lang.upper()}\n\n"
+        
+        # Show current language and option to change
+        settings_msg += "*Cambiar Idioma:*\n"
+        
+        keyboard = [
+            [InlineKeyboardButton("🇪🇸 Español", callback_data="change_lang_es")],
+            [InlineKeyboardButton("🇺🇸 English", callback_data="change_lang_en")],
+            [InlineKeyboardButton("🇵🇹 Português", callback_data="change_lang_pt")],
+            [InlineKeyboardButton("🇮🇹 Italiano", callback_data="change_lang_it")],
+            [InlineKeyboardButton("◀️ Volver", callback_data="back_to_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        try:
+            await query.edit_message_text(settings_msg, parse_mode='Markdown', reply_markup=reply_markup)
+        except Exception as e:
+            logger.error(f"Error showing settings: {e}")
+            await query.answer("Error al abrir configuración", show_alert=True)
+        return
+    
+    # Handle open miniapp button
+    if query.data == "open_miniapp":
+        logger.info(f"📱 Open miniapp clicked by user {query.from_user.id}")
+        await query.answer("Abriendo MiniApp...")
+        user_id = query.from_user.id
+        user = get_user(user_id)
+        lang = get_user_language(user)
+        
+        # Create WebApp button for miniapp
+        miniapp_url = f"https://bot-bens11-production.up.railway.app/miniapp?v=2&user_id={user_id}"
+        
+        miniapp_msg = "📱 *MiniApp*\n\n"
+        miniapp_msg += "Haz clic en el botón de abajo para abrir la aplicación.\n\n"
+        
+        keyboard = [
+            [InlineKeyboardButton("🚀 Abrir MiniApp", web_app=WebAppInfo(url=miniapp_url))],
+            [InlineKeyboardButton("◀️ Volver", callback_data="back_to_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        try:
+            await query.edit_message_text(miniapp_msg, parse_mode='Markdown', reply_markup=reply_markup)
+        except Exception as e:
+            logger.error(f"Error showing miniapp: {e}")
+            await query.message.reply_text(miniapp_msg, parse_mode='Markdown', reply_markup=reply_markup)
+        return
+    
+    # Fallback: log unknown button
+    logger.warning(f"⚠️ Unknown callback data: {query.data} from user {query.from_user.id}")
+    await query.answer(f"Botón no reconocido: {query.data}", show_alert=False)
 
 
 async def send_premium_invoice_callback(update: Update, context: ContextTypes.DEFAULT_TYPE, plan_key='monthly'):
@@ -2625,6 +2689,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     first_name = update.effective_user.first_name
     username = update.effective_user.username
+    logger.info(f"🚀 /START command from user {user_id} (@{username})")
     
     # Get user's language from Telegram (if available)
     telegram_language = update.effective_user.language_code or 'es'
@@ -3935,6 +4000,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle incoming messages with Telegram links"""
     user_id = update.effective_user.id
     text = update.message.text
+    logger.info(f"📨 MESSAGE from {user_id}: {text[:50] if text else 'None'}")
     
     if not text:
         return
