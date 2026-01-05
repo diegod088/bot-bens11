@@ -33,6 +33,7 @@ app.secret_key = os.getenv("DASHBOARD_SECRET_KEY", "cambiar-esta-clave-en-produc
 # Token de administrador desde variables de entorno
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "admin123")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+BOT_USERNAME_CACHE = None
 
 DB_FILE = "users.db"
 
@@ -1502,26 +1503,32 @@ def miniapp_referrals():
         
         # Obtener estadísticas
         stats = get_referral_stats(user_id)
-        user = get_user(user_id)
-        
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
         
         # Generar enlace de referido
-        bot_info_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getMe"
-        bot_response = requests.get(bot_info_url).json()
-        bot_username = bot_response.get('result', {}).get('username', 'bot')
+        # Intentar obtener el username del bot (cachear si es posible)
+        global BOT_USERNAME_CACHE
+        bot_username = os.getenv('BOT_USERNAME') or BOT_USERNAME_CACHE
+        
+        if not bot_username:
+            try:
+                bot_info_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getMe"
+                bot_response = requests.get(bot_info_url, timeout=5).json()
+                bot_username = bot_response.get('result', {}).get('username', 'bot')
+                BOT_USERNAME_CACHE = bot_username
+            except Exception as e:
+                logger.error(f"Error getting bot username: {e}")
+                bot_username = "bot"
         
         referral_link = f"https://t.me/{bot_username}?start=ref_{user_id}"
         
         return jsonify({
             'ok': True,
             'stats': {
-                'confirmed': stats['confirmed'],
-                'pending': stats['pending'],
-                'days_earned': stats['days_earned'],
-                'progress': stats['progress'],
-                'next_reward_at': stats['next_reward_at']
+                'confirmed': stats.get('confirmed', 0),
+                'pending': stats.get('pending', 0),
+                'days_earned': stats.get('days_earned', 0),
+                'progress': stats.get('progress', 0),
+                'next_reward_at': stats.get('next_reward_at', 15)
             },
             'referral_link': referral_link,
             'max_days': 15
