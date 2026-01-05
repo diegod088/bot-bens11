@@ -117,6 +117,27 @@ def activity_page():
     return render_template('activity.html')
 
 
+@app.route('/status')
+def status():
+    """Endpoint público de estado del sistema"""
+    try:
+        from database import get_user_stats
+        stats = get_user_stats()
+        return jsonify({
+            'ok': True,
+            'status': 'Online',
+            'users': stats['total_users'],
+            'bot_online': True,
+            'dashboard_online': True,
+            'miniapp_url': '/miniapp'
+        })
+    except Exception as e:
+        return jsonify({
+            'ok': False,
+            'error': str(e)
+        }), 500
+
+
 @app.route('/')
 @login_required
 def dashboard():
