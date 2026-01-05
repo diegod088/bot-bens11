@@ -4684,6 +4684,9 @@ async def async_main():
                 logger.error(f"Failed to initialize bot after {max_retries} attempts")
                 raise
     
+    # Execute post_init manually (it's not called automatically in async mode)
+    await post_init(application)
+    
     await application.start()
     
     # Start polling without signal handlers (they don't work in non-main threads)
