@@ -40,8 +40,31 @@
 
         .container {
             max-width: 100%;
-            padding: 12px;
-            padding-bottom: 90px;
+            padding: 16px;
+            padding-bottom: 100px;
+            margin: 0 auto;
+        }
+
+        /* Responsive container */
+        @media (min-width: 768px) {
+            .container {
+                padding: 24px;
+                padding-bottom: 120px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 800px;
+                padding: 32px 24px;
+                padding-bottom: 120px;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .container {
+                max-width: 900px;
+            }
         }
 
         /* ========== ONBOARDING ========== */
@@ -237,29 +260,71 @@
         /* ========== CARDS ========== */
         .card {
             background: var(--bg-primary);
-            border-radius: 16px;
-            margin-bottom: 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Responsive card spacing */
+        @media (min-width: 768px) {
+            .card {
+                border-radius: 24px;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .card {
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: 24px;
+            }
         }
 
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 16px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--bg-card);
         }
 
+        @media (min-width: 768px) {
+            .card-header {
+                padding: 18px 24px;
+            }
+        }
+
         .card-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
+        @media (min-width: 768px) {
+            .card-title {
+                font-size: 16px;
+            }
+        }
+
         .card-body {
-            padding: 16px;
+            padding: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .card-body {
+                padding: 24px;
+            }
         }
 
         /* ========== TABS ========== */
@@ -559,35 +624,247 @@
 
         .buy-button {
             width: 100%;
-            padding: 18px;
+            padding: 16px 24px;
             border: none;
-            border-radius: 14px;
-            background: var(--accent-blue);
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), #1E96D1);
             color: white;
-            font-size: 17px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             font-family: inherit;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .buy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .buy-button:hover::before {
+            left: 100%;
+        }
+
+        .buy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(42, 171, 238, 0.4);
         }
 
         .buy-button:active {
-            transform: scale(0.98);
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(42, 171, 238, 0.3);
         }
 
         .buy-button:disabled {
             background: var(--bg-card);
             cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.5;
+        }
+
+        /* Responsive button sizes */
+        @media (min-width: 768px) {
+            .buy-button {
+                padding: 18px 32px;
+                font-size: 17px;
+                border-radius: 18px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .buy-button {
+                padding: 20px 40px;
+                font-size: 18px;
+            }
+        }
+
+        /* ========== PREMIUM PLAN CARDS ========== */
+        .plan-card {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            margin-top: 16px;
+            overflow: visible;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .plan-card.featured {
+            border-width: 2px;
+            box-shadow: 0 4px 16px rgba(42, 171, 238, 0.2);
+        }
+
+        .plan-card.featured:hover {
+            box-shadow: 0 8px 32px rgba(42, 171, 238, 0.3);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            letter-spacing: 0.5px;
+        }
+
+        @media (min-width: 768px) {
+            .plan-badge {
+                font-size: 12px;
+                padding: 7px 20px;
+            }
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .plan-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .plan-info h3 {
+                font-size: 22px;
+            }
+        }
+
+        .plan-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .plan-desc {
+                font-size: 14px;
+            }
+        }
+
+        .plan-price {
+            text-align: right;
+        }
+
+        .plan-price-main {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .plan-price-main {
+                font-size: 32px;
+            }
+        }
+
+        .plan-price-star {
+            font-size: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .plan-price-star {
+                font-size: 22px;
+            }
+        }
+
+        .plan-price-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .plan-savings {
+            background: rgba(229, 165, 88, 0.15);
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .plan-savings {
+                padding: 12px;
+            }
+        }
+
+        .referral-bonus-card {
+            background: linear-gradient(135deg, rgba(42, 171, 238, 0.1), rgba(155, 123, 234, 0.1));
+            border: 1px solid rgba(42, 171, 238, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .referral-bonus-card {
+                padding: 24px;
+            }
+        }
+
+        .referral-bonus-btn {
+            margin-top: 14px;
+            padding: 10px 20px;
+            background: rgba(42, 171, 238, 0.2);
+            border: none;
+            border-radius: 12px;
+            color: var(--accent-blue);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .referral-bonus-btn:hover {
+            background: rgba(42, 171, 238, 0.3);
+            transform: scale(1.05);
+        }
+
+        @media (min-width: 768px) {
+            .referral-bonus-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
         }
 
         /* Premium Active */
         .premium-active {
             text-align: center;
             padding: 30px 16px;
+        }
+
+        @media (min-width: 768px) {
+            .premium-active {
+                padding: 40px 24px;
+            }
         }
 
         .premium-active-badge {
@@ -1003,105 +1280,111 @@
                 </div>
 
                 <!-- Bonus Referidos -->
-                <div class="card" style="background: linear-gradient(135deg, rgba(42, 171, 238, 0.1), rgba(155, 123, 234, 0.1)); border: 1px solid rgba(42, 171, 238, 0.2);">
-                    <div class="card-body" style="text-align: center; padding: 16px;">
-                        <div style="font-size: 32px; margin-bottom: 8px;">🎁</div>
-                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">BONUS REFERIDOS GRATIS</div>
-                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                            15 referidos confirmados = <span style="color: var(--accent-green); font-weight: 600;">+1 día Premium</span><br>
-                            Máximo acumulable: 15 días
-                        </div>
-                        <button style="margin-top: 12px; padding: 8px 16px; background: rgba(42, 171, 238, 0.2); border: none; border-radius: 8px; color: var(--accent-blue); font-size: 12px; font-weight: 600; cursor: pointer;" onclick="switchTab('referrals')">
-                            👥 Ver Mis Referidos
-                        </button>
+                <div class="referral-bonus-card">
+                    <div style="font-size: 40px; margin-bottom: 12px;">🎁</div>
+                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">BONUS REFERIDOS GRATIS</div>
+                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                        15 referidos confirmados = <span style="color: var(--accent-green); font-weight: 700;">+1 día Premium</span><br>
+                        Máximo acumulable: 15 días
                     </div>
+                    <button class="referral-bonus-btn" onclick="switchTab('referrals')">
+                        👥 Ver Mis Referidos
+                    </button>
                 </div>
 
                 <!-- Plan 1: Prueba -->
-                <div class="card" style="margin-top: 16px; border: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div class="card-body" style="padding: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                            <div>
-                                <div style="font-size: 11px; color: var(--accent-purple); font-weight: 600; margin-bottom: 4px;">✨ PRUEBA</div>
-                                <div style="font-size: 18px; font-weight: 700;">🎁 Prueba</div>
-                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Perfecto para probar</div>
+                <div class="plan-card">
+                    <div class="card-body">
+                        <div class="plan-header">
+                            <div class="plan-info">
+                                <div style="font-size: 12px; color: var(--accent-purple); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;">✨ PRUEBA</div>
+                                <h3>🎁 Prueba</h3>
+                                <p class="plan-desc">Perfecto para probar (8.3⭐/día)</p>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">25 <span style="font-size: 16px;">⭐</span></div>
-                                <div style="font-size: 11px; color: var(--text-muted);">3 días (~$0.25)</div>
+                            <div class="plan-price">
+                                <div class="plan-price-main" style="color: var(--accent-blue);">
+                                    25 <span class="plan-price-star">⭐</span>
+                                </div>
+                                <div class="plan-price-sub">3 días · ~$0.25</div>
                             </div>
                         </div>
-                        <button class="buy-button" style="margin-top: 8px; padding: 12px; font-size: 13px;" onclick="buyPremium('trial')">
-                            ⭐ Obtener 3 días
+                        <button class="buy-button" onclick="buyPremium('trial')">
+                            ⭐ Obtener Prueba
                         </button>
                     </div>
                 </div>
 
                 <!-- Plan 2: Semanal (MÁS POPULAR) -->
-                <div class="card" style="margin-top: 12px; border: 2px solid var(--accent-blue); position: relative;">
-                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-blue); padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                <div class="plan-card featured" style="border-color: var(--accent-blue); position: relative;">
+                    <div class="plan-badge" style="background: var(--accent-blue);">
                         🔥 MÁS POPULAR
                     </div>
-                    <div class="card-body" style="padding: 20px 16px 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                            <div>
-                                <div style="font-size: 18px; font-weight: 700;">🔥 Semanal</div>
-                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Mejor precio/día (10.7⭐/día)</div>
+                    <div class="card-body" style="padding-top: 24px;">
+                        <div class="plan-header">
+                            <div class="plan-info">
+                                <h3>🔥 Semanal</h3>
+                                <p class="plan-desc">Mejor precio/día (10.7⭐/día)</p>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 28px; font-weight: 700; color: var(--accent-blue);">75 <span style="font-size: 18px;">⭐</span></div>
-                                <div style="font-size: 11px; color: var(--text-muted);">7 días (~$0.75)</div>
+                            <div class="plan-price">
+                                <div class="plan-price-main" style="color: var(--accent-blue);">
+                                    75 <span class="plan-price-star">⭐</span>
+                                </div>
+                                <div class="plan-price-sub">7 días · ~$0.75</div>
                             </div>
                         </div>
-                        <button class="buy-button" style="margin-top: 8px; padding: 14px; font-size: 14px; background: var(--accent-blue);" onclick="buyPremium('weekly')">
-                            🔥 Obtener 7 días
+                        <button class="buy-button" style="background: linear-gradient(135deg, var(--accent-blue), #1E96D1);" onclick="buyPremium('weekly')">
+                            🔥 Obtener Semanal
                         </button>
                     </div>
                 </div>
 
                 <!-- Plan 3: Mensual (RECOMENDADO) -->
-                <div class="card" style="margin-top: 12px; border: 2px solid var(--accent-green); position: relative;">
-                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-green); padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                <div class="plan-card featured" style="border-color: var(--accent-green); position: relative;">
+                    <div class="plan-badge" style="background: var(--accent-green);">
                         ⭐ RECOMENDADO
                     </div>
-                    <div class="card-body" style="padding: 20px 16px 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                            <div>
-                                <div style="font-size: 18px; font-weight: 700;">💎 Mensual</div>
-                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">El más elegido (5.0⭐/día)</div>
+                    <div class="card-body" style="padding-top: 24px;">
+                        <div class="plan-header">
+                            <div class="plan-info">
+                                <h3>💎 Mensual</h3>
+                                <p class="plan-desc">El más elegido (5.0⭐/día)</p>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 28px; font-weight: 700; color: var(--accent-green);">149 <span style="font-size: 18px;">⭐</span></div>
-                                <div style="font-size: 11px; color: var(--text-muted);">30 días (~$1.49)</div>
+                            <div class="plan-price">
+                                <div class="plan-price-main" style="color: var(--accent-green);">
+                                    149 <span class="plan-price-star">⭐</span>
+                                </div>
+                                <div class="plan-price-sub">30 días · ~$1.49</div>
                             </div>
                         </div>
-                        <button class="buy-button" style="margin-top: 8px; padding: 14px; font-size: 14px; background: var(--accent-green);" onclick="buyPremium('monthly')">
-                            💎 Obtener 1 mes
+                        <button class="buy-button" style="background: linear-gradient(135deg, var(--accent-green), #5BB05B);" onclick="buyPremium('monthly')">
+                            💎 Obtener Mensual
                         </button>
                     </div>
                 </div>
 
                 <!-- Plan 4: Trimestral (MEJOR VALOR) -->
-                <div class="card" style="margin-top: 12px; border: 2px solid var(--accent-orange); position: relative;">
-                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-orange); padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                <div class="plan-card featured" style="border-color: var(--accent-orange); position: relative;">
+                    <div class="plan-badge" style="background: var(--accent-orange);">
                         💰 MEJOR VALOR
                     </div>
-                    <div class="card-body" style="padding: 20px 16px 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                            <div>
-                                <div style="font-size: 18px; font-weight: 700;">👑 Trimestral</div>
-                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Ahorra 11% (4.4⭐/día)</div>
+                    <div class="card-body" style="padding-top: 24px;">
+                        <div class="plan-header">
+                            <div class="plan-info">
+                                <h3>👑 Trimestral</h3>
+                                <p class="plan-desc">Ahorra 11% (4.4⭐/día)</p>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 28px; font-weight: 700; color: var(--accent-orange);">399 <span style="font-size: 18px;">⭐</span></div>
-                                <div style="font-size: 11px; color: var(--text-muted);">90 días (~$3.99)</div>
+                            <div class="plan-price">
+                                <div class="plan-price-main" style="color: var(--accent-orange);">
+                                    399 <span class="plan-price-star">⭐</span>
+                                </div>
+                                <div class="plan-price-sub">90 días · ~$3.99</div>
                             </div>
                         </div>
-                        <div style="background: rgba(229, 165, 88, 0.15); padding: 8px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                            <span style="font-size: 11px; color: var(--accent-orange); font-weight: 600;">💰 AHORRAS 48⭐ vs 3 meses separados</span>
+                        <div class="plan-savings">
+                            <span style="font-size: 12px; color: var(--accent-orange); font-weight: 700;">💰 AHORRAS 48⭐ vs 3 meses separados</span>
                         </div>
-                        <button class="buy-button" style="margin-top: 8px; padding: 14px; font-size: 14px; background: var(--accent-orange);" onclick="buyPremium('quarterly')">
-                            👑 Obtener 3 meses
+                        <button class="buy-button" style="background: linear-gradient(135deg, var(--accent-orange), #D89640);" onclick="buyPremium('quarterly')">
+                            👑 Obtener Trimestral
                         </button>
                     </div>
                 </div>
