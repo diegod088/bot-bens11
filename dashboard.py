@@ -1301,30 +1301,63 @@ def miniapp_stats():
 
 @app.route('/api/miniapp/create-invoice', methods=['POST'])
 def create_invoice():
-    """Create a Telegram Stars invoice link"""
+    """Create a Telegram Stars invoice link with support for multiple plans"""
     try:
         data = request.get_json() or {}
         user_id = data.get('user_id')
+        plan_key = data.get('plan_key', 'monthly')  # Default to monthly plan
         
         if not user_id:
             return jsonify({'error': 'User ID required'}), 400
+        
+        # Premium plans configuration
+        PREMIUM_PLANS = {
+            'trial': {
+                'stars': 25,
+                'days': 3,
+                'name': '🎁 Prueba',
+                'description': 'Prueba Premium por 3 días | Descargas ilimitadas'
+            },
+            'weekly': {
+                'stars': 75,
+                'days': 7,
+                'name': '🔥 Semanal',
+                'description': 'Premium por 7 días | Mejor precio por día'
+            },
+            'monthly': {
+                'stars': 149,
+                'days': 30,
+                'name': '💎 Mensual',
+                'description': 'Premium por 30 días | El más popular'
+            },
+            'quarterly': {
+                'stars': 399,
+                'days': 90,
+                'name': '👑 Trimestral',
+                'description': 'Premium por 90 días | Ahorra hasta 50%'
+            }
+        }
+        
+        # Get plan details or default to monthly
+        plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['monthly'])
             
         # Telegram API createInvoiceLink
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/createInvoiceLink"
         
         payload = {
-            "title": "Premium 30 días",
-            "description": "Acceso ilimitado a descargas de video, música y APKs por 30 días.",
-            "payload": f"premium_30_{user_id}",
-            "provider_token": "", # Empty for Stars
+            "title": f"{plan['name']} - Premium {plan['days']} días",
+            "description": plan['description'],
+            "payload": f"premium_{plan['days']}_days_{plan_key}_{user_id}",
+            "provider_token": "",  # Empty for Stars
             "currency": "XTR",
-            "prices": [{"label": "Premium", "amount": 199}]
+            "prices": [{"label": f"Premium {plan['days']} días", "amount": plan['stars']}]
         }
         
         response = requests.post(url, json=payload)
         result = response.json()
         
         if result.get('ok'):
+            logger.info(f"Invoice created for user {user_id}: {plan_key} ({plan['stars']}⭐ / {plan['days']}d)")
             return jsonify({'ok': True, 'invoice_link': result['result']})
         else:
             logger.error(f"Telegram API error: {result}")

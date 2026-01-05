@@ -998,57 +998,154 @@
             <div id="premiumOffer">
                 <div class="premium-hero">
                     <div class="premium-crown">⭐</div>
-                    <h2 class="premium-title">Hazte Premium</h2>
-                    <p class="premium-desc">Desbloquea todo el potencial</p>
+                    <h2 class="premium-title">Elige tu Plan Premium</h2>
+                    <p class="premium-desc">4 opciones para ti</p>
                 </div>
 
-                <div class="card">
+                <!-- Bonus Referidos -->
+                <div class="card" style="background: linear-gradient(135deg, rgba(42, 171, 238, 0.1), rgba(155, 123, 234, 0.1)); border: 1px solid rgba(42, 171, 238, 0.2);">
+                    <div class="card-body" style="text-align: center; padding: 16px;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">🎁</div>
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">BONUS REFERIDOS GRATIS</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                            15 referidos confirmados = <span style="color: var(--accent-green); font-weight: 600;">+1 día Premium</span><br>
+                            Máximo acumulable: 15 días
+                        </div>
+                        <button style="margin-top: 12px; padding: 8px 16px; background: rgba(42, 171, 238, 0.2); border: none; border-radius: 8px; color: var(--accent-blue); font-size: 12px; font-weight: 600; cursor: pointer;" onclick="switchTab('referrals')">
+                            👥 Ver Mis Referidos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Plan 1: Prueba -->
+                <div class="card" style="margin-top: 16px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="card-body" style="padding: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-size: 11px; color: var(--accent-purple); font-weight: 600; margin-bottom: 4px;">✨ PRUEBA</div>
+                                <div style="font-size: 18px; font-weight: 700;">🎁 Prueba</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Perfecto para probar</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">25 <span style="font-size: 16px;">⭐</span></div>
+                                <div style="font-size: 11px; color: var(--text-muted);">3 días (~$0.25)</div>
+                            </div>
+                        </div>
+                        <button class="buy-button" style="margin-top: 8px; padding: 12px; font-size: 13px;" onclick="buyPremium('trial')">
+                            ⭐ Obtener 3 días
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Plan 2: Semanal (MÁS POPULAR) -->
+                <div class="card" style="margin-top: 12px; border: 2px solid var(--accent-blue); position: relative;">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-blue); padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                        🔥 MÁS POPULAR
+                    </div>
+                    <div class="card-body" style="padding: 20px 16px 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700;">🔥 Semanal</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Mejor precio/día (10.7⭐/día)</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 28px; font-weight: 700; color: var(--accent-blue);">75 <span style="font-size: 18px;">⭐</span></div>
+                                <div style="font-size: 11px; color: var(--text-muted);">7 días (~$0.75)</div>
+                            </div>
+                        </div>
+                        <button class="buy-button" style="margin-top: 8px; padding: 14px; font-size: 14px; background: var(--accent-blue);" onclick="buyPremium('weekly')">
+                            🔥 Obtener 7 días
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Plan 3: Mensual (RECOMENDADO) -->
+                <div class="card" style="margin-top: 12px; border: 2px solid var(--accent-green); position: relative;">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-green); padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                        ⭐ RECOMENDADO
+                    </div>
+                    <div class="card-body" style="padding: 20px 16px 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700;">💎 Mensual</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">El más elegido (5.0⭐/día)</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 28px; font-weight: 700; color: var(--accent-green);">149 <span style="font-size: 18px;">⭐</span></div>
+                                <div style="font-size: 11px; color: var(--text-muted);">30 días (~$1.49)</div>
+                            </div>
+                        </div>
+                        <button class="buy-button" style="margin-top: 8px; padding: 14px; font-size: 14px; background: var(--accent-green);" onclick="buyPremium('monthly')">
+                            💎 Obtener 1 mes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Plan 4: Trimestral (MEJOR VALOR) -->
+                <div class="card" style="margin-top: 12px; border: 2px solid var(--accent-orange); position: relative;">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-orange); padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                        💰 MEJOR VALOR
+                    </div>
+                    <div class="card-body" style="padding: 20px 16px 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700;">👑 Trimestral</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Ahorra 11% (4.4⭐/día)</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 28px; font-weight: 700; color: var(--accent-orange);">399 <span style="font-size: 18px;">⭐</span></div>
+                                <div style="font-size: 11px; color: var(--text-muted);">90 días (~$3.99)</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(229, 165, 88, 0.15); padding: 8px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                            <span style="font-size: 11px; color: var(--accent-orange); font-weight: 600;">💰 AHORRAS 48⭐ vs 3 meses separados</span>
+                        </div>
+                        <button class="buy-button" style="margin-top: 8px; padding: 14px; font-size: 14px; background: var(--accent-orange);" onclick="buyPremium('quarterly')">
+                            👑 Obtener 3 meses
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Comparativa de beneficios -->
+                <div class="card" style="margin-top: 16px;">
                     <div class="card-header">
-                        <span class="card-title">Comparativa</span>
+                        <span class="card-title">✨ Beneficios Premium</span>
                     </div>
-                    <div class="card-body compare-table">
-                        <div class="compare-row">
-                            <div class="compare-feature"></div>
-                            <div class="compare-free compare-header">FREE</div>
-                            <div class="compare-premium compare-header">PRO</div>
+                    <div class="card-body">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size: 24px;">📸</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; font-weight: 600;">Fotos Ilimitadas</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Descarga todas las que quieras</div>
+                            </div>
+                            <div style="color: var(--accent-green); font-weight: 600;">∞</div>
                         </div>
-                        <div class="compare-row">
-                            <div class="compare-feature">Videos</div>
-                            <div class="compare-free compare-value">3/día</div>
-                            <div class="compare-premium compare-value gold">50/día</div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size: 24px;">🎬</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; font-weight: 600;">50 Videos/día</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">vs 3 en plan gratuito</div>
+                            </div>
+                            <div style="color: var(--accent-green); font-weight: 600;">50</div>
                         </div>
-                        <div class="compare-row">
-                            <div class="compare-feature">Fotos</div>
-                            <div class="compare-free compare-value">10/día</div>
-                            <div class="compare-premium compare-value gold">∞</div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size: 24px;">🎵</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; font-weight: 600;">50 Canciones/día</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Música sin límites</div>
+                            </div>
+                            <div style="color: var(--accent-green); font-weight: 600;">50</div>
                         </div>
-                        <div class="compare-row">
-                            <div class="compare-feature">Música</div>
-                            <div class="compare-free compare-x">✕</div>
-                            <div class="compare-premium compare-check">✓</div>
-                        </div>
-                        <div class="compare-row">
-                            <div class="compare-feature">APKs</div>
-                            <div class="compare-free compare-x">✕</div>
-                            <div class="compare-premium compare-check">✓</div>
-                        </div>
-                        <div class="compare-row">
-                            <div class="compare-feature">Sin anuncios</div>
-                            <div class="compare-free compare-x">✕</div>
-                            <div class="compare-premium compare-check">✓</div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0;">
+                            <div style="font-size: 24px;">🚫</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; font-weight: 600;">Sin Anuncios</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Experiencia premium</div>
+                            </div>
+                            <div style="color: var(--accent-green); font-weight: 600;">✓</div>
                         </div>
                     </div>
                 </div>
-
-                <div class="price-card">
-                    <span class="price-amount">199</span>
-                    <span class="price-star">⭐</span>
-                    <div class="price-period">por 30 días</div>
-                </div>
-
-                <button class="buy-button" id="buyButton" onclick="buyPremium()">
-                    ⭐ Obtener Premium
-                </button>
             </div>
         </div>
 
@@ -1646,18 +1743,26 @@
         }
 
         // ========== PREMIUM ==========
-        async function buyPremium() {
-            const btn = document.getElementById('buyButton');
-            if (btn) btn.disabled = true;
-            
+        async function buyPremium(planKey = 'monthly') {
             showToast('Preparando pago...');
+
+            // Plan details
+            const plans = {
+                'trial': { stars: 25, days: 3, name: '🎁 Prueba' },
+                'weekly': { stars: 75, days: 7, name: '🔥 Semanal' },
+                'monthly': { stars: 149, days: 30, name: '💎 Mensual' },
+                'quarterly': { stars: 399, days: 90, name: '👑 Trimestral' }
+            };
+
+            const plan = plans[planKey] || plans['monthly'];
 
             try {
                 const response = await fetch(`${API_BASE}/api/miniapp/create-invoice`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: userData?.user_id || tg.initDataUnsafe?.user?.id
+                        user_id: userData?.user_id || tg.initDataUnsafe?.user?.id,
+                        plan_key: planKey
                     })
                 });
 
@@ -1666,9 +1771,12 @@
                 if (result.ok && result.invoice_link) {
                     tg.openInvoice(result.invoice_link, (status) => {
                         if (status === 'paid') {
-                            tg.showAlert('¡Gracias! Tu Premium se activará en segundos ✨');
+                            tg.showAlert(`¡Gracias! Tu Premium ${plan.name} se activará en segundos ✨`);
                             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                            setTimeout(() => tg.close(), 2000);
+                            setTimeout(() => {
+                                loadUserData();
+                                tg.close();
+                            }, 2000);
                         } else if (status === 'cancelled') {
                             showToast('Pago cancelado');
                         } else if (status === 'failed') {
