@@ -2149,7 +2149,11 @@
                     console.error('HTTP error:', response.status, errorText);
                     const linkEl = document.getElementById('referralLink');
                     if (linkEl) {
-                        linkEl.textContent = `Error HTTP ${response.status}`;
+                        if (response.status === 404) {
+                            linkEl.textContent = 'Error 404: Endpoint no encontrado';
+                        } else {
+                            linkEl.textContent = `Error HTTP ${response.status}`;
+                        }
                         linkEl.style.color = 'var(--accent-red)';
                     }
                     return false;

@@ -1495,14 +1495,17 @@ def miniapp_referrals():
     try:
         user_id = request.args.get('user_id', type=int)
         
+        logger.info(f"MiniApp referrals request for user_id: {user_id}")
+        
         if not user_id:
-            return jsonify({'error': 'User ID required'}), 400
+            return jsonify({'ok': False, 'error': 'User ID required'}), 400
         
         # Importar funciones de database
-        from database import get_referral_stats, get_user
+        from database import get_referral_stats
         
         # Obtener estadísticas
         stats = get_referral_stats(user_id)
+        logger.info(f"Stats for user {user_id}: {stats}")
         
         # Generar enlace de referido
         # Intentar obtener el username del bot (cachear si es posible)
@@ -1511,17 +1514,21 @@ def miniapp_referrals():
         
         if not bot_username:
             try:
+                logger.info("Fetching bot username from Telegram API...")
                 bot_info_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getMe"
                 bot_response = requests.get(bot_info_url, timeout=5).json()
-                bot_username = bot_response.get('result', {}).get('username', 'bot')
+                logger.info(f"Telegram API response: {bot_response}")
+                bot_username = bot_response.get('result', {}).get('username', 'MEDIA_SAVE_videosbot')
                 BOT_USERNAME_CACHE = bot_username
+                logger.info(f"Bot username set to: {bot_username}")
             except Exception as e:
                 logger.error(f"Error getting bot username: {e}")
-                bot_username = "bot"
+                bot_username = "MEDIA_SAVE_videosbot"  # Fallback a nombre conocido
         
         referral_link = f"https://t.me/{bot_username}?start=ref_{user_id}"
+        logger.info(f"Generated referral link: {referral_link}")
         
-        return jsonify({
+        response = {
             'ok': True,
             'stats': {
                 'confirmed': stats.get('confirmed', 0),
@@ -1532,11 +1539,14 @@ def miniapp_referrals():
             },
             'referral_link': referral_link,
             'max_days': 15
-        })
+        }
+        
+        logger.info(f"Returning referral response: {response}")
+        return jsonify(response)
         
     except Exception as e:
-        logger.error(f"MiniApp referrals error: {e}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"MiniApp referrals error: {e}", exc_info=True)
+        return jsonify({'ok': False, 'error': str(e)}), 500
 
 
 if __name__ == '__main__':
