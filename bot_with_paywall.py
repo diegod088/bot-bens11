@@ -4865,72 +4865,24 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 async def main():
-    """Start the bot (async)"""
-    from telegram.request import HTTPXRequest
-
-    request = HTTPXRequest(
-        connection_pool_size=20,  # Aumentado para mejor concurrencia
-        connect_timeout=60.0,     # 1 minuto para conectar (antes 30s)
-        read_timeout=900.0,       # 15 minutos para leer (antes 30s) - crucial para archivos grandes
-        write_timeout=900.0,      # 15 minutos para escribir (antes 30s)
-        pool_timeout=120.0        # 2 minutos para pool (antes 30s)
-    )
-
-    application = (
-        Application.builder()
-        .token(TELEGRAM_TOKEN)
-        .request(request)
-        .post_init(post_init)
-        .post_shutdown(post_shutdown)
-        .build()
-    )
-
-    # Login conversation handler
-    login_handler = ConversationHandler(
-        entry_points=[
-            CommandHandler("configurar", start_login),
-            CallbackQueryHandler(start_login, pattern="^connect_account$")
-        ],
-        states={
-            PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_phone)],
-            CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_code)],
-            PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_password)],
-        },
-        fallbacks=[
-            CommandHandler("cancel", cancel_login),
-            CallbackQueryHandler(cancel_login, pattern="^cancel_login$")
-        ],
-        allow_reentry=True
-    )
-    application.add_handler(login_handler)
-    application.add_handler(CommandHandler("logout", logout_command))
-
-    application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(CommandHandler("panel", panel_command))
-    application.add_handler(CommandHandler("premium", premium_command))
-    application.add_handler(CommandHandler("miniapp", miniapp_command))
-    application.add_handler(CommandHandler("testpay", testpay_command))
-    application.add_handler(CommandHandler("adminstats", adminstats_command))
-    application.add_handler(CommandHandler("stats", stats_command))
-    application.add_handler(CommandHandler("referidos", referidos_command))
-    application.add_handler(CallbackQueryHandler(button_callback))
-    application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
-    application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
-    application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-    # Add diagnostic command for Railway troubleshooting
-    application.add_handler(CommandHandler("diagnostic", diagnostic_command))
-
-    # Registrar el manejador de errores global
-    application.add_error_handler(error_handler)
-
-    logger.info("Bot started. Waiting for messages...")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    """
+    ⚠️ LEGACY FUNCTION - DO NOT USE
+    This function is kept for backward compatibility only.
+    Use async_main() instead which is the proper async entry point.
+    """
+    logger.warning("❌ main() called - this is deprecated. Use async_main() or bot_with_paywall.py directly")
+    raise RuntimeError("❌ CRITICAL: Do not call main() - use async_main() via asyncio.run() instead")
 
 
 if __name__ == "__main__":
-    main()
+    # Entry point for direct execution (only for testing)
+    logger.info("=" * 80)
+    logger.info("🚀 TELEGRAM BOT - DIRECT EXECUTION (Testing Only)")
+    logger.info("=" * 80)
+    logger.warning("⚠️ WARNING: Direct bot execution is not recommended. Use railway_start.py or start.py")
+    logger.info("=" * 80)
+    
+    asyncio.run(async_main())
 
 
 async def async_main():
@@ -5023,24 +4975,23 @@ async def async_main():
                 logger.error(f"Failed to initialize bot after {max_retries} attempts")
                 raise
     
-    # Execute post_init manually (it's not called automatically in async mode)
-    await post_init(application)
-    
-    await application.start()
-    
-    # Start polling without signal handlers (they don't work in non-main threads)
-    await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
-    
-    # Keep running
+    # Start the application with run_polling (PTB v20+ recommended method)
+    # This is the ONLY correct way to run the bot
     try:
-        while True:
-            await asyncio.sleep(1)
-    except asyncio.CancelledError:
-        pass
+        logger.info("=" * 80)
+        logger.info("🚀 TELEGRAM BOT POLLING STARTED")
+        logger.info("✅ Listening for incoming messages...")
+        logger.info("=" * 80)
+        
+        # run_polling() is blocking and handles the entire lifecycle
+        await application.run_polling(allowed_updates=Update.ALL_TYPES)
+        
+    except KeyboardInterrupt:
+        logger.info("⚠️ Keyboard interrupt received")
+    except Exception as e:
+        logger.error(f"❌ Bot polling error: {e}", exc_info=True)
     finally:
         logger.info("🛑 Bot shutting down...")
-        await application.stop()
-        await application.shutdown()
         # Reset flag to allow restart if needed
         with _bot_instance_lock:
             _bot_instance_running = False
