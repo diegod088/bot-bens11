@@ -2761,7 +2761,15 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+    # Handle both direct commands and callback queries
+    if update.callback_query:
+        try:
+            await update.callback_query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+        except Exception as e:
+            logger.warning(f"Could not edit message, sending new one: {e}")
+            await update.callback_query.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+    else:
+        await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
     return
     
     # Check and reset daily limits
