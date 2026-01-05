@@ -112,20 +112,10 @@ def main():
     signal.signal(signal.SIGINT, lambda s, f: sys.exit(0))
     
     # Check bot requirements
-    required_vars = ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_API_ID', 'TELEGRAM_API_HASH']
-    alt_names = {
-        'TELEGRAM_BOT_TOKEN': 'TELEGRAM_TOKEN',
-        'TELEGRAM_API_ID': 'API_ID',
-        'TELEGRAM_API_HASH': 'API_HASH'
-    }
+    telegram_token = os.environ.get('TELEGRAM_TOKEN') or os.environ.get('TELEGRAM_BOT_TOKEN')
     
-    missing = []
-    for var in required_vars:
-        if not os.environ.get(var) and not os.environ.get(alt_names.get(var)):
-            missing.append(var)
-    
-    if missing:
-        logger.error(f"❌ Missing bot variables: {missing}")
+    if not telegram_token:
+        logger.error(f"❌ Missing TELEGRAM_TOKEN")
         logger.warning("⚠️ Starting dashboard only (no bot)")
         
         # Run only dashboard in main thread
@@ -135,7 +125,7 @@ def main():
             logger.info("🛑 Shutting down...")
         return
     
-    logger.info("✅ Bot requirements satisfied")
+    logger.info("✅ Bot token found")
     logger.info("")
     
     # Start dashboard in SEPARATE THREAD
