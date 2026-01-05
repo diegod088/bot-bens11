@@ -846,7 +846,7 @@
 </head>
 <body>
     <!-- Onboarding -->
-    <div id="onboarding" class="onboarding" style="display: none;">
+    <div id="onboarding" class="onboarding" style="display: flex;">
         <div class="onboarding-slides" id="slides">
             <div class="onboarding-slide">
                 <div class="onboarding-icon">📥</div>
@@ -1754,10 +1754,30 @@
         }
 
         // ========== INIT ==========
-        checkOnboarding();
-        const seen = localStorage.getItem('onboarding_seen');
-        if (seen) {
-            loadUserData();
+        // Esperar a que el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking onboarding...');
+            checkOnboarding();
+            const seen = localStorage.getItem('onboarding_seen');
+            if (seen) {
+                console.log('User has seen onboarding, loading data...');
+                loadUserData();
+            } else {
+                console.log('First time user, showing onboarding');
+            }
+        });
+
+        // Fallback si DOMContentLoaded ya pasó
+        if (document.readyState === 'loading') {
+            // DOM aún no está listo, el event listener lo manejará
+        } else {
+            // DOM ya está listo
+            console.log('DOM already loaded, checking onboarding immediately...');
+            checkOnboarding();
+            const seen = localStorage.getItem('onboarding_seen');
+            if (seen) {
+                loadUserData();
+            }
         }
 
         // Cargar stats de referidos al cambiar a la pestaña
