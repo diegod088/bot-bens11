@@ -1797,6 +1797,9 @@
             document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
             document.getElementById('welcomeText').textContent = `¡Hola, ${name}!`;
             
+            // Cargar stats de referidos automáticamente
+            loadReferralStats();
+            
             // Plan
             if (userData.premium) {
                 document.getElementById('userPlan').textContent = 'Plan Premium ⭐';
