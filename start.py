@@ -38,6 +38,10 @@ except Exception as e:
 # Flag for graceful shutdown
 shutdown_event = threading.Event()
 
+# Global flag to prevent multiple bot instances
+_bot_started = False
+_bot_lock = threading.Lock()
+
 
 def run_dashboard():
     """Run the Flask dashboard in a separate thread"""
@@ -66,6 +70,15 @@ def run_dashboard():
 
 def run_bot():
     """Run the Telegram bot (blocking, runs in separate thread)"""
+    global _bot_started
+    
+    # Prevent multiple instances
+    with _bot_lock:
+        if _bot_started:
+            logger.warning("⚠️ Bot already started, skipping duplicate initialization")
+            return
+        _bot_started = True
+    
     try:
         logger.info("🤖 Starting Telegram Bot...")
         
@@ -83,6 +96,9 @@ def run_bot():
             
     except Exception as e:
         logger.error(f"❌ Bot error: {e}")
+        # Reset flag on error to allow retry
+        with _bot_lock:
+            _bot_started = False
         raise
 
 

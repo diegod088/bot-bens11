@@ -11,6 +11,7 @@ import os
 import re
 import asyncio
 import logging
+import threading
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
@@ -117,6 +118,10 @@ WAITING_FOR_LINK = 1
 # Network retry settings
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds
+
+# Global flag to prevent multiple bot instances (Conflict 409 protection)
+_bot_instance_running = False
+_bot_instance_lock = threading.Lock()
 
 
 # ==================== UTILITY FUNCTIONS ====================
@@ -4591,6 +4596,17 @@ if __name__ == "__main__":
 
 async def async_main():
     """Start the bot asynchronously (for use in non-main threads)"""
+    global _bot_instance_running
+    
+    # Prevent multiple bot instances (Conflict 409 protection)
+    with _bot_instance_lock:
+        if _bot_instance_running:
+            logger.warning("⚠️ Bot instance already running. Skipping to prevent Conflict 409.")
+            return
+        _bot_instance_running = True
+    
+    logger.info("🤖 Initializing Telegram Bot (async_main)...")
+    
     from telegram.request import HTTPXRequest
     from telegram.error import TimedOut, NetworkError
     
@@ -4680,5 +4696,11 @@ async def async_main():
     except asyncio.CancelledError:
         pass
     finally:
+        global _bot_instance_running
+        logger.info("🛑 Bot shutting down...")
         await application.stop()
         await application.shutdown()
+        # Reset flag to allow restart if needed
+        with _bot_instance_lock:
+            _bot_instance_running = False
+        logger.info("✅ Bot stopped cleanly")
