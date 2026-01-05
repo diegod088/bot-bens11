@@ -4,6 +4,622 @@
 
 {% block extra_css %}
 <style>
+    /* === MOBILE-FIRST TOOLBAR === */
+    .toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .toolbar input,
+    .toolbar select {
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        font-size: 16px;
+        background: var(--bg-surface);
+        color: var(--text-primary);
+    }
+
+    .toolbar .btn {
+        width: 100%;
+    }
+
+    /* === USER CARDS (MOBILE) === */
+    .users-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .user-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        transition: all 0.2s;
+    }
+
+    .user-card:active {
+        box-shadow: var(--shadow-md);
+    }
+
+    .user-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .user-card-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-id {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        margin-bottom: 0.25rem;
+    }
+
+    .user-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        word-break: break-word;
+    }
+
+    .user-username {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .user-meta {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .badge-premium {
+        background: var(--warning-bg);
+        color: var(--warning);
+    }
+
+    .badge-free {
+        background: var(--bg-body);
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+    }
+
+    .badge-success {
+        background: var(--success-bg);
+        color: var(--success);
+    }
+
+    .badge-danger {
+        background: var(--danger-bg);
+        color: var(--danger);
+    }
+
+    .user-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+    }
+
+    .stat-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .user-card-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .user-card-actions .btn {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* === TABLE (DESKTOP) === */
+    .table-container {
+        display: none;
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    th {
+        background: var(--bg-body);
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover td {
+        background: var(--bg-body);
+    }
+
+    /* === PAGINATION === */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .page-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--bg-surface);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.75rem;
+    }
+
+    .page-btn:active:not(:disabled) {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .page-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* === STATES === */
+    .loading-state {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* === DESKTOP RESPONSIVE === */
+    @media (min-width: 768px) {
+        .toolbar {
+            grid-template-columns: 1fr 150px 150px 100px;
+            gap: 1rem;
+        }
+
+        .toolbar .btn {
+            width: 100%;
+            padding: 0.5rem 1rem;
+        }
+
+        .users-grid {
+            display: none;
+        }
+
+        .table-container {
+            display: block;
+        }
+
+        /* Hide checkboxes and bulk actions on desktop (for cleaner UX) */
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        #bulk-actions {
+            display: none !important;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+    }
+
+    /* === BULK ACTIONS BANNER === */
+    #bulk-actions {
+        background: var(--primary-light);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: none;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    #bulk-actions.active {
+        display: flex;
+    }
+
+    #bulk-actions .btn {
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        #bulk-actions {
+            flex-direction: row;
+            align-items: center;
+        }
+
+        #bulk-actions .btn {
+            width: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h1 class="section-title">👥 Usuarios</h1>
+</div>
+
+<div class="card">
+    <div class="toolbar">
+        <div style="position: relative;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="search-input" placeholder="Buscar..." style="padding-left: 2.5rem;">
+        </div>
+        
+        <select id="status-filter" onchange="loadUsers(1)">
+            <option value="all">Todos</option>
+            <option value="premium">Premium</option>
+            <option value="free">Gratuitos</option>
+        </select>
+        
+        <select id="sort-filter" onchange="loadUsers(1)">
+            <option value="created_at-desc">Recientes</option>
+            <option value="downloads-desc">Descargas</option>
+            <option value="updated_at-desc">Activos</option>
+        </select>
+        
+        <button class="btn btn-primary" onclick="exportCSV()" title="Exportar CSV">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        </button>
+    </div>
+
+    <!-- Bulk Actions Banner (Mobile) -->
+    <div id="bulk-actions">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; color: var(--primary);" id="selected-count">0 seleccionados</span>
+            <button class="btn btn-outline" onclick="clearSelection()" style="width: auto; padding: 0.5rem 1rem;">Cancelar</button>
+        </div>
+        <button class="btn btn-primary" onclick="bulkAddPremium()">✨ Añadir Premium a Seleccionados</button>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading-state" style="display: none;">
+        <div class="spinner"></div>
+        <p>Cargando usuarios...</p>
+    </div>
+
+    <!-- Content -->
+    <div id="content">
+        <!-- Users Grid (Mobile) -->
+        <div class="users-grid" id="users-grid">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- Users Table (Desktop) -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre/Usuario</th>
+                        <th>Estado</th>
+                        <th>Vencimiento</th>
+                        <th>Descargas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="pagination"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentPage = 1;
+    const perPage = 20;
+    let selectedUsers = new Set();
+
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+    }
+
+    function getDaysLeft(expiryDate) {
+        if (!expiryDate) return 0;
+        const diffTime = new Date(expiryDate) - new Date();
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function toggleUserSelection(userId, checkbox) {
+        if (checkbox.checked) selectedUsers.add(userId);
+        else selectedUsers.delete(userId);
+        updateBulkActions();
+    }
+
+    function updateBulkActions() {
+        const banner = document.getElementById('bulk-actions');
+        if (selectedUsers.size > 0) {
+            banner.classList.add('active');
+            document.getElementById('selected-count').textContent = `${selectedUsers.size} seleccionado${selectedUsers.size > 1 ? 's' : ''}`;
+        } else {
+            banner.classList.remove('active');
+        }
+    }
+
+    function clearSelection() {
+        selectedUsers.clear();
+        document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = false);
+        updateBulkActions();
+    }
+
+    function bulkAddPremium() {
+        if (selectedUsers.size === 0) return;
+        const days = prompt('¿Cuántos días?', '30');
+        if (!days) return;
+        
+        fetch('/api/admin/add-premium-bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_ids: Array.from(selectedUsers), days: parseInt(days) })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                Utils.showToast(`Premium añadido a ${data.affected} usuarios`, 'success');
+                clearSelection();
+                loadUsers(1);
+            } else {
+                Utils.showToast(data.error, 'error');
+            }
+        });
+    }
+
+    function renderUsersCards(users) {
+        const grid = document.getElementById('users-grid');
+        grid.innerHTML = '';
+
+        if (users.length === 0) {
+            grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No se encontraron usuarios</div>';
+            return;
+        }
+
+        users.forEach(user => {
+            const isPremium = user.is_premium;
+            const daysLeft = isPremium ? getDaysLeft(user.premium_expiry) : 0;
+            const nameDisplay = user.first_name || (user.username ? `@${user.username}` : 'Usuario');
+            
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            card.innerHTML = `
+                <div class="user-card-header">
+                    <div class="user-card-info">
+                        <div class="user-id">ID: ${user.user_id}</div>
+                        <div class="user-name">${nameDisplay}</div>
+                        ${user.username && user.first_name ? `<div class="user-username">@${user.username}</div>` : ''}
+                    </div>
+                    <input type="checkbox" class="user-checkbox" data-user-id="${user.user_id}" onchange="toggleUserSelection(${user.user_id}, this)">
+                </div>
+
+                <div class="user-meta">
+                    <span class="badge ${isPremium ? 'badge-premium' : 'badge-free'}">
+                        ${isPremium ? '⭐ Premium' : 'Gratis'}
+                    </span>
+                    ${isPremium ? `<span class="badge ${daysLeft < 3 ? 'badge-danger' : 'badge-success'}">${daysLeft}d</span>` : ''}
+                </div>
+
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Descargas</span>
+                        <span class="stat-value">${user.downloads_count || 0}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Desde</span>
+                        <span class="stat-value">${formatDate(user.created_at)}</span>
+                    </div>
+                </div>
+
+                <div class="user-card-actions">
+                    <a href="/user/${user.user_id}" class="btn btn-primary" style="flex: 1;">Ver Detalle</a>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function renderUsersTable(users) {
+        const tbody = document.getElementById('users-table-body');
+        tbody.innerHTML = '';
+
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 3rem;">No se encontraron usuarios</td></tr>';
+            return;
+        }
+
+        users.forEach(user => {
+            const isPremium = user.is_premium;
+            const daysLeft = isPremium ? getDaysLeft(user.premium_expiry) : 0;
+            const nameDisplay = user.first_name || (user.username ? `@${user.username}` : 'Usuario');
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="font-medium">${user.user_id}</td>
+                <td>${nameDisplay}</td>
+                <td><span class="badge ${isPremium ? 'badge-premium' : 'badge-free'}">${isPremium ? 'Premium' : 'Gratis'}</span></td>
+                <td>${isPremium ? `<span class="badge badge-${daysLeft < 3 ? 'danger' : 'success'}">${daysLeft}d</span>` : '-'}</td>
+                <td>${user.downloads_count || 0}</td>
+                <td><a href="/user/${user.user_id}" class="btn btn-outline text-xs">Ver</a></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderPagination(totalUsers) {
+        const totalPages = Math.ceil(totalUsers / perPage);
+        const container = document.getElementById('pagination');
+        container.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        // Prev
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'page-btn';
+        prevBtn.innerHTML = '←';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => loadUsers(currentPage - 1);
+        container.appendChild(prevBtn);
+
+        // Pages
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                btn.textContent = i;
+                btn.onclick = () => loadUsers(i);
+                container.appendChild(btn);
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                const span = document.createElement('span');
+                span.textContent = '...';
+                span.style.padding = '0.5rem';
+                span.style.color = 'var(--text-tertiary)';
+                container.appendChild(span);
+            }
+        }
+
+        // Next
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'page-btn';
+        nextBtn.innerHTML = '→';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => loadUsers(currentPage + 1);
+        container.appendChild(nextBtn);
+    }
+
+    function exportCSV() {
+        const search = document.getElementById('search-input').value;
+        const status = document.getElementById('status-filter').value;
+        let url = '/api/export/users?format=csv';
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (status !== 'all') url += `&status=${status}`;
+        window.open(url, '_blank');
+    }
+
+    function loadUsers(page = 1) {
+        currentPage = page;
+        const loading = document.getElementById('loading');
+        const content = document.getElementById('content');
+        const search = document.getElementById('search-input').value;
+        const status = document.getElementById('status-filter').value;
+        const [sortBy, order] = document.getElementById('sort-filter').value.split('-');
+
+        loading.style.display = 'block';
+        content.style.opacity = '0.5';
+
+        let url = `/api/users?page=${page}&per_page=${perPage}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (status !== 'all') url += `&status=${status}`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                renderUsersCards(data.users);
+                renderUsersTable(data.users);
+                renderPagination(data.total);
+                loading.style.display = 'none';
+                content.style.opacity = '1';
+            })
+            .catch(err => {
+                Utils.showToast('Error al cargar', 'error');
+                loading.style.display = 'none';
+                content.style.opacity = '1';
+            });
+    }
+
+    document.getElementById('search-input').addEventListener('keypress', e => {
+        if (e.key === 'Enter') loadUsers(1);
+    });
+
+    // Initial load
+    loadUsers();
+</script>
+{% endblock %}
+<style>
     .toolbar {
         display: flex;
         gap: 1rem;

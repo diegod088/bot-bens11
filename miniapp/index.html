@@ -1661,32 +1661,30 @@
         let userData = null;
         let isConnected = false;
         let currentSlide = 0;
+        let currentLanguage = 'es'; // Default language
 
-        // ========== ONBOARDING ==========
-        function checkOnboarding() {
+        // ========== AUTO-DETECT LANGUAGE & SKIP ONBOARDING ==========
+        function initializeApp() {
+            console.log('Inicializando app...');
+            // Skip onboarding - go directly to app
+            document.getElementById('onboarding').style.display = 'none';
+            document.getElementById('loading').style.display = 'flex';
+            
+            // Mark onboarding as seen
             try {
-                const seen = localStorage.getItem('onboarding_seen');
-                const onboardingEl = document.getElementById('onboarding');
-                const loadingEl = document.getElementById('loading');
-                
-                console.log('checkOnboarding called, seen:', seen);
-                
-                if (seen === 'true') {
-                    console.log('Onboarding ya visto, ocultando...');
-                    onboardingEl.style.display = 'none';
-                    loadingEl.style.display = 'flex';
-                    loadUserData();
-                } else {
-                    console.log('Primera vez o no visto, mostrando onboarding');
-                    onboardingEl.style.display = 'flex';
-                    loadingEl.style.display = 'none';
-                }
+                localStorage.setItem('onboarding_seen', 'true');
+                console.log('✓ Onboarding marcado como visto');
             } catch (error) {
-                console.error('Error checking onboarding:', error);
-                // Si falla, mostrar onboarding por seguridad
-                document.getElementById('onboarding').style.display = 'flex';
-                document.getElementById('loading').style.display = 'none';
+                console.warn('No se pudo guardar estado de onboarding:', error);
             }
+            
+            loadUserData();
+        }
+
+        // ========== ONBOARDING (Legacy - puede ser removido en futuro) ==========
+        function checkOnboarding() {
+            // Not used anymore - directly initialize app
+            initializeApp();
         }
 
         function nextSlide() {
@@ -1712,7 +1710,7 @@
         function finishOnboarding() {
             try {
                 localStorage.setItem('onboarding_seen', 'true');
-                console.log('Onboarding completado y guardado');
+                console.log('✓ Onboarding completado');
             } catch (error) {
                 console.error('Error saving onboarding state:', error);
             }
@@ -1748,7 +1746,7 @@
         async function loadUserData() {
             try {
                 const telegramUser = tg.initDataUnsafe?.user || {};
-                console.log('Telegram user data:', telegramUser);
+                console.log('📱 Datos de usuario Telegram:', telegramUser);
                 
                 const response = await fetch(`${API_BASE}/api/miniapp/user`, {
                     method: 'POST',
@@ -1763,9 +1761,15 @@
                 
                 if (response.ok) {
                     userData = await response.json();
-                    console.log('User data loaded from API:', userData);
+                    console.log('✓ Datos de usuario obtenidos del servidor:', userData);
+                    
+                    // Extract language from userData
+                    if (userData.language) {
+                        currentLanguage = userData.language;
+                        console.log(`📍 Idioma detectado: ${currentLanguage}`);
+                    }
                 } else {
-                    console.error('API error:', response.status, await response.text());
+                    console.error('❌ Error en API:', response.status, await response.text());
                 }
             } catch (e) {
                 console.error('Exception loading user data:', e);
@@ -1776,12 +1780,20 @@
                 const telegramUser = tg.initDataUnsafe?.user || {};
                 const telegramUserId = telegramUser.id;
                 
-                console.warn('Using fallback data with Telegram user_id:', telegramUserId);
+                console.warn('⚠️ Usando datos por defecto con user_id de Telegram:', telegramUserId);
+                
+                // Detectar idioma de Telegram (fallback)
+                if (telegramUser.language_code) {
+                    currentLanguage = ['es', 'en', 'pt', 'it'].includes(telegramUser.language_code) ? 
+                        telegramUser.language_code : 'es';
+                    console.log(`📍 Idioma de Telegram: ${currentLanguage}`);
+                }
                 
                 userData = {
                     user_id: telegramUserId || null,
                     first_name: telegramUser.first_name || 'Usuario',
                     username: telegramUser.username || '',
+                    language: currentLanguage,
                     premium: false,
                     premium_until: null,
                     has_session: false,
@@ -1798,7 +1810,8 @@
                 };
             }
 
-            console.log('Final userData before updateUI:', userData);
+            console.log('✓ userData final antes de updateUI:', userData);
+            console.log(`✓ Idioma actual: ${currentLanguage}`);
             updateUI();
         }
 

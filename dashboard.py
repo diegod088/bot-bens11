@@ -1213,7 +1213,7 @@ def miniapp_get_user():
         
         cursor.execute("""
             SELECT user_id, first_name, username, downloads, premium, premium_until,
-                   daily_photo, daily_video, daily_music, daily_apk, created_at
+                   daily_photo, daily_video, daily_music, daily_apk, created_at, language
             FROM users WHERE user_id = ?
         """, (user_id,))
         
@@ -1226,6 +1226,7 @@ def miniapp_get_user():
                 'user_id': user_id,
                 'first_name': user_info.get('first_name', 'Usuario'),
                 'username': user_info.get('username', ''),
+                'language': 'es',  # Default language
                 'premium': False,
                 'premium_until': None,
                 'has_session': has_session,
@@ -1269,6 +1270,7 @@ def miniapp_get_user():
             'user_id': user['user_id'],
             'first_name': user['first_name'] or user_info.get('first_name', 'Usuario'),
             'username': user['username'] or user_info.get('username', ''),
+            'language': user.get('language', 'es'),  # User's language from DB
             'premium': is_premium,
             'premium_until': user['premium_until'],
             'has_session': has_session,

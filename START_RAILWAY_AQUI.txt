@@ -1,0 +1,33 @@
+# ⚡ RAILWAY - START AQUÍ (2 MINUTOS)
+
+## 🚀 VERSIÓN ULTRA-RÁPIDA
+
+### 3 Variables que necesitas:
+
+```
+TELEGRAM_BOT_TOKEN   = [De @BotFather en Telegram]
+ADMIN_PASSWORD       = [Que inventas, 8+ caracteres]
+SECRET_KEY          = [python -c "import secrets; print(secrets.token_urlsafe(32))"]
+```
+
+### 4 Pasos para deployer:
+
+```
+1. railway.app → Dashboard → New Project
+2. Deploy from GitHub (conecta tu repo)
+3. Agrega las 3 variables
+4. ¡LISTO! Railway hace el deploy automáticamente (2-5 min)
+```
+
+---
+
+## 📖 Documentación Completa:
+
+- **RAILWAY_PASO_A_PASO.md** - Tutorial con screenshots
+- **VARIABLES_RAILWAY.md** - Cómo obtener cada variable
+- **RAILWAY_CHECKLIST.md** - Validar cada paso
+- **RAILWAY_GUIA_COMPLETA.md** - Troubleshooting
+
+---
+
+**¿Dudas?** Ver: RAILWAY_COMIENZA_AQUI.md

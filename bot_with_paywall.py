@@ -2110,32 +2110,56 @@ async def successful_payment_callback(update: Update, context: ContextTypes.DEFA
     user_id = update.effective_user.id
     payment_info = update.message.successful_payment
     
-    logger.info(f"Payment received from user {user_id}: {payment_info.total_amount} {payment_info.currency}")
+    logger.info(f"🎉 PAGO RECIBIDO - User {user_id}: {payment_info.total_amount} {payment_info.currency}")
+    logger.info(f"📦 Payload: {payment_info.invoice_payload}")
+    logger.info(f"🔑 Transaction ID: {payment_info.telegram_payment_charge_id}")
     
-    # Extract plan key from payload (format: premium_{days}_days_{plan_key})
+    # Extract plan key from payload (format: premium_{days}_days_{plan_key}_{user_id})
     payload = payment_info.invoice_payload
     days = 30  # default
     plan_name = "Premium"
+    plan_key = "monthly"
     
     try:
-        # Parse payload to get days
-        if "_days_" in payload:
-            parts = payload.split("_")
-            days = int(parts[1])
-            plan_key = parts[3] if len(parts) > 3 else 'monthly'
-            
-            # Get plan details
-            plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['monthly'])
-            plan_name = plan['name']
-            
-            logger.info(f"Detected plan: {plan_key} with {days} days")
+        # Parse payload to get days and plan key
+        if "premium_" in payload and "_days_" in payload:
+            # Format: premium_3_days_trial_123456789 or premium_30_days_monthly_123456789
+            parts = payload.split("_days_")
+            if len(parts) == 2:
+                days_str = parts[0].replace("premium_", "")
+                days = int(days_str)
+                
+                # Get plan key and user_id from second part
+                remaining = parts[1].split("_")
+                if len(remaining) >= 1:
+                    plan_key = remaining[0]
+                if len(remaining) >= 2:
+                    payload_user_id = remaining[1]
+                    logger.info(f"✓ Payload includes user_id: {payload_user_id}")
+                
+                # Get plan details
+                plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['monthly'])
+                plan_name = plan['name']
+                
+                logger.info(f"✓ Plan detectado: {plan_key} ({plan['name']}) - {days} días - {plan['stars']}⭐")
+            else:
+                logger.warning(f"⚠️ Formato de payload incorrecto: {payload}, usando plan por defecto (30 días)")
         else:
-            logger.warning(f"Could not parse payload: {payload}, using default 30 days")
+            logger.warning(f"⚠️ Payload no reconocido: {payload}, usando plan por defecto (30 días)")
     except Exception as e:
-        logger.error(f"Error parsing payment payload: {e}, using default 30 days")
+        logger.error(f"❌ Error parseando payload: {e}, usando plan por defecto (30 días)")
+        import traceback
+        logger.error(traceback.format_exc())
     
     # Activate Premium for the purchased duration
-    set_premium(user_id, days=days)
+    logger.info(f"💾 Actualizando premium para user {user_id} por {days} días...")
+    try:
+        set_premium(user_id, days=days)
+        logger.info(f"✓ Premium activado correctamente para user {user_id}")
+    except Exception as e:
+        logger.error(f"❌ Error activando premium: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
     
     from datetime import datetime, timedelta
     expiry = datetime.now() + timedelta(days=days)
@@ -2597,10 +2621,34 @@ def check_download_limits(user: dict, content_type: str) -> tuple[bool, str, dic
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /start command"""
+    """Handle /start command - Auto-detect language and open miniapp directly"""
     user_id = update.effective_user.id
     first_name = update.effective_user.first_name
     username = update.effective_user.username
+    
+    # Get user's language from Telegram (if available)
+    telegram_language = update.effective_user.language_code or 'es'
+    logger.info(f"User {user_id} Telegram language_code: {telegram_language}")
+    
+    # Map Telegram language codes to our supported languages
+    language_map = {
+        'es': 'es',
+        'es-ES': 'es',
+        'es-MX': 'es',
+        'es-AR': 'es',
+        'en': 'en',
+        'en-US': 'en',
+        'en-GB': 'en',
+        'pt': 'pt',
+        'pt-BR': 'pt',
+        'pt-PT': 'pt',
+        'it': 'it',
+        'it-IT': 'it'
+    }
+    
+    # Determine user language (fallback to es if not supported)
+    user_language = language_map.get(telegram_language, 'es')
+    logger.info(f"Mapped to language: {user_language}")
     
     # Check if user exists (first time user)
     is_new_user = not get_user(user_id)
@@ -2620,39 +2668,36 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Ensure user exists in database
     if is_new_user:
-        create_user(user_id, first_name=first_name, username=username)
+        create_user(user_id, first_name=first_name, username=username, language=user_language)
+        logger.info(f"✓ New user {user_id} created with language: {user_language}")
         # Registrar referido PENDIENTE (no cuenta hasta que descargue)
         if referred_by:
-            add_user(user_id, language='es', referred_by=referred_by)
+            add_user(user_id, language=user_language, referred_by=referred_by)
+    else:
+        # Update language for existing users if it changed
+        set_user_language(user_id, user_language)
     
     # Ensure admins have premium
     ensure_admin_premium(user_id)
     
     user = get_user(user_id)
     
-    # If new user, show language selection first
-    if is_new_user:
-        welcome_message = (
-            f"👋 ¡Hola {first_name}! / Hello {first_name}!\n\n"
-            "🌐 **Selecciona tu idioma** / **Select your language**\n\n"
-            "Por favor elige el idioma que prefieres usar:\n"
-            "Please choose your preferred language:"
-        )
-        
-        keyboard = [
-            [
-                InlineKeyboardButton("🇪🇸 Español", callback_data="set_lang_es"),
-                InlineKeyboardButton("🇺🇸 English", callback_data="set_lang_en")
-            ],
-            [
-                InlineKeyboardButton("🇧🇷 Português", callback_data="set_lang_pt"),
-                InlineKeyboardButton("🇮🇹 Italiano", callback_data="set_lang_it")
-            ]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
-        return
+    # Direct to miniapp without language selection (auto-detected)
+    logger.info(f"✓ Enviando usuario {user_id} directamente a miniapp con idioma: {user_language}")
+    welcome_message = (
+        f"👋 ¡Hola {first_name}! / Hello {first_name}!\n\n"
+        "🚀 Abriendo MiniApp...\n"
+    )
+    
+    keyboard = [
+        [InlineKeyboardButton("📱 Abrir MiniApp", callback_data="open_miniapp")],
+        [InlineKeyboardButton("⚙️ Configuración", callback_data="settings")],
+        [InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+    return
     
     # Check and reset daily limits
     check_and_reset_daily_limits(user_id)
@@ -4819,8 +4864,8 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     logger.error(f"Error no manejado: {error}", exc_info=context.error)
 
 
-def main():
-    """Start the bot (sync, compatible con PTB v20+)"""
+async def main():
+    """Start the bot (async)"""
     from telegram.request import HTTPXRequest
 
     request = HTTPXRequest(

@@ -700,9 +700,11 @@ def set_premium(user_id: int, months: int = None, days: int = None, level: int =
                WHERE user_id = ?""",
             (level, new_expiry.isoformat(), user_id)
         )
+        conn.commit()
+        logger.info(f"✓ BD actualizada: premium=1, premium_until={new_expiry.isoformat()}")
     
     level_name = "VIP" if level == 2 else "Premium"
-    logger.info(f"User {user_id} upgraded to {level_name} until {new_expiry}")
+    logger.info(f"✓ User {user_id} actualizado a {level_name} hasta {new_expiry.strftime('%d/%m/%Y %H:%M:%S')}")
 
 
 def set_user_language(user_id: int, language: str = 'es'):

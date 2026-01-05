@@ -4,45 +4,109 @@
 
 {% block extra_css %}
 <style>
+    /* Mobile-First Foundation */
     .user-header {
         display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     .user-avatar {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 600;
         box-shadow: var(--shadow-md);
     }
 
+    .user-info {
+        width: 100%;
+    }
+
     .user-info h1 {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .user-info > div {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
         margin-bottom: 0.5rem;
     }
 
     .user-meta {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem;
         align-items: center;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
     }
 
+    .user-meta .badge {
+        font-size: 0.85rem;
+    }
+
+    .user-meta .text-sm {
+        font-size: 0.8rem;
+    }
+
+    /* Premium Status Card - Mobile First */
+    .premium-status-card {
+        background: var(--bg-surface);
+        border: 2px solid var(--primary);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .premium-status-card.free {
+        border-color: var(--text-tertiary);
+    }
+
+    .status-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .status-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .premium-status-card .status-value {
+        color: var(--primary);
+    }
+
+    .premium-status-card.free .status-value {
+        color: var(--text-tertiary);
+    }
+
+    .expiry-info {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    /* Detail Grid - Mobile Single Column */
     .detail-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     .detail-item {
@@ -53,7 +117,7 @@
     }
 
     .detail-label {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--text-secondary);
@@ -62,31 +126,72 @@
     }
 
     .detail-value {
-        font-size: 1.125rem;
+        font-size: 1rem;
         font-weight: 600;
         color: var(--text-primary);
     }
 
-    .action-card {
+    /* Accordion Sections */
+    .accordion-section {
         background: var(--bg-surface);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+        overflow: hidden;
+        margin-bottom: 1rem;
     }
 
-    .action-header {
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
+    .accordion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--bg-body);
         border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        gap: 1rem;
+        min-height: 44px;
+        transition: background-color 0.2s;
     }
 
-    .action-title {
-        font-size: 1.125rem;
+    .accordion-header:active {
+        background-color: var(--primary-light);
+    }
+
+    .accordion-header h3 {
+        font-size: 1rem;
         font-weight: 600;
         color: var(--text-primary);
+        margin: 0;
     }
 
+    .accordion-toggle {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: var(--text-secondary);
+        transition: transform 0.2s ease;
+    }
+
+    .accordion-section.open .accordion-toggle {
+        transform: rotate(180deg);
+    }
+
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .accordion-section.open .accordion-content {
+        max-height: 1000px;
+        padding: 1rem;
+    }
+
+    /* Form Groups */
     .form-group {
         margin-bottom: 1rem;
     }
@@ -101,35 +206,141 @@
 
     .form-input {
         width: 100%;
-        padding: 0.5rem;
+        padding: 0.75rem;
         border: 1px solid var(--border);
         border-radius: var(--radius-md);
-        font-size: 0.875rem;
+        font-size: 1rem;
         outline: none;
         transition: border-color 0.2s;
+        min-height: 44px;
     }
 
     .form-input:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 2px var(--primary-light);
+        box-shadow: 0 0 0 3px var(--primary-light);
     }
 
+    /* Button Groups - Mobile Full Width */
     .btn-group {
         display: flex;
-        gap: 1rem;
-        margin-top: 1.5rem;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    /* Danger Zone */
+    .danger-notice {
+        background: var(--danger-light);
+        border-left: 4px solid var(--danger);
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+    }
+
+    .accordion-section.danger .accordion-header {
+        background: var(--danger-light);
+        border-color: var(--danger);
+    }
+
+    .accordion-section.danger .accordion-header h3 {
+        color: var(--danger);
+    }
+
+    /* Back Button */
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        min-height: 44px;
+    }
+
+    /* Desktop Breakpoint - 768px */
+    @media (min-width: 768px) {
+        .user-header {
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 2rem;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .user-info h1 {
+            font-size: 1.75rem;
+        }
+
+        .detail-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Desktop: Accordion becomes side-by-side cards */
+        .accordion-section {
+            margin-bottom: 0;
+            border: none;
+        }
+
+        .accordion-header {
+            display: none;
+        }
+
+        .accordion-content {
+            max-height: none;
+            padding: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .accordion-section.open .accordion-content {
+            max-height: none;
+        }
+
+        /* Desktop: Premium Management and Danger Side by Side */
+        .action-sections-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Button Groups - Desktop Horizontal */
+        .btn-group {
+            flex-direction: row;
+        }
+
+        .btn-group .btn {
+            width: auto;
+            flex: 1;
+        }
+
+        .back-btn {
+            margin-bottom: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <a href="/users" class="btn btn-outline text-xs" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Volver a Usuarios
-    </a>
-</div>
+<a href="/users" class="btn btn-outline back-btn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Volver
+</a>
 
+<!-- Premium Status - Always Visible at Top -->
 <div class="card mb-6">
     <div class="user-header">
         <div class="user-avatar">
@@ -139,89 +350,104 @@
             {% if user.first_name %}
                 <h1>{{ user.first_name }}</h1>
                 {% if user.username %}
-                    <div style="color: var(--text-secondary); margin-bottom: 0.25rem; font-size: 1.1rem;">@{{ user.username }}</div>
+                    <div>@{{ user.username }}</div>
                 {% endif %}
-                <div style="color: var(--text-tertiary); font-size: 0.9rem; margin-bottom: 0.5rem;">ID: {{ user.user_id }}</div>
+                <div style="font-size: 0.85rem;">ID: {{ user.user_id }}</div>
             {% elif user.username %}
                 <h1>@{{ user.username }}</h1>
-                <div style="color: var(--text-tertiary); font-size: 0.9rem; margin-bottom: 0.5rem;">ID: {{ user.user_id }}</div>
+                <div style="font-size: 0.85rem;">ID: {{ user.user_id }}</div>
             {% else %}
                 <h1>Usuario #{{ user.user_id }}</h1>
             {% endif %}
-            <div class="user-meta">
+        </div>
+    </div>
+
+    {% if user.is_premium %}
+        <div class="premium-status-card">
+            <div class="status-label">Estado</div>
+            <div class="status-value">Premium ✓</div>
+            <div class="expiry-info">Vence: {{ user.premium_expiry }}</div>
+        </div>
+    {% else %}
+        <div class="premium-status-card free">
+            <div class="status-label">Estado</div>
+            <div class="status-value">Gratis</div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Activity Stats Grid -->
+<div class="detail-grid">
+    <div class="detail-item">
+        <div class="detail-label">Total Descargas</div>
+        <div class="detail-value">{{ user.downloads_count }}</div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-label">Última Actividad</div>
+        <div class="detail-value">{{ user.last_active }}</div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-label">Fecha de Registro</div>
+        <div class="detail-value">{{ user.joined_date }}</div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-label">Estado General</div>
+        <div class="detail-value" style="color: var(--success);">Activo</div>
+    </div>
+</div>
+
+<!-- Desktop Wrapper for Side-by-Side Layout -->
+<div class="action-sections-wrapper">
+    <!-- Premium Management - Accordion on Mobile, Card on Desktop -->
+    <div class="accordion-section open">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h3>🎁 Gestión Premium</h3>
+            <div class="accordion-toggle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </div>
+        </div>
+        <div class="accordion-content">
+            <div class="form-group">
+                <label class="form-label">Añadir días Premium</label>
+                <input type="number" id="days-input" class="form-input" value="30" min="1" max="365">
+            </div>
+
+            <div class="btn-group">
+                <button onclick="addPremium()" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    Añadir Premium
+                </button>
                 {% if user.is_premium %}
-                    <span class="badge badge-premium">Premium</span>
-                    <span class="text-sm text-secondary">Vence: {{ user.premium_expiry }}</span>
-                {% else %}
-                    <span class="badge badge-free">Gratis</span>
+                <button onclick="removePremium()" class="btn btn-danger">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    Remover
+                </button>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="detail-grid">
-        <div class="detail-item">
-            <div class="detail-label">Fecha de Registro</div>
-            <div class="detail-value">{{ user.joined_date }}</div>
+    <!-- Danger Zone - Accordion on Mobile, Card on Desktop -->
+    <div class="accordion-section danger">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h3>⚠️ Zona de Peligro</h3>
+            <div class="accordion-toggle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </div>
         </div>
-        <div class="detail-item">
-            <div class="detail-label">Total Descargas</div>
-            <div class="detail-value">{{ user.downloads_count }}</div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Última Actividad</div>
-            <div class="detail-value">{{ user.last_active }}</div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Estado</div>
-            <div class="detail-value" style="color: var(--success);">Activo</div>
-        </div>
-    </div>
-</div>
+        <div class="accordion-content">
+            <div class="danger-notice">
+                ⚠️ Estas acciones son irreversibles. Ten cuidado al ejecutarlas.
+            </div>
 
-<div class="grid-stats" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-    <!-- Premium Management -->
-    <div class="action-card">
-        <div class="action-header">
-            <h2 class="action-title">Gestión Premium</h2>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">Añadir días Premium</label>
-            <input type="number" id="days-input" class="form-input" value="30" min="1">
-        </div>
-
-        <div class="btn-group">
-            <button onclick="addPremium()" class="btn btn-primary" style="flex: 1;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                Añadir Premium
-            </button>
-            {% if user.is_premium %}
-            <button onclick="removePremium()" class="btn btn-danger" style="flex: 1;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                Remover Premium
-            </button>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Danger Zone -->
-    <div class="action-card" style="border-color: var(--danger-bg);">
-        <div class="action-header" style="border-color: var(--danger-bg);">
-            <h2 class="action-title" style="color: var(--danger);">Zona de Peligro</h2>
-        </div>
-        
-        <p class="text-sm text-secondary mb-4">
-            Estas acciones son irreversibles. Ten cuidado al ejecutarlas.
-        </p>
-
-        <div class="btn-group">
-            <button onclick="resetStats()" class="btn btn-outline" style="border-color: var(--danger); color: var(--danger); flex: 1;">
-                Resetear Estadísticas
-            </button>
-            <button onclick="deleteUser()" class="btn btn-danger" style="flex: 1;">
-                Eliminar Usuario
-            </button>
+            <div class="btn-group">
+                <button onclick="resetStats()" class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);">
+                    Resetear Estadísticas
+                </button>
+                <button onclick="deleteUser()" class="btn btn-danger">
+                    Eliminar Usuario
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -230,6 +456,22 @@
 {% block extra_js %}
 <script>
     const userId = "{{ user.user_id }}";
+
+    // Accordion Toggle Function
+    function toggleAccordion(headerElement) {
+        const section = headerElement.parentElement;
+        const isOpen = section.classList.contains('open');
+        
+        // Close all other accordions
+        document.querySelectorAll('.accordion-section.open').forEach(el => {
+            if (el !== section) {
+                el.classList.remove('open');
+            }
+        });
+
+        // Toggle current accordion
+        section.classList.toggle('open');
+    }
 
     function addPremium() {
         const days = document.getElementById('days-input').value;
