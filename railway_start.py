@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 """
-🚂 Railway Startup Script - BOT + DASHBOARD
+🚂 Railway Startup Script - BOT + DASHBOARD (SINGLE EVENT LOOP)
 """
 
 import os
 import sys
-import signal
 import logging
 import threading
 import asyncio
 from dotenv import load_dotenv
+
+# Necesario para threads con asyncio
+try:
+    import nest_asyncio
+    nest_asyncio.apply()
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.info("✅ nest_asyncio applied")
+except ImportError:
+    pass
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,82 +67,41 @@ async def run_bot_async():
         await async_main()
     except Exception as e:
         logger.error(f"❌ Bot error: {e}", exc_info=True)
+        raise
 
 def main():
-    """Ejecutar BOT (main thread) + DASHBOARD (background thread)"""
+    """Ejecutar BOT (priority) o DASHBOARD (fallback)"""
     
     logger.info("=" * 70)
-    logger.info("🚂 RAILWAY DEPLOYMENT - BOT + DASHBOARD")
+    logger.info("🚂 RAILWAY DEPLOYMENT")
     logger.info("=" * 70)
+    logger.info("")
     
     # Initialize database
     if not init_database():
         logger.error("Failed to initialize database")
-        return
+        sys.exit(1)
     
     # Check for bot token
     telegram_token = os.environ.get('TELEGRAM_TOKEN')
-    if not telegram_token:
+    if telegram_token:
+        logger.info("✅ TELEGRAM_TOKEN found - starting BOT")
+        logger.info("")
+        logger.info("📍 Running Bot in MAIN THREAD...")
+        try:
+            asyncio.run(run_bot_async())
+        except KeyboardInterrupt:
+            logger.info("🛑 Bot stopped by user")
+            sys.exit(0)
+        except Exception as e:
+            logger.error(f"❌ Fatal bot error: {e}", exc_info=True)
+            sys.exit(1)
+    else:
         logger.error("❌ TELEGRAM_TOKEN not found")
-        logger.info("Starting dashboard only...")
+        logger.info("Starting DASHBOARD only...")
+        logger.info("")
         run_dashboard()
-        return
-    
-    logger.info("✅ TELEGRAM_TOKEN found")
-    logger.info("")
-    
-    # Start dashboard in background thread
-    logger.info("📍 Starting Dashboard in background thread...")
-    dashboard_thread = threading.Thread(
-        target=run_dashboard,
-        daemon=True,
-        name="DashboardThread"
-    )
-    dashboard_thread.start()
-    logger.info("✅ Dashboard thread started")
-    logger.info("")
-    
-    # Run bot in main thread
-    logger.info("📍 Running Bot in main thread...")
-    try:
-        asyncio.run(run_bot_async())
-    except KeyboardInterrupt:
-        logger.info("🛑 Bot stopped")
-        sys.exit(0)
-    except Exception as e:
-        logger.error(f"❌ Fatal error: {e}", exc_info=True)
-        sys.exit(1)
 
 if __name__ == '__main__':
     main()
-        sys.exit(1)
 
-def signal_handler(signum, frame):
-    """Manejo de señales"""
-    logger.info("🛑 Shutdown signal received")
-    sys.exit(0)
-
-def main():
-    """Entrada principal"""
-    logger.info("=" * 70)
-    logger.info("🚂 RAILWAY DEPLOYMENT - DASHBOARD ONLY")
-    logger.info("=" * 70)
-    
-    signal.signal(signal.SIGTERM, signal_handler)
-    signal.signal(signal.SIGINT, signal_handler)
-    
-    if not init_database():
-        logger.error("Failed to init database")
-        sys.exit(1)
-    
-    logger.info("=" * 70)
-    logger.info("🌐 Starting Dashboard...")
-    logger.info("=" * 70)
-    run_dashboard()
-
-if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        logger.info("🛑 Shutting down...")
-        sys.exit(0)
