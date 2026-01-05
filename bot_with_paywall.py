@@ -4700,7 +4700,6 @@ async def async_main():
         await application.stop()
         await application.shutdown()
         # Reset flag to allow restart if needed
-        global _bot_instance_running
         with _bot_instance_lock:
             _bot_instance_running = False
         logger.info("✅ Bot stopped cleanly")
