@@ -1289,14 +1289,17 @@
                 const onboardingEl = document.getElementById('onboarding');
                 const loadingEl = document.getElementById('loading');
                 
-                if (!seen) {
-                    console.log('Mostrando onboarding (primera vez)');
-                    onboardingEl.style.display = 'flex';
-                    loadingEl.style.display = 'none';
-                } else {
-                    console.log('Onboarding ya visto, cargando app...');
+                console.log('checkOnboarding called, seen:', seen);
+                
+                if (seen === 'true') {
+                    console.log('Onboarding ya visto, ocultando...');
                     onboardingEl.style.display = 'none';
                     loadingEl.style.display = 'flex';
+                    loadUserData();
+                } else {
+                    console.log('Primera vez o no visto, mostrando onboarding');
+                    onboardingEl.style.display = 'flex';
+                    loadingEl.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error checking onboarding:', error);
@@ -1754,31 +1757,23 @@
         }
 
         // ========== INIT ==========
-        // Esperar a que el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, checking onboarding...');
-            checkOnboarding();
-            const seen = localStorage.getItem('onboarding_seen');
-            if (seen) {
-                console.log('User has seen onboarding, loading data...');
-                loadUserData();
+        // Ejecutar inmediatamente cuando el script se carga
+        (function() {
+            console.log('=== INIT MINIAPP ===');
+            console.log('ReadyState:', document.readyState);
+            
+            // Si el DOM ya está listo, ejecutar inmediatamente
+            if (document.readyState !== 'loading') {
+                console.log('DOM ya listo, ejecutando checkOnboarding...');
+                checkOnboarding();
             } else {
-                console.log('First time user, showing onboarding');
+                // Esperar a que el DOM esté listo
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('DOMContentLoaded fired, ejecutando checkOnboarding...');
+                    checkOnboarding();
+                });
             }
-        });
-
-        // Fallback si DOMContentLoaded ya pasó
-        if (document.readyState === 'loading') {
-            // DOM aún no está listo, el event listener lo manejará
-        } else {
-            // DOM ya está listo
-            console.log('DOM already loaded, checking onboarding immediately...');
-            checkOnboarding();
-            const seen = localStorage.getItem('onboarding_seen');
-            if (seen) {
-                loadUserData();
-            }
-        }
+        })();
 
         // Cargar stats de referidos al cambiar a la pestaña
         const originalSwitchTab = switchTab;

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test MiniApp Flow</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+        .test { margin: 10px 0; padding: 10px; border-left: 3px solid #0f0; }
+        .pass { border-color: #0f0; }
+        .fail { border-color: #f00; color: #f00; }
+        .running { border-color: #ff0; color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 MiniApp Test Suite</h1>
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+        const TEST_USER = { id: 624579068, first_name: 'Eduardo' };
+        const resultsDiv = document.getElementById('results');
+
+        function log(message, status = 'running') {
+            const div = document.createElement('div');
+            div.className = `test ${status}`;
+            div.innerHTML = `${status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⏳'} ${message}`;
+            resultsDiv.appendChild(div);
+            return div;
+        }
+
+        async function testEndpoint(name, config) {
+            const testDiv = log(`Testing ${name}...`);
+            try {
+                const response = await fetch(API_BASE + config.url, {
+                    method: config.method || 'GET',
+                    headers: config.headers || {},
+                    body: config.body ? JSON.stringify(config.body) : undefined
+                });
+                
+                const data = await response.json();
+                
+                if (config.validate && !config.validate(data)) {
+                    testDiv.className = 'test fail';
+                    testDiv.textContent = `❌ ${name} - Validation failed`;
+                    return false;
+                }
+                
+                testDiv.className = 'test pass';
+                testDiv.textContent = `✅ ${name} - OK`;
+                console.log(`${name} response:`, data);
+                return true;
+            } catch (e) {
+                testDiv.className = 'test fail';
+                testDiv.textContent = `❌ ${name} - ${e.message}`;
+                return false;
+            }
+        }
+
+        async function runTests() {
+            log('🚀 Starting tests...');
+            
+            // Test 1: Load miniapp page
+            await testEndpoint('GET /miniapp', {
+                url: '/miniapp',
+                validate: (html) => typeof html === 'string' || html instanceof ArrayBuffer
+            });
+
+            // Test 2: Get user data
+            await testEndpoint('POST /api/miniapp/user', {
+                url: '/api/miniapp/user',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: { user: TEST_USER },
+                validate: (data) => data.user_id === TEST_USER.id
+            });
+
+            // Test 3: Get global stats
+            await testEndpoint('GET /api/miniapp/stats', {
+                url: '/api/miniapp/stats',
+                validate: (data) => 'total_users' in data
+            });
+
+            // Test 4: Get referral stats
+            await testEndpoint('GET /api/miniapp/referrals', {
+                url: `/api/miniapp/referrals?user_id=${TEST_USER.id}`,
+                validate: (data) => data.ok && data.stats && data.referral_link
+            });
+
+            // Test 5: Create invoice
+            await testEndpoint('POST /api/miniapp/create-invoice', {
+                url: '/api/miniapp/create-invoice',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: { user_id: TEST_USER.id, days: 7 },
+                validate: (data) => data.ok || data.invoice_link
+            });
+
+            // Test 6: Configure account
+            await testEndpoint('POST /api/miniapp/configure', {
+                url: '/api/miniapp/configure',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: { user_id: TEST_USER.id },
+                validate: (data) => data.ok
+            });
+
+            log('✨ All tests completed!', 'pass');
+        }
+
+        runTests();
+    </script>
+</body>
+</html>
