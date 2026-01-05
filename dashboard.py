@@ -1059,6 +1059,130 @@ def filter_users():
 
 
 # ============================================================
+# Broadcast API Endpoint
+# ============================================================
+
+@app.route('/api/admin/broadcast', methods=['POST'])
+@login_required
+def broadcast_message():
+    """API para enviar mensajes masivos a todos los usuarios"""
+    import requests
+    import time
+    
+    data = request.get_json() or {}
+    message = data.get('message', '').strip()
+    target = data.get('target', 'all')  # all, premium, free
+    
+    if not message:
+        return jsonify({'error': 'El mensaje no puede estar vacío'}), 400
+    
+    if len(message) > 4096:
+        return jsonify({'error': 'El mensaje es demasiado largo (máx 4096 caracteres)'}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Obtener usuarios según el filtro
+        if target == 'premium':
+            cursor.execute("SELECT user_id FROM users WHERE premium = 1")
+        elif target == 'free':
+            cursor.execute("SELECT user_id FROM users WHERE premium = 0")
+        else:
+            cursor.execute("SELECT user_id FROM users")
+        
+        users = cursor.fetchall()
+        total_users = len(users)
+        
+        if total_users == 0:
+            return jsonify({'error': 'No hay usuarios para enviar el mensaje'}), 400
+        
+        # Enviar mensajes usando la API de Telegram
+        bot_token = os.getenv('TELEGRAM_TOKEN')
+        if not bot_token:
+            return jsonify({'error': 'Token de Telegram no configurado'}), 500
+        
+        sent = 0
+        failed = 0
+        blocked = 0
+        
+        for user in users:
+            user_id = user['user_id']
+            try:
+                url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                payload = {
+                    "chat_id": user_id,
+                    "text": message,
+                    "parse_mode": "HTML"
+                }
+                response = requests.post(url, json=payload, timeout=10)
+                result = response.json()
+                
+                if result.get('ok'):
+                    sent += 1
+                else:
+                    error_code = result.get('error_code', 0)
+                    if error_code == 403:  # User blocked the bot
+                        blocked += 1
+                    else:
+                        failed += 1
+                        logger.warning(f"Failed to send to {user_id}: {result}")
+                
+                # Rate limiting - Telegram allows ~30 messages/second
+                time.sleep(0.035)
+                
+            except Exception as e:
+                failed += 1
+                logger.error(f"Error sending to {user_id}: {e}")
+        
+        logger.info(f"Broadcast completed: sent={sent}, failed={failed}, blocked={blocked}")
+        
+        return jsonify({
+            'success': True,
+            'total': total_users,
+            'sent': sent,
+            'failed': failed,
+            'blocked': blocked
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in broadcast: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/admin/broadcast/preview', methods=['POST'])
+@login_required
+def broadcast_preview():
+    """API para previsualizar el conteo de usuarios que recibirán el mensaje"""
+    data = request.get_json() or {}
+    target = data.get('target', 'all')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        if target == 'premium':
+            cursor.execute("SELECT COUNT(*) as count FROM users WHERE premium = 1")
+        elif target == 'free':
+            cursor.execute("SELECT COUNT(*) as count FROM users WHERE premium = 0")
+        else:
+            cursor.execute("SELECT COUNT(*) as count FROM users")
+        
+        result = cursor.fetchone()
+        count = result['count'] if result else 0
+        
+        return jsonify({'count': count, 'target': target})
+        
+    except Exception as e:
+        logger.error(f"Error in broadcast preview: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
+# ============================================================
 # MiniApp API Endpoints
 # ============================================================
 
@@ -1078,6 +1202,10 @@ def miniapp_get_user():
         
         if not user_id:
             return jsonify({'error': 'User ID required'}), 400
+        
+        # Check if user has a session file (connected account)
+        session_file = f"sessions/session_{user_id}.session"
+        has_session = os.path.exists(session_file)
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -1099,6 +1227,7 @@ def miniapp_get_user():
                 'username': user_info.get('username', ''),
                 'premium': False,
                 'premium_until': None,
+                'has_session': has_session,
                 'downloads': 0,
                 'daily_video': 0,
                 'daily_photo': 0,
@@ -1141,6 +1270,7 @@ def miniapp_get_user():
             'username': user['username'] or user_info.get('username', ''),
             'premium': is_premium,
             'premium_until': user['premium_until'],
+            'has_session': has_session,
             'downloads': user['downloads'] or 0,
             'daily_video': user['daily_video'] or 0,
             'daily_photo': user['daily_photo'] or 0,
@@ -1202,6 +1332,170 @@ def create_invoice():
             
     except Exception as e:
         logger.error(f"Create invoice error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/miniapp/download', methods=['POST'])
+def miniapp_download():
+    """API endpoint to process download requests from MiniApp"""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+        link = data.get('link', '')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        if not link or 't.me/' not in link:
+            return jsonify({'error': 'Valid Telegram link required'}), 400
+        
+        # Check if user has session
+        session_file = f"sessions/session_{user_id}.session"
+        if not os.path.exists(session_file):
+            return jsonify({
+                'ok': False, 
+                'error': 'no_session',
+                'message': 'Necesitas configurar tu cuenta primero'
+            })
+        
+        # Send message to user via bot
+        send_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        message_payload = {
+            "chat_id": user_id,
+            "text": f"📥 *Descarga solicitada desde MiniApp*\n\n🔗 Procesando: {link}\n\n⏳ Espera un momento...",
+            "parse_mode": "Markdown"
+        }
+        requests.post(send_url, json=message_payload)
+        
+        return jsonify({
+            'ok': True,
+            'message': 'Descarga iniciada. Revisa el chat del bot.'
+        })
+        
+    except Exception as e:
+        logger.error(f"MiniApp download error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/miniapp/configure', methods=['POST'])
+def miniapp_configure():
+    """API endpoint to redirect user to configure account"""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        # Send message to user via bot with configure instructions
+        send_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        
+        keyboard = {
+            "inline_keyboard": [[
+                {"text": "⚙️ Configurar ahora", "callback_data": "connect_account"}
+            ]]
+        }
+        
+        message_payload = {
+            "chat_id": user_id,
+            "text": "⚙️ *Configuración de cuenta*\n\n"
+                    "Para descargar contenido de canales privados, necesitas vincular tu cuenta de Telegram.\n\n"
+                    "Toca el botón de abajo para comenzar:",
+            "parse_mode": "Markdown",
+            "reply_markup": keyboard
+        }
+        requests.post(send_url, json=message_payload)
+        
+        return jsonify({
+            'ok': True,
+            'message': 'Revisa el chat del bot para configurar'
+        })
+        
+    except Exception as e:
+        logger.error(f"MiniApp configure error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/miniapp/disconnect', methods=['POST'])
+def miniapp_disconnect():
+    """API endpoint to disconnect user session"""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        # Remove session file
+        session_file = f"sessions/session_{user_id}.session"
+        if os.path.exists(session_file):
+            os.remove(session_file)
+            
+            # Notify user
+            send_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+            message_payload = {
+                "chat_id": user_id,
+                "text": "✅ Tu cuenta ha sido desconectada correctamente.\n\nPuedes volver a configurarla cuando quieras con /configurar",
+                "parse_mode": "Markdown"
+            }
+            requests.post(send_url, json=message_payload)
+            
+            return jsonify({
+                'ok': True,
+                'message': 'Cuenta desconectada'
+            })
+        else:
+            return jsonify({
+                'ok': False,
+                'message': 'No tienes ninguna cuenta conectada'
+            })
+        
+    except Exception as e:
+        logger.error(f"MiniApp disconnect error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/miniapp/referrals', methods=['GET'])
+def miniapp_referrals():
+    """API endpoint para obtener estadísticas de referidos"""
+    try:
+        user_id = request.args.get('user_id', type=int)
+        
+        if not user_id:
+            return jsonify({'error': 'User ID required'}), 400
+        
+        # Importar funciones de database
+        from database import get_referral_stats, get_user
+        
+        # Obtener estadísticas
+        stats = get_referral_stats(user_id)
+        user = get_user(user_id)
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Generar enlace de referido
+        bot_info_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getMe"
+        bot_response = requests.get(bot_info_url).json()
+        bot_username = bot_response.get('result', {}).get('username', 'bot')
+        
+        referral_link = f"https://t.me/{bot_username}?start=ref_{user_id}"
+        
+        return jsonify({
+            'ok': True,
+            'stats': {
+                'confirmed': stats['confirmed'],
+                'pending': stats['pending'],
+                'days_earned': stats['days_earned'],
+                'progress': stats['progress'],
+                'next_reward_at': stats['next_reward_at']
+            },
+            'referral_link': referral_link,
+            'max_days': 15
+        })
+        
+    except Exception as e:
+        logger.error(f"MiniApp referrals error: {e}")
         return jsonify({'error': str(e)}), 500
 
 

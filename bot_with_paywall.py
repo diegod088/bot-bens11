@@ -50,7 +50,10 @@ from database import (
     set_user_session,
     get_user_session,
     has_active_session,
-    delete_user_session
+    delete_user_session,
+    confirm_referral,
+    check_and_reward_referrer,
+    get_referral_stats
 )
 
 # Import messages module for multi-language support
@@ -1282,6 +1285,11 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await cancel_login(update, context)
         return
     
+    if query.data == "connect_account":
+        await query.answer()
+        await start_login(update, context)
+        return
+    
     if query.data == "panel_menu":
         await query.answer()
         await panel_command(update, context)
@@ -2347,6 +2355,37 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
             elif content_type == 'apk':
                 increment_daily_counter(user_id, 'apk')
             
+            # SISTEMA DE REFERIDOS: Confirmar referido si cumple requisitos
+            referrer_id = confirm_referral(user_id)
+            if referrer_id:
+                # Verificar y recompensar al referente si alcanzó 15 referidos
+                days_earned = check_and_reward_referrer(referrer_id)
+                if days_earned > 0:
+                    try:
+                        await context.bot.send_message(
+                            chat_id=referrer_id,
+                            text=f"🎉 *¡Felicidades!*\n\n"
+                                 f"Has alcanzado 15 referidos válidos y has ganado *{days_earned} día de Premium*.\n\n"
+                                 f"🎁 ¡Gracias por ayudarnos a crecer!\n\n"
+                                 f"Usa /referidos para ver tu progreso.",
+                            parse_mode='Markdown'
+                        )
+                    except Exception as e:
+                        logger.warning(f"Could not notify referrer {referrer_id}: {e}")
+                else:
+                    # Notificar confirmación del referido sin recompensa aún
+                    try:
+                        stats = get_referral_stats(referrer_id)
+                        await context.bot.send_message(
+                            chat_id=referrer_id,
+                            text=f"✅ *Referido confirmado!*\n\n"
+                                 f"Tienes {stats['confirmed']}/15 referidos válidos.\n\n"
+                                 f"Usa /referidos para más detalles.",
+                            parse_mode='Markdown'
+                        )
+                    except Exception as e:
+                        logger.warning(f"Could not notify referrer {referrer_id}: {e}")
+            
             # Éxito - eliminar mensaje de estado
             try:
                 await status_msg.delete()
@@ -2426,9 +2465,26 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Check if user exists (first time user)
     is_new_user = not get_user(user_id)
     
+    # Detectar código de referido (formato: ref_123456)
+    referred_by = None
+    if context.args and is_new_user:
+        arg = context.args[0]
+        if arg.startswith('ref_'):
+            try:
+                referrer_id = int(arg[4:])
+                if referrer_id != user_id and get_user(referrer_id):
+                    referred_by = referrer_id
+                    logger.info(f"User {user_id} referred by {referrer_id}")
+            except ValueError:
+                pass
+    
     # Ensure user exists in database
     if is_new_user:
         create_user(user_id, first_name=first_name, username=username)
+        # Registrar referido PENDIENTE (no cuenta hasta que descargue)
+        if referred_by:
+            from database import add_user
+            add_user(user_id, referred_by=referred_by)
     
     # Ensure admins have premium
     ensure_admin_premium(user_id)
@@ -2951,6 +3007,143 @@ async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+
+
+async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Show user stats"""
+    user_id = update.effective_user.id
+    user = get_user(user_id)
+    
+    if not user:
+        await update.message.reply_text("⚠️ Usuario no encontrado. Usa /start primero.")
+        return
+    
+    lang = get_user_language(user)
+    
+    # Get usage stats (funciona con datos nuevos y antiguos)
+    usage = get_user_usage_stats(user_id)
+    
+    stats_message = get_msg("stats_title", lang)
+    stats_message += get_msg("stats_your_plan", lang)
+    
+    if user['premium']:
+        if user.get('premium_until'):
+            expiry = datetime.fromisoformat(user['premium_until'])
+            days_left = (expiry - datetime.now()).days
+            stats_message += get_msg("stats_premium_active", lang, 
+                                       expiry=expiry.strftime('%d/%m/%Y'),
+                                       days_left=days_left)
+        else:
+            stats_message += get_msg("stats_premium_lifetime", lang)
+    else:
+        stats_message += get_msg("stats_free_plan", lang)
+    
+    stats_message += get_msg("stats_divider", lang)
+    stats_message += get_msg("stats_usage_today", lang)
+    stats_message += get_msg("stats_photos", lang, count=usage['today']['photos'])
+    stats_message += get_msg("stats_videos", lang, count=usage['today']['videos'])
+    stats_message += get_msg("stats_music", lang, count=usage['today']['music'])
+    stats_message += get_msg("stats_apk", lang, count=usage['today']['apk'])
+    
+    stats_message += get_msg("stats_divider", lang)
+    stats_message += get_msg("stats_all_time", lang)
+    stats_message += get_msg("stats_total_downloads", lang, total=usage['total'])
+    
+    # Buttons with language support
+    keyboard = [
+        [InlineKeyboardButton(get_msg("btn_back_menu", lang), callback_data="panel_menu")]
+    ]
+    
+    # Add upgrade button for free users
+    if not user['premium']:
+        keyboard.insert(0, [InlineKeyboardButton(get_msg("btn_get_premium", lang), callback_data="get_premium")])
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    # Detectar si es callback o comando directo
+    if update.callback_query:
+        try:
+            await update.callback_query.edit_message_text(
+                stats_message, 
+                parse_mode='Markdown',
+                reply_markup=reply_markup
+            )
+        except Exception:
+            await update.callback_query.message.reply_text(
+                stats_message, 
+                parse_mode='Markdown',
+                reply_markup=reply_markup
+            )
+    else:
+        await update.message.reply_text(
+            stats_message, 
+            parse_mode='Markdown',
+            reply_markup=reply_markup
+        )
+
+
+async def referidos_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """🔥 COMANDO /REFERIDOS - Sistema de referidos con validación anti-abuso"""
+    user_id = update.effective_user.id
+    user = get_user(user_id)
+    
+    if not user:
+        await update.message.reply_text("⚠️ Usuario no encontrado. Usa /start primero.")
+        return
+    
+    # Obtener estadísticas de referidos
+    stats = get_referral_stats(user_id)
+    
+    # Generar enlace de referido
+    bot_username = context.bot.username
+    referral_link = f"https://t.me/{bot_username}?start=ref_{user_id}"
+    
+    # Construir mensaje
+    message = (
+        "👥 *Sistema de Referidos*\n\n"
+        "🎯 *Cómo Funciona:*\n"
+        "1️⃣ Comparte tu enlace personal\n"
+        "2️⃣ Tus amigos se unen y usan el bot\n"
+        "3️⃣ Cada 15 referidos válidos = 1 día Premium\n\n"
+        "⚠️ *Requisitos para ser válido:*\n"
+        "• Usuario nuevo\n"
+        "• Conecta su cuenta\n"
+        "• Realiza al menos 1 descarga\n\n"
+        "📊 *Tu Progreso:*\n"
+        f"✅ Referidos confirmados: *{stats['confirmed']}*\n"
+        f"⏳ Pendientes: *{stats['pending']}*\n"
+        f"🎁 Días Premium ganados: *{stats['days_earned']}*\n"
+        f"📈 Progreso: *{stats['progress']}/{stats['next_reward_at']}*\n\n"
+    )
+    
+    # Añadir información sobre el límite
+    if stats['days_earned'] >= 15:
+        message += "🏆 *¡Has alcanzado el límite de 15 días!*\n\n"
+    else:
+        remaining = 15 - stats['days_earned']
+        message += f"🎯 Puedes ganar hasta *{remaining} días más* de Premium.\n\n"
+    
+    message += (
+        "🔗 *Tu Enlace Personal:*\n"
+        f"`{referral_link}`\n\n"
+        "👇 Comparte tu enlace usando el botón de abajo."
+    )
+    
+    # Botón para compartir
+    keyboard = [
+        [InlineKeyboardButton(
+            "📤 Compartir Enlace",
+            url=f"https://t.me/share/url?url={referral_link}&text="
+                f"¡Descarga contenido de Telegram con este bot! 🚀"
+        )]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text(
+        message,
+        parse_mode='Markdown',
+        reply_markup=reply_markup
+    )
 
 
 async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4359,7 +4552,10 @@ def main():
             CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_code)],
             PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_password)],
         },
-        fallbacks=[CommandHandler("cancel", cancel_login)],
+        fallbacks=[
+            CommandHandler("cancel", cancel_login),
+            CallbackQueryHandler(cancel_login, pattern="^cancel_login$")
+        ],
         allow_reentry=True
     )
     application.add_handler(login_handler)
@@ -4372,6 +4568,7 @@ def main():
     application.add_handler(CommandHandler("testpay", testpay_command))
     application.add_handler(CommandHandler("adminstats", adminstats_command))
     application.add_handler(CommandHandler("stats", stats_command))
+    application.add_handler(CommandHandler("referidos", referidos_command))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
     application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
@@ -4426,7 +4623,10 @@ async def async_main():
             CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_code)],
             PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_password)],
         },
-        fallbacks=[CommandHandler("cancel", cancel_login)],
+        fallbacks=[
+            CommandHandler("cancel", cancel_login),
+            CallbackQueryHandler(cancel_login, pattern="^cancel_login$")
+        ],
         allow_reentry=True
     )
     application.add_handler(login_handler)
@@ -4439,6 +4639,7 @@ async def async_main():
     application.add_handler(CommandHandler("testpay", testpay_command))
     application.add_handler(CommandHandler("adminstats", adminstats_command))
     application.add_handler(CommandHandler("stats", stats_command))
+    application.add_handler(CommandHandler("referidos", referidos_command))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
     application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))

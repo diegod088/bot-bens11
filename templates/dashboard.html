@@ -169,6 +169,38 @@
     </div>
 </div>
 
+<!-- Broadcast Section -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="section-header" style="margin-bottom: 1rem;">
+        <h2 class="section-title">📢 Enviar Mensaje Masivo</h2>
+        <span class="text-sm font-medium text-secondary" id="broadcast-count">Destinatarios: {{ stats.total_users }}</span>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+        <select id="broadcast-target" class="form-select" style="padding: 0.5rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary); width: 200px;" onchange="updateBroadcastCount()">
+            <option value="all">Todos los usuarios</option>
+            <option value="premium">Solo Premium</option>
+            <option value="free">Solo Free</option>
+        </select>
+    </div>
+    
+    <textarea id="broadcast-message" placeholder="Escribe tu mensaje aquí... (soporta HTML: <b>negrita</b>, <i>cursiva</i>, <code>código</code>)" style="width: 100%; min-height: 120px; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary); font-family: inherit; resize: vertical; margin-bottom: 1rem;"></textarea>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="text-sm text-secondary" id="char-count">0 / 4096 caracteres</span>
+        <div style="display: flex; gap: 0.5rem;">
+            <button onclick="previewBroadcast()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                👁 Previsualizar
+            </button>
+            <button onclick="sendBroadcast()" class="btn btn-primary" style="padding: 0.5rem 1rem;" id="send-broadcast-btn">
+                📤 Enviar a Todos
+            </button>
+        </div>
+    </div>
+    
+    <div id="broadcast-result" style="margin-top: 1rem; padding: 1rem; border-radius: var(--radius-md); display: none;"></div>
+</div>
+
 <div class="grid-stats" style="grid-template-columns: 2fr 1fr;">
     <!-- Daily Activity -->
     <div class="card">
@@ -270,5 +302,144 @@
 
     // Update every 30 seconds
     setInterval(updateStats, 30000);
-</script>
+
+    // ========== BROADCAST FUNCTIONS ==========
+    
+    // Character counter
+    document.getElementById('broadcast-message').addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById('char-count').textContent = count + ' / 4096 caracteres';
+        if (count > 4096) {
+            document.getElementById('char-count').style.color = 'var(--danger)';
+        } else {
+            document.getElementById('char-count').style.color = 'var(--text-secondary)';
+        }
+    });
+
+    function updateBroadcastCount() {
+        const target = document.getElementById('broadcast-target').value;
+        fetch('/api/admin/broadcast/preview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: target })
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('broadcast-count').textContent = 'Destinatarios: ' + data.count;
+            const btn = document.getElementById('send-broadcast-btn');
+            if (target === 'all') {
+                btn.textContent = '📤 Enviar a Todos';
+            } else if (target === 'premium') {
+                btn.textContent = '📤 Enviar a Premium';
+            } else {
+                btn.textContent = '📤 Enviar a Free';
+            }
+        });
+    }
+
+    function previewBroadcast() {
+        const message = document.getElementById('broadcast-message').value;
+        const target = document.getElementById('broadcast-target').value;
+        const resultDiv = document.getElementById('broadcast-result');
+        
+        if (!message.trim()) {
+            resultDiv.innerHTML = '<span style="color: var(--danger);">⚠️ El mensaje no puede estar vacío</span>';
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
+            return;
+        }
+
+        fetch('/api/admin/broadcast/preview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: target })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const targetLabel = target === 'all' ? 'todos los usuarios' : target === 'premium' ? 'usuarios Premium' : 'usuarios Free';
+            resultDiv.innerHTML = `
+                <div style="margin-bottom: 0.5rem;"><strong>📊 Vista previa:</strong></div>
+                <div style="margin-bottom: 0.5rem;">Destinatarios: <strong>${data.count} ${targetLabel}</strong></div>
+                <div style="margin-bottom: 0.5rem;">Tiempo estimado: <strong>~${Math.ceil(data.count * 0.035)} segundos</strong></div>
+                <div style="padding: 1rem; background: var(--bg-body); border-radius: var(--radius-md); margin-top: 0.5rem;">
+                    <div style="color: var(--text-secondary); font-size: 0.75rem; margin-bottom: 0.5rem;">Mensaje:</div>
+                    <div>${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = 'rgba(42, 171, 238, 0.1)';
+        });
+    }
+
+    function sendBroadcast() {
+        const message = document.getElementById('broadcast-message').value;
+        const target = document.getElementById('broadcast-target').value;
+        const resultDiv = document.getElementById('broadcast-result');
+        const btn = document.getElementById('send-broadcast-btn');
+        
+        if (!message.trim()) {
+            resultDiv.innerHTML = '<span style="color: var(--danger);">⚠️ El mensaje no puede estar vacío</span>';
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
+            return;
+        }
+
+        const targetLabel = target === 'all' ? 'TODOS los usuarios' : target === 'premium' ? 'usuarios Premium' : 'usuarios Free';
+        if (!confirm(`¿Estás seguro de enviar este mensaje a ${targetLabel}?\n\nEsta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Enviando...';
+        resultDiv.innerHTML = '<div style="text-align: center;"><div class="spinner" style="margin: 0 auto;"></div><p style="margin-top: 0.5rem;">Enviando mensajes... Esto puede tardar unos minutos.</p></div>';
+        resultDiv.style.display = 'block';
+        resultDiv.style.background = 'rgba(42, 171, 238, 0.1)';
+
+        fetch('/api/admin/broadcast', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message, target: target })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '📤 Enviar a Todos';
+            
+            if (data.success) {
+                resultDiv.innerHTML = `
+                    <div style="color: var(--success); font-weight: 600; margin-bottom: 0.5rem;">✅ ¡Broadcast completado!</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
+                        <div style="text-align: center; padding: 0.5rem; background: var(--bg-body); border-radius: var(--radius-md);">
+                            <div style="font-size: 1.25rem; font-weight: 700;">${data.total}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Total</div>
+                        </div>
+                        <div style="text-align: center; padding: 0.5rem; background: var(--bg-body); border-radius: var(--radius-md);">
+                            <div style="font-size: 1.25rem; font-weight: 700; color: var(--success);">${data.sent}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Enviados</div>
+                        </div>
+                        <div style="text-align: center; padding: 0.5rem; background: var(--bg-body); border-radius: var(--radius-md);">
+                            <div style="font-size: 1.25rem; font-weight: 700; color: var(--warning);">${data.blocked}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Bloqueados</div>
+                        </div>
+                        <div style="text-align: center; padding: 0.5rem; background: var(--bg-body); border-radius: var(--radius-md);">
+                            <div style="font-size: 1.25rem; font-weight: 700; color: var(--danger);">${data.failed}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Fallidos</div>
+                        </div>
+                    </div>
+                `;
+                resultDiv.style.background = 'rgba(109, 194, 109, 0.1)';
+                document.getElementById('broadcast-message').value = '';
+                document.getElementById('char-count').textContent = '0 / 4096 caracteres';
+            } else {
+                resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error: ${data.error}</span>`;
+                resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '📤 Enviar a Todos';
+            resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error de conexión: ${err.message}</span>`;
+            resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
+        });
+    }</script>
 {% endblock %}

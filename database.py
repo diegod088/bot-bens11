@@ -103,28 +103,280 @@ def init_database():
         except sqlite3.OperationalError:
             pass
 
-        # Add first_name column
+        # Add referral columns
         try:
-            cursor.execute("ALTER TABLE users ADD COLUMN first_name TEXT DEFAULT NULL")
-            logger.info("Added first_name column to users table")
+            cursor.execute("ALTER TABLE users ADD COLUMN referred_by INTEGER DEFAULT NULL")
+            logger.info("Added referred_by column to users table")
+        except sqlite3.OperationalError:
+            pass
+        
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN referral_code TEXT DEFAULT NULL")
+            logger.info("Added referral_code column to users table")
         except sqlite3.OperationalError:
             pass
 
-        # Add username column
         try:
-            cursor.execute("ALTER TABLE users ADD COLUMN username TEXT DEFAULT NULL")
-            logger.info("Added username column to users table")
+            cursor.execute("ALTER TABLE users ADD COLUMN referrals_made INTEGER DEFAULT 0")
+            logger.info("Added referrals_made column to users table")
         except sqlite3.OperationalError:
             pass
+
+        # Add new referral columns for anti-abuse system
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN referrals_count INTEGER DEFAULT 0")
+            logger.info("Added referrals_count column to users table")
+        except sqlite3.OperationalError:
+            pass
+
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN referrals_rewarded INTEGER DEFAULT 0")
+            logger.info("Added referrals_rewarded column to users table")
+        except sqlite3.OperationalError:
+            pass
+
+        # Create referrals tracking table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS referrals (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                referrer_id INTEGER NOT NULL,
+                referred_id INTEGER NOT NULL,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                confirmed_at TIMESTAMP DEFAULT NULL,
+                FOREIGN KEY(referrer_id) REFERENCES users(user_id),
+                FOREIGN KEY(referred_id) REFERENCES users(user_id),
+                UNIQUE(referred_id)
+            )
+        """)
+
+        # Crear tabla de pagos
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS payments (
+                payment_id INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                amount INTEGER,
+                currency TEXT,
+                status TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(user_id)
+            )
+        """)
         
-        # Índices para mejorar rendimiento
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_premium ON users(premium)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_last_reset ON users(last_reset)")
-        
-    logger.info("Database initialized successfully")
+        logger.info("Database initialized successfully")
 
 
 # ==================== OPERACIONES DE USUARIO ====================
+
+def add_user(user_id: int, language: str = 'es', referred_by: Optional[int] = None) -> None:
+    """Adds a new user to the database or updates their language."""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,))
+        user = cursor.fetchone()
+        if user is None:
+            cursor.execute(
+                """
+                INSERT INTO users (user_id, language, last_reset)
+                VALUES (?, ?, ?)
+                """,
+                (user_id, language, datetime.now())
+            )
+            logger.info(f"New user {user_id} added with language {language}.")
+            
+            # Registrar referido como PENDIENTE (no cuenta aún)
+            if referred_by and referred_by != user_id:
+                try:
+                    cursor.execute(
+                        "INSERT INTO referrals (referrer_id, referred_id, status) VALUES (?, ?, 'pending')",
+                        (referred_by, user_id)
+                    )
+                    logger.info(f"Pending referral registered: {referred_by} -> {user_id}")
+                except sqlite3.IntegrityError:
+                    logger.warning(f"Referral already exists for user {user_id}")
+        else:
+            cursor.execute(
+                "UPDATE users SET language = ?, updated_at = ? WHERE user_id = ?",
+                (language, datetime.now(), user_id)
+            )
+            logger.info(f"User {user_id} language updated to {language}.")
+
+
+def confirm_referral(referred_user_id: int) -> Optional[int]:
+    """
+    Confirma un referido después de que cumpla los requisitos:
+    1. Conectó su cuenta (session_string existe)
+    2. Realizó al menos 1 descarga
+    
+    Returns:
+        referrer_id si la confirmación tuvo éxito, None en caso contrario
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Verificar que el referido tiene cuenta conectada y al menos 1 descarga
+        cursor.execute(
+            "SELECT session_string, downloads FROM users WHERE user_id = ?",
+            (referred_user_id,)
+        )
+        user_data = cursor.fetchone()
+        
+        if not user_data or not user_data['session_string'] or user_data['downloads'] < 1:
+            return None
+        
+        # Buscar el referido pendiente
+        cursor.execute(
+            "SELECT referrer_id, status FROM referrals WHERE referred_id = ? AND status = 'pending'",
+            (referred_user_id,)
+        )
+        referral = cursor.fetchone()
+        
+        if not referral:
+            return None
+        
+        referrer_id = referral['referrer_id']
+        
+        # Confirmar el referido
+        cursor.execute(
+            "UPDATE referrals SET status = 'confirmed', confirmed_at = ? WHERE referred_id = ?",
+            (datetime.now(), referred_user_id)
+        )
+        
+        # Incrementar contador del referente
+        cursor.execute(
+            "UPDATE users SET referrals_count = referrals_count + 1 WHERE user_id = ?",
+            (referrer_id,)
+        )
+        
+        logger.info(f"Referral confirmed: {referrer_id} -> {referred_user_id}")
+        return referrer_id
+
+
+def check_and_reward_referrer(referrer_id: int) -> int:
+    """
+    Verifica si un referente ha alcanzado 15 referidos válidos y le otorga 1 día de Premium.
+    Límite máximo: 15 días acumulables.
+    
+    Returns:
+        Días de Premium otorgados (0 o 1)
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        cursor.execute(
+            "SELECT referrals_count, referrals_rewarded, premium_until FROM users WHERE user_id = ?",
+            (referrer_id,)
+        )
+        user_data = cursor.fetchone()
+        
+        if not user_data:
+            return 0
+        
+        referrals_count = user_data['referrals_count']
+        referrals_rewarded = user_data['referrals_rewarded'] or 0
+        
+        # Calcular cuántos grupos de 15 referidos sin recompensar hay
+        pending_rewards = (referrals_count - referrals_rewarded * 15) // 15
+        
+        if pending_rewards <= 0:
+            return 0
+        
+        # Límite: máximo 15 días acumulables
+        max_days_allowed = 15
+        
+        # Calcular días de Premium actuales
+        current_premium_days = 0
+        if user_data['premium_until']:
+            expiry = datetime.fromisoformat(user_data['premium_until'])
+            if expiry > datetime.now():
+                current_premium_days = (expiry - datetime.now()).days
+        
+        # No otorgar si ya tiene 15 días o más
+        if current_premium_days >= max_days_allowed:
+            logger.info(f"User {referrer_id} already has {current_premium_days} premium days. Reward skipped.")
+            return 0
+        
+        # Otorgar 1 día de Premium
+        days_to_add = 1
+        
+        # Calcular nueva fecha de expiración
+        if user_data['premium_until']:
+            expiry = datetime.fromisoformat(user_data['premium_until'])
+            if expiry > datetime.now():
+                new_expiry = expiry + timedelta(days=days_to_add)
+            else:
+                new_expiry = datetime.now() + timedelta(days=days_to_add)
+        else:
+            new_expiry = datetime.now() + timedelta(days=days_to_add)
+        
+        # Aplicar límite de 15 días
+        max_expiry = datetime.now() + timedelta(days=max_days_allowed)
+        if new_expiry > max_expiry:
+            new_expiry = max_expiry
+        
+        # Actualizar base de datos
+        cursor.execute(
+            """UPDATE users 
+               SET premium = 1, 
+                   premium_level = 1, 
+                   premium_until = ?, 
+                   referrals_rewarded = referrals_rewarded + 1 
+               WHERE user_id = ?""",
+            (new_expiry.isoformat(), referrer_id)
+        )
+        
+        logger.info(f"Rewarded {days_to_add} day(s) of Premium to user {referrer_id}")
+        return days_to_add
+
+
+def get_referral_stats(user_id: int) -> Dict:
+    """
+    Obtiene las estadísticas de referidos de un usuario.
+    
+    Returns:
+        Dict con total de referidos, pendientes, confirmados y días ganados
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Obtener datos del usuario
+        cursor.execute(
+            "SELECT referrals_count, referrals_rewarded FROM users WHERE user_id = ?",
+            (user_id,)
+        )
+        user_data = cursor.fetchone()
+        
+        if not user_data:
+            return {
+                'confirmed': 0,
+                'pending': 0,
+                'days_earned': 0,
+                'progress': 0,
+                'next_reward_at': 15
+            }
+        
+        referrals_count = user_data['referrals_count'] or 0
+        referrals_rewarded = user_data['referrals_rewarded'] or 0
+        
+        # Contar referidos pendientes
+        cursor.execute(
+            "SELECT COUNT(*) as count FROM referrals WHERE referrer_id = ? AND status = 'pending'",
+            (user_id,)
+        )
+        pending_count = cursor.fetchone()['count']
+        
+        # Calcular progreso hacia la próxima recompensa
+        progress = referrals_count - (referrals_rewarded * 15)
+        
+        return {
+            'confirmed': referrals_count,
+            'pending': pending_count,
+            'days_earned': referrals_rewarded,
+            'progress': progress,
+            'next_reward_at': 15
+        }
+
 
 def get_user(user_id: int, auto_reset: bool = True) -> Optional[Dict]:
     """
@@ -156,28 +408,32 @@ def get_user(user_id: int, auto_reset: bool = True) -> Optional[Dict]:
         user_data = dict(row)
         
         # Check if premium expired
-        if auto_reset and user_data['premium'] and user_data['premium_until']:
+        if user_data['premium'] and user_data['premium_until']:
             expiry = datetime.fromisoformat(user_data['premium_until'])
             if datetime.now() > expiry:
-                cursor.execute(
-                    "UPDATE users SET premium = 0, premium_level = 0 WHERE user_id = ?", 
-                    (user_id,)
-                )
+                with get_db_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "UPDATE users SET premium = 0, premium_level = 0 WHERE user_id = ?", 
+                        (user_id,)
+                    )
                 user_data['premium'] = 0
                 user_data['premium_level'] = 0
         
         # Check if daily counters need reset
-        if auto_reset and user_data['last_reset']:
+        if user_data['last_reset']:
             last_reset_dt = datetime.fromisoformat(user_data['last_reset'])
             if datetime.now() - last_reset_dt > timedelta(hours=24):
-                cursor.execute(
-                    """UPDATE users SET 
-                       daily_photo = 0, daily_video = 0, 
-                       daily_music = 0, daily_apk = 0, 
-                       last_reset = ? 
-                       WHERE user_id = ?""",
-                    (datetime.now().isoformat(), user_id)
-                )
+                with get_db_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        """UPDATE users SET 
+                           daily_photo = 0, daily_video = 0, 
+                           daily_music = 0, daily_apk = 0, 
+                           last_reset = ? 
+                           WHERE user_id = ?""",
+                        (datetime.now().isoformat(), user_id)
+                    )
                 user_data.update({
                     'daily_photo': 0,
                     'daily_video': 0,
