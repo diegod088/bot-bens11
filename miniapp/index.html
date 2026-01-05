@@ -1747,26 +1747,41 @@
         // ========== LOAD USER DATA ==========
         async function loadUserData() {
             try {
+                const telegramUser = tg.initDataUnsafe?.user || {};
+                console.log('Telegram user data:', telegramUser);
+                
                 const response = await fetch(`${API_BASE}/api/miniapp/user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         initData: tg.initData || '',
-                        user: tg.initDataUnsafe?.user || {}
+                        user: telegramUser
                     })
                 });
+                
+                console.log('API /api/miniapp/user response status:', response.status);
+                
                 if (response.ok) {
                     userData = await response.json();
+                    console.log('User data loaded from API:', userData);
+                } else {
+                    console.error('API error:', response.status, await response.text());
                 }
             } catch (e) {
-                console.error(e);
+                console.error('Exception loading user data:', e);
             }
 
-            // Fallback data
+            // Fallback data - usar el ID de Telegram directamente
             if (!userData) {
+                const telegramUser = tg.initDataUnsafe?.user || {};
+                const telegramUserId = telegramUser.id;
+                
+                console.warn('Using fallback data with Telegram user_id:', telegramUserId);
+                
                 userData = {
-                    user_id: tg.initDataUnsafe?.user?.id || 12345,
-                    first_name: tg.initDataUnsafe?.user?.first_name || 'Usuario',
+                    user_id: telegramUserId || null,
+                    first_name: telegramUser.first_name || 'Usuario',
+                    username: telegramUser.username || '',
                     premium: false,
                     premium_until: null,
                     has_session: false,
@@ -1783,6 +1798,7 @@
                 };
             }
 
+            console.log('Final userData before updateUI:', userData);
             updateUI();
         }
 
@@ -1797,8 +1813,12 @@
             document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
             document.getElementById('welcomeText').textContent = `¡Hola, ${name}!`;
             
-            // Cargar stats de referidos automáticamente
-            loadReferralStats();
+            // Cargar stats de referidos automáticamente (con delay para asegurar que userData esté listo)
+            setTimeout(() => {
+                console.log('Intentando cargar referral stats...');
+                console.log('userData:', userData);
+                loadReferralStats();
+            }, 500);
             
             // Plan
             if (userData.premium) {
@@ -2087,35 +2107,71 @@
             try {
                 const userId = userData?.user_id || tg.initDataUnsafe?.user?.id;
                 
-                if (!userId) {
-                    console.error('No user ID available');
+                console.log('loadReferralStats called with userId:', userId);
+                
+                if (!userId || userId === 12345) {
+                    console.error('No valid user ID available (userId:', userId, ')');
+                    // Mostrar mensaje en el UI
+                    const linkEl = document.getElementById('referralLink');
+                    if (linkEl) {
+                        linkEl.textContent = 'Error: Usuario no identificado';
+                        linkEl.style.color = 'var(--accent-red)';
+                    }
                     return false;
                 }
                 
-                const response = await fetch(`${API_BASE}/api/miniapp/referrals?user_id=${userId}`);
+                const url = `${API_BASE}/api/miniapp/referrals?user_id=${userId}`;
+                console.log('Fetching:', url);
+                
+                const response = await fetch(url);
+                console.log('Response status:', response.status);
                 
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('API response:', result);
+                    
                     if (result.ok) {
                         referralData = result;
                         updateReferralUI();
+                        console.log('✅ Referral stats loaded successfully');
                         return true;
                     } else {
                         console.error('API returned error:', result);
+                        const linkEl = document.getElementById('referralLink');
+                        if (linkEl) {
+                            linkEl.textContent = 'Error: ' + (result.error || 'Desconocido');
+                            linkEl.style.color = 'var(--accent-red)';
+                        }
                         return false;
                     }
                 } else {
-                    console.error('HTTP error:', response.status);
+                    const errorText = await response.text();
+                    console.error('HTTP error:', response.status, errorText);
+                    const linkEl = document.getElementById('referralLink');
+                    if (linkEl) {
+                        linkEl.textContent = `Error HTTP ${response.status}`;
+                        linkEl.style.color = 'var(--accent-red)';
+                    }
                     return false;
                 }
             } catch (e) {
-                console.error('Error loading referral stats:', e);
+                console.error('Exception loading referral stats:', e);
+                const linkEl = document.getElementById('referralLink');
+                if (linkEl) {
+                    linkEl.textContent = 'Error de conexión';
+                    linkEl.style.color = 'var(--accent-red)';
+                }
                 return false;
             }
         }
 
         function updateReferralUI() {
-            if (!referralData) return;
+            if (!referralData) {
+                console.warn('updateReferralUI called but referralData is null');
+                return;
+            }
+            
+            console.log('Updating referral UI with data:', referralData);
             
             const stats = referralData.stats;
             
@@ -2130,7 +2186,11 @@
             document.getElementById('progressBar').style.width = `${Math.min(progressPercent, 100)}%`;
             
             // Actualizar enlace
-            document.getElementById('referralLink').textContent = referralData.referral_link;
+            const linkEl = document.getElementById('referralLink');
+            if (linkEl) {
+                linkEl.textContent = referralData.referral_link;
+                linkEl.style.color = 'var(--accent-blue)'; // Restaurar color normal
+            }
         }
 
         async function copyReferralLink() {
