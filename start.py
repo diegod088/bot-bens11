@@ -45,24 +45,27 @@ _bot_lock = threading.Lock()
 def run_dashboard():
     """Run Flask dashboard in a SEPARATE THREAD (non-blocking)"""
     try:
+        logger.info("📍 Importing dashboard app...")
         from dashboard import app
         
         port = int(os.environ.get('PORT', 5000))
         host = os.environ.get('HOST', '0.0.0.0')
         
         logger.info(f"🌐 Starting Dashboard on {host}:{port}")
+        logger.info(f"   Health check will be at http://{host}:{port}/health")
         
         try:
             from waitress import serve
             logger.info("📦 Using Waitress production server (8 threads)")
-            serve(app, host=host, port=port, threads=8)
+            logger.info("✅ Dashboard server is now listening and ready!")
+            serve(app, host=host, port=port, threads=8, _quiet=True)
         except ImportError:
             logger.info("Using Flask development server (not recommended for production)")
             app.run(host=host, port=port, debug=False, use_reloader=False, threaded=True)
             
     except Exception as e:
         logger.error(f"❌ Dashboard error: {e}", exc_info=True)
-        raise
+        sys.exit(1)
 
 
 async def run_bot_async():

@@ -18,16 +18,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Variables de entorno por defecto
-ENV PORT=5000
-ENV HOST=0.0.0.0
 ENV PYTHONUNBUFFERED=1
 
-# Exponer el puerto del dashboard
-EXPOSE ${PORT}
+# Exponer puerto por defecto (Railway asignará su propio puerto via variable PORT)
+EXPOSE 5000
 
-# Health check para Railway
-HEALTHCHECK --interval=30s --timeout=15s --start-period=180s --retries=5 \
-    CMD curl -f http://localhost:${PORT}/health || exit 1
+# Health check para Railway (usa variable de entorno PORT)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
 # Comando para ejecutar bot + dashboard
 CMD ["python", "start.py"]
