@@ -143,12 +143,12 @@ def main():
     
     # Give dashboard time to start before healthcheck
     import time
-    time.sleep(2)
+    time.sleep(5)  # Wait 5 seconds to ensure Flask is fully initialized
     logger.info("")
     
     # Run bot in MAIN THREAD (prevents set_wakeup_fd error)
     logger.info("=" * 80)
-    logger.info("📍 Running Bot in MAIN THREAD")
+    logger.info("📍 Running Bot in MAIN THREAD (after dashboard ready)")
     logger.info("=" * 80)
     logger.info("(This is the correct way - no async.run() in threads)")
     logger.info("")
