@@ -50,13 +50,12 @@ def get_db_connection():
 
 
 def login_required(f):
-    """Decorador para verificar si el usuario está autenticado como admin - DESHABILITADO PARA DESARROLLO"""
+    """Decorador para verificar si el usuario está autenticado como admin"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # En desarrollo, permitir acceso sin autenticación
-        # En producción, descomentar la línea de abajo:
-        # if 'admin' not in session:
-        #     return redirect(url_for('login'))
+        # Verificar si el usuario está autenticado
+        if 'admin' not in session:
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
