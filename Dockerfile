@@ -29,5 +29,5 @@ EXPOSE ${PORT}
 HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=5 \
     CMD curl -f http://localhost:${PORT}/health || exit 1
 
-# Comando para ejecutar servidor de salud + bot
-CMD ["python", "railway_start.py"]
+# Comando para ejecutar bot + dashboard
+CMD ["python", "start.py"]
