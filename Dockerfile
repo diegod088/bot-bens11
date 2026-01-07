@@ -26,7 +26,7 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE ${PORT}
 
 # Health check para Railway
-HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=5 \
+HEALTHCHECK --interval=30s --timeout=15s --start-period=180s --retries=5 \
     CMD curl -f http://localhost:${PORT}/health || exit 1
 
 # Comando para ejecutar bot + dashboard

@@ -128,18 +128,22 @@ def main():
     logger.info("✅ Bot token found")
     logger.info("")
     
-    # Start dashboard in SEPARATE THREAD
+    # Start dashboard in SEPARATE THREAD (non-daemon so it keeps running)
     logger.info("=" * 80)
     logger.info("📍 Starting Dashboard in background thread")
     logger.info("=" * 80)
     
     dashboard_thread = threading.Thread(
         target=run_dashboard,
-        daemon=True,
+        daemon=False,  # Non-daemon to ensure it keeps running
         name="DashboardThread"
     )
     dashboard_thread.start()
     logger.info(f"✅ Dashboard thread started: {dashboard_thread.name}")
+    
+    # Give dashboard time to start before healthcheck
+    import time
+    time.sleep(2)
     logger.info("")
     
     # Run bot in MAIN THREAD (prevents set_wakeup_fd error)
