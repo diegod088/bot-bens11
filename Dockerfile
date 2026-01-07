@@ -27,5 +27,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
     CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
-# Comando para ejecutar bot + dashboard (usa simple.py para Railway)
-CMD ["python", "start_simple.py"]
+# Comando para ejecutar bot + dashboard (usa debug.py para mejores logs en Railway)
+CMD ["python", "start_debug.py"]
