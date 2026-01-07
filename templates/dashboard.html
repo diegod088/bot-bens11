@@ -298,6 +298,41 @@
     </div>
 </div>
 
+<!-- Charts Section -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <div class="section-header" style="margin-bottom: 1rem;">
+        <h2 class="section-title">📈 Gráficos</h2>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 1rem;">
+        <!-- Revenue Chart -->
+        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
+            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">💰 Ingresos (Últimos 7 días)</h3>
+            <canvas id="revenueChart" style="max-height: 250px;"></canvas>
+        </div>
+        
+        <!-- Users Chart -->
+        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
+            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">👥 Usuarios Nuevos (Últimos 7 días)</h3>
+            <canvas id="usersChart" style="max-height: 250px;"></canvas>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <!-- Distribution Chart -->
+        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
+            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">🎯 Distribución</h3>
+            <canvas id="distributionChart" style="max-height: 200px;"></canvas>
+        </div>
+        
+        <!-- Downloads Chart -->
+        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
+            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">📥 Descargas por Tipo</h3>
+            <canvas id="downloadsChart" style="max-height: 200px;"></canvas>
+        </div>
+    </div>
+</div>
+
 <!-- Activity Card - Hidden on small screens, visible on desktop -->
 <div class="card" style="margin-bottom: 1.5rem; display: none;" id="activity-section">
     <div class="section-header" style="margin-bottom: 1rem;">
@@ -388,7 +423,125 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script>
+    // Chart instances
+    let revenueChart, usersChart, distributionChart, downloadsChart;
+    
+    function initCharts() {
+        // Revenue Chart
+        fetch('/api/charts/revenue')
+            .then(r => r.json())
+            .then(data => {
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                if (revenueChart) revenueChart.destroy();
+                revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Ingresos',
+                            data: data.data,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { drawBorder: false } }
+                        }
+                    }
+                });
+            });
+
+        // Users Chart
+        fetch('/api/charts/users')
+            .then(r => r.json())
+            .then(data => {
+                const ctx = document.getElementById('usersChart').getContext('2d');
+                if (usersChart) usersChart.destroy();
+                usersChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Usuarios Nuevos',
+                            data: data.data,
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { drawBorder: false } }
+                        }
+                    }
+                });
+            });
+
+        // Distribution Chart
+        fetch('/api/charts/distribution')
+            .then(r => r.json())
+            .then(data => {
+                const ctx = document.getElementById('distributionChart').getContext('2d');
+                if (distributionChart) distributionChart.destroy();
+                distributionChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.data,
+                            backgroundColor: data.colors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            });
+
+        // Downloads Chart
+        fetch('/api/charts/downloads')
+            .then(r => r.json())
+            .then(data => {
+                const ctx = document.getElementById('downloadsChart').getContext('2d');
+                if (downloadsChart) downloadsChart.destroy();
+                downloadsChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.data,
+                            backgroundColor: data.colors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            });
+    }
+    
+    // Initialize charts on load
+    window.addEventListener('load', initCharts);
+    
     // Show activity section on desktop
     const activitySection = document.getElementById('activity-section');
     if (window.innerWidth >= 768) {
@@ -429,12 +582,17 @@
 
                 const now = new Date();
                 document.getElementById('last-updated').textContent = now.toLocaleTimeString();
+                
+                // Refresh charts every 5 minutes
+                initCharts();
             })
             .catch(err => console.error('Error:', err));
     }
 
     // Update every 30 seconds
     setInterval(updateStats, 30000);
+    // Update charts every 5 minutes
+    setInterval(initCharts, 300000);
 
     // === BROADCAST ===
     document.getElementById('broadcast-message').addEventListener('input', function() {

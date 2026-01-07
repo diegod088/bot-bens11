@@ -8,6 +8,10 @@ import sys
 import logging
 import asyncio
 from dotenv import load_dotenv
+import nest_asyncio
+
+# Apply nest_asyncio to allow nested event loops (CRITICAL for python-telegram-bot)
+nest_asyncio.apply()
 
 # Configure logging
 logging.basicConfig(

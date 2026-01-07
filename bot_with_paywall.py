@@ -1842,9 +1842,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if query.data == "set_lang_es":
-        await query.answer("✅ Idioma cambiado a Español")
         user_id = query.from_user.id
         set_user_language(user_id, 'es')
+        await query.answer(get_msg("language_changed", 'es'))
         
         # Return to main menu in Spanish
         user = get_user(user_id)
@@ -1896,9 +1896,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if query.data == "set_lang_en":
-        await query.answer("✅ Language changed to English")
         user_id = query.from_user.id
         set_user_language(user_id, 'en')
+        await query.answer(get_msg("language_changed", 'en'))
         
         # Return to main menu in English
         user = get_user(user_id)
@@ -1950,9 +1950,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if query.data == "set_lang_pt":
-        await query.answer("✅ Idioma alterado para Português")
         user_id = query.from_user.id
         set_user_language(user_id, 'pt')
+        await query.answer(get_msg("language_changed", 'pt'))
         
         # Return to main menu in Portuguese
         user = get_user(user_id)
@@ -1997,9 +1997,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if query.data == "set_lang_it":
-        await query.answer("✅ Lingua cambiata in Italiano")
         user_id = query.from_user.id
         set_user_language(user_id, 'it')
+        await query.answer(get_msg("language_changed", 'it'))
         
         # Return to main menu in Italian
         user = get_user(user_id)
@@ -2100,6 +2100,33 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(f"Error showing miniapp: {e}")
             await query.message.reply_text(miniapp_msg, parse_mode='Markdown', reply_markup=reply_markup)
+        return
+    
+    # Handle premium plans display
+    if query.data == "show_premium_plans":
+        await query.answer()
+        user_id = update.effective_user.id
+        user = get_user(user_id)
+        lang = get_user_language(user) if user else 'es'
+        await show_premium_plans(query, context, lang)
+        return
+    
+    # Handle language changes (change_lang_XX)
+    if query.data.startswith("change_lang_"):
+        await query.answer()
+        user_id = update.effective_user.id
+        lang_code = query.data.replace("change_lang_", "")
+        
+        # Update user language in database
+        try:
+            set_user_language(user_id, lang_code)
+            user = get_user(user_id)
+            
+            # Re-show settings with new language
+            await panel_command(update, context)
+        except Exception as e:
+            logger.error(f"Error changing language: {e}")
+            await query.answer("Error al cambiar idioma", show_alert=True)
         return
     
     # Fallback: log unknown button
@@ -3416,79 +3443,6 @@ async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
-
-
-async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Show user stats"""
-    user_id = update.effective_user.id
-    user = get_user(user_id)
-    
-    if not user:
-        await update.message.reply_text("⚠️ Usuario no encontrado. Usa /start primero.")
-        return
-    
-    lang = get_user_language(user)
-    
-    # Get usage stats (funciona con datos nuevos y antiguos)
-    usage = get_user_usage_stats(user_id)
-    
-    stats_message = get_msg("stats_title", lang)
-    stats_message += get_msg("stats_your_plan", lang)
-    
-    if user['premium']:
-        if user.get('premium_until'):
-            expiry = datetime.fromisoformat(user['premium_until'])
-            days_left = (expiry - datetime.now()).days
-            stats_message += get_msg("stats_premium_active", lang, 
-                                       expiry=expiry.strftime('%d/%m/%Y'),
-                                       days_left=days_left)
-        else:
-            stats_message += get_msg("stats_premium_lifetime", lang)
-    else:
-        stats_message += get_msg("stats_free_plan", lang)
-    
-    stats_message += get_msg("stats_divider", lang)
-    stats_message += get_msg("stats_usage_today", lang)
-    stats_message += get_msg("stats_photos", lang, count=usage['today']['photos'])
-    stats_message += get_msg("stats_videos", lang, count=usage['today']['videos'])
-    stats_message += get_msg("stats_music", lang, count=usage['today']['music'])
-    stats_message += get_msg("stats_apk", lang, count=usage['today']['apk'])
-    
-    stats_message += get_msg("stats_divider", lang)
-    stats_message += get_msg("stats_all_time", lang)
-    stats_message += get_msg("stats_total_downloads", lang, total=usage['total'])
-    
-    # Buttons with language support
-    keyboard = [
-        [InlineKeyboardButton(get_msg("btn_back_menu", lang), callback_data="panel_menu")]
-    ]
-    
-    # Add upgrade button for free users
-    if not user['premium']:
-        keyboard.insert(0, [InlineKeyboardButton(get_msg("btn_get_premium", lang), callback_data="get_premium")])
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    # Detectar si es callback o comando directo
-    if update.callback_query:
-        try:
-            await update.callback_query.edit_message_text(
-                stats_message, 
-                parse_mode='Markdown',
-                reply_markup=reply_markup
-            )
-        except Exception:
-            await update.callback_query.message.reply_text(
-                stats_message, 
-                parse_mode='Markdown',
-                reply_markup=reply_markup
-            )
-    else:
-        await update.message.reply_text(
-            stats_message, 
-            parse_mode='Markdown',
-            reply_markup=reply_markup
-        )
 
 
 async def referidos_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -5049,16 +5003,22 @@ async def async_main():
                 logger.error(f"Failed to initialize bot after {max_retries} attempts")
                 raise
     
-    # Start the application with run_polling (PTB v20+ recommended method)
-    # This is the ONLY correct way to run the bot
+# Start the application with polling (PTB v20+)
+    # Compatible with nest_asyncio using await application.start() + stop()
     try:
         logger.info("=" * 80)
         logger.info("🚀 TELEGRAM BOT POLLING STARTED")
         logger.info("✅ Listening for incoming messages...")
         logger.info("=" * 80)
         
-        # run_polling() is blocking and handles the entire lifecycle
-        await application.run_polling(allowed_updates=Update.ALL_TYPES)
+        # Initialize and start application
+        await application.initialize()
+        await application.start()
+        await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
+        
+        # Keep running until interrupted
+        while True:
+            await asyncio.sleep(1)
         
     except KeyboardInterrupt:
         logger.info("⚠️ Keyboard interrupt received")
@@ -5066,6 +5026,16 @@ async def async_main():
         logger.error(f"❌ Bot polling error: {e}", exc_info=True)
     finally:
         logger.info("🛑 Bot shutting down...")
+        try:
+            # Stop polling
+            await application.updater.stop()
+            # Stop application
+            await application.stop()
+            # Shutdown application
+            await application.shutdown()
+        except Exception as e:
+            logger.debug(f"Debug: Shutdown exception (can be normal): {e}")
+        
         # Reset flag to allow restart if needed
         with _bot_instance_lock:
             _bot_instance_running = False

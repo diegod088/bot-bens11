@@ -56,7 +56,6 @@ MESSAGES = {
         "btn_upgrade": "💎 Mejorar a Premium",
         
         # Buttons
-        "btn_panel": "📥 Empezar a Descargar",
         "btn_download_now": "📥 Empezar a Descargar",
         "btn_how_to_use": "❓ Ayuda",
         "btn_plans": "💎 Ver Planes",
@@ -342,6 +341,12 @@ MESSAGES = {
         "panel_connection_ok": "✅ *Bot:* Online & Connected\n",
         "panel_connection_fail": "⚠️ *Bot:* Connection Issues\n",
         "panel_footer": "\n💡 *Tip:* Upgrade to Premium for higher limits!",
+        "panel_connected": "✅ Connected to Telegram",
+        "panel_disconnected": "❌ Not connected",
+        "panel_desc_connected": "_(You can download from private channels)_\n\n",
+        "panel_desc_disconnected": "_(Connect your account to download from private channels)_\n\n",
+        "panel_stats_title": "\n📊 *Your Downloads Today:*\n",
+        "panel_stats_unlimited": "{icon} {label}: Unlimited ✨\n",
         
         # Stats
         "stats_title": "📊 *Your Statistics*\n\n",

@@ -323,23 +323,33 @@
     <div class="toolbar">
         <div style="position: relative;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="search-input" placeholder="Buscar..." style="padding-left: 2.5rem;">
+            <input type="text" id="search-input" placeholder="Buscar por nombre, usuario o ID..." style="padding-left: 2.5rem;">
         </div>
         
         <select id="status-filter" onchange="loadUsers(1)">
-            <option value="all">Todos</option>
-            <option value="premium">Premium</option>
-            <option value="free">Gratuitos</option>
+            <option value="all">Todos los usuarios</option>
+            <option value="premium">⭐ Premium activo</option>
+            <option value="premium-expired">⭐ Premium expirado</option>
+            <option value="free">Gratuito</option>
         </select>
         
         <select id="sort-filter" onchange="loadUsers(1)">
-            <option value="created_at-desc">Recientes</option>
-            <option value="downloads-desc">Descargas</option>
-            <option value="updated_at-desc">Activos</option>
+            <option value="created_at-desc">📅 Más recientes</option>
+            <option value="created_at-asc">📅 Más antiguos</option>
+            <option value="downloads-desc">📥 Más descargas</option>
+            <option value="updated_at-desc">⏱️ Más activos</option>
+            <option value="premium_until-desc">⭐ Próximo vencimiento</option>
+        </select>
+        
+        <select id="per-page-filter" onchange="changePerPage()">
+            <option value="10">10 por pág.</option>
+            <option value="20" selected>20 por pág.</option>
+            <option value="50">50 por pág.</option>
+            <option value="100">100 por pág.</option>
         </select>
         
         <button class="btn btn-primary" onclick="exportCSV()" title="Exportar CSV">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            💾 CSV
         </button>
     </div>
 
@@ -393,7 +403,7 @@
 {% block extra_js %}
 <script>
     let currentPage = 1;
-    const perPage = 20;
+    let perPage = 20;
     let selectedUsers = new Set();
 
     function formatDate(dateString) {
@@ -405,6 +415,11 @@
         if (!expiryDate) return 0;
         const diffTime = new Date(expiryDate) - new Date();
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('per-page-filter').value);
+        loadUsers(1);
     }
 
     function toggleUserSelection(userId, checkbox) {
@@ -593,7 +608,9 @@
 
         let url = `/api/users?page=${page}&per_page=${perPage}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
-        if (status !== 'all') url += `&status=${status}`;
+        if (status !== 'all' && status !== 'premium-expired') url += `&status=${status}`;
+        // Manejo especial para premium expirado
+        if (status === 'premium-expired') url += `&status=premium&expired=true`;
 
         fetch(url)
             .then(res => res.json())
@@ -614,9 +631,15 @@
     document.getElementById('search-input').addEventListener('keypress', e => {
         if (e.key === 'Enter') loadUsers(1);
     });
+    
+    // Búsqueda en tiempo real (opcional)
+    document.getElementById('search-input').addEventListener('input', () => {
+        loadUsers(1);
+    });
 
     // Initial load
     loadUsers();
+
 </script>
 {% endblock %}
 <style>
