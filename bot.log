@@ -1,0 +1,25 @@
+nohup: no se tendrá en cuenta la entrada
+2026-01-07 19:20:01,316 - database - INFO - ✅ ENCRYPTION_KEY cargada correctamente.
+2026-01-07 19:20:01,316 - database - INFO - Initializing database...
+2026-01-07 19:20:01,317 - database - INFO - Database initialized successfully
+2026-01-07 19:20:01,317 - __main__ - INFO - ✅ Database initialized
+2026-01-07 19:20:01,317 - __main__ - INFO - ✅ All requirements satisfied
+2026-01-07 19:20:01,317 - __main__ - INFO - 
+2026-01-07 19:20:01,317 - __main__ - INFO - ================================================================================
+2026-01-07 19:20:01,317 - __main__ - INFO - 🤖 STARTING TELEGRAM BOT
+2026-01-07 19:20:01,317 - __main__ - INFO - ================================================================================
+2026-01-07 19:20:01,317 - __main__ - INFO - 
+2026-01-07 19:20:01,541 - telethon.crypto.aes - INFO - libssl detected, it will be used for encryption
+2026-01-07 19:20:01,722 - bot_with_paywall - INFO - 🤖 Initializing Telegram Bot (async_main)...
+/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py:4951: PTBUserWarning: If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message. Read this FAQ entry to learn more about the per_* settings: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do.
+  login_handler = ConversationHandler(
+2026-01-07 19:20:01,793 - bot_with_paywall - INFO - Bot started. Waiting for messages...
+2026-01-07 19:20:01,793 - bot_with_paywall - INFO - Initializing bot (attempt 1/5)...
+2026-01-07 19:20:02,572 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getMe "HTTP/1.1 200 OK"
+2026-01-07 19:20:02,573 - bot_with_paywall - INFO - Bot initialized successfully!
+2026-01-07 19:20:02,573 - bot_with_paywall - INFO - ================================================================================
+2026-01-07 19:20:02,573 - bot_with_paywall - INFO - 🚀 TELEGRAM BOT POLLING STARTED
+2026-01-07 19:20:02,573 - bot_with_paywall - INFO - ✅ Listening for incoming messages...
+2026-01-07 19:20:02,574 - bot_with_paywall - INFO - ================================================================================
+2026-01-07 19:20:02,574 - telegram.ext.Application - INFO - Application started
+2026-01-07 19:20:02,778 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/deleteWebhook "HTTP/1.1 200 OK"

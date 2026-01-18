@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Onboarding Simplificado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #0088cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0066aa;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .feature-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Test Onboarding Simplificado</h1>
+    
+    <div class="test-section">
+        <h2>📋 Nuevo Diseño del Onboarding</h2>
+        <p>El onboarding ahora es una sola sección con todas las características explicadas:</p>
+        
+        <div class="feature-preview">
+            <h3>✨ Características del Nuevo Diseño:</h3>
+            <ul>
+                <li>🎯 <strong>Una sola vista</strong> - Sin navegación entre diapositivas</li>
+                <li>📱 <strong>Características visuales</strong> - Cada feature con icono y descripción</li>
+                <li>🌐 <strong>Multiidioma</strong> - Traducciones automáticas</li>
+                <li>⚡ <strong>Simple y directo</strong> - Botón "Comenzar" y "Omitir"</li>
+            </ul>
+        </div>
+        
+        <h3>🧪 Escenarios de Prueba</h3>
+        
+        <h4>🇪🇸 Español</h4>
+        <button class="test-button" onclick="testOnboarding('es')">Usuario Nuevo Español</button>
+        
+        <h4>🇬🇧 English</h4>
+        <button class="test-button" onclick="testOnboarding('en')">New User English</button>
+        
+        <h4>🇧🇷 Português</h4>
+        <button class="test-button" onclick="testOnboarding('pt')">Novo Usuário Português</button>
+        
+        <h4>🇮🇹 Italiano</h4>
+        <button class="test-button" onclick="testOnboarding('it')">Nuovo Utente Italiano</button>
+        
+        <h4>🔄 Usuario Existente</h4>
+        <button class="test-button" onclick="testExistingUser()">Usuario Existente (sin onboarding)</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📱 Vista Previa</h2>
+        <div id="preview-container">
+            <p>Haz clic en uno de los botones de arriba para probar el onboarding.</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Resultados</h2>
+        <div id="test-results">
+            <p>Los resultados de las pruebas aparecerán aquí.</p>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            const statusClass = type === 'success' ? 'success' : 'info';
+            results.innerHTML += `<div class="status ${statusClass}">[${timestamp}] ${message}</div>`;
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function testOnboarding(lang) {
+            log(`🌍 Iniciando prueba de onboarding en ${lang.toUpperCase()}`);
+            
+            // Limpiar estado anterior
+            localStorage.clear();
+            
+            // Simular usuario nuevo
+            const userId = Math.floor(Math.random() * 100000);
+            const url = `http://localhost:8000/miniapp/index.html?v=2&user_id=${userId}&new=true&lang=${lang}`;
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="${url}" onload="onFrameLoad('${lang}')"></iframe>
+                </div>
+            `;
+            
+            log(`📱 MiniApp cargada: ${url}`);
+            log(`⏳ Esperando onboarding en ${lang}...`);
+        }
+        
+        function testExistingUser() {
+            log('👤 Iniciando prueba de USUARIO EXISTENTE');
+            
+            // Establecer estado como existente
+            localStorage.clear();
+            localStorage.setItem('onboarding_seen', 'true');
+            
+            const userId = Math.floor(Math.random() * 100000);
+            const url = `http://localhost:8000/miniapp/index.html?v=2&user_id=${userId}&new=false`;
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="${url}" onload="onFrameLoad('existente')"></iframe>
+                </div>
+            `;
+            
+            log(`📱 MiniApp cargada: ${url}`);
+            log('⏳ Esperando que se salte el onboarding...');
+        }
+        
+        function onFrameLoad(type) {
+            setTimeout(() => {
+                try {
+                    const frame = document.querySelector('iframe');
+                    const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                    
+                    const onboardingVisible = frameDoc.getElementById('onboarding')?.style.display !== 'none';
+                    const loadingVisible = frameDoc.getElementById('loading')?.style.display !== 'none';
+                    
+                    if (type === 'existente') {
+                        if (!onboardingVisible && loadingVisible) {
+                            log('✅ ÉXITO: Onboarding omitido para usuario existente', 'success');
+                        } else {
+                            log('❌ ERROR: Onboarding visible para usuario existente');
+                        }
+                    } else {
+                        if (onboardingVisible) {
+                            log(`✅ ÉXITO: Onboarding visible en ${type}`, 'success');
+                            
+                            // Verificar elementos del nuevo diseño
+                            const content = frameDoc.querySelector('.onboarding-content');
+                            const featureItems = frameDoc.querySelectorAll('.feature-item');
+                            const title = frameDoc.querySelector('.onboarding-title');
+                            
+                            if (content && featureItems.length >= 3 && title) {
+                                log(`📝 Contenido encontrado: ${featureItems.length} características`);
+                                log(`🎨 Título: "${title.textContent}"`);
+                                
+                                // Verificar botones
+                                const btn = frameDoc.getElementById('onboardingBtn');
+                                const skipBtn = frameDoc.getElementById('skipBtn');
+                                
+                                if (btn && skipBtn) {
+                                    log(`🔘 Botón principal: "${btn.textContent}"`);
+                                    log(`🔘 Botón omitir: "${skipBtn.textContent}"`);
+                                }
+                                
+                                log('🎉 Nuevo diseño de onboarding funcionando correctamente', 'success');
+                            } else {
+                                log('⚠️ Estructura del nuevo onboarding incompleta');
+                            }
+                        } else {
+                            log(`❌ ERROR: Onboarding no visible en ${type}`);
+                        }
+                    }
+                } catch (error) {
+                    log(`⚠️ No se pudo verificar el estado: ${error.message}`);
+                    log('💡 Esto puede deberse a políticas de mismo origen. Prueba manualmente.');
+                }
+            }, 1500);
+        }
+        
+        // Instrucciones iniciales
+        log('🚀 Sistema de pruebas del nuevo onboarding listo');
+        log('📝 Nuevo diseño: una sola sección con 3 características explicadas');
+        log('🌐 Soporta idiomas: Español, Inglés, Portugués, Italiano');
+        log('🎯 Más simple y efectivo que el sistema de diapositivas');
+    </script>
+</body>
+</html>

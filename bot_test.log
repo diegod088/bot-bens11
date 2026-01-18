@@ -1,0 +1,273 @@
+nohup: no se tendrá en cuenta la entrada
+2026-01-06 00:46:37,363 - INFO - ======================================================================
+2026-01-06 00:46:37,363 - INFO - 🚂 RAILWAY DEPLOYMENT - BOT
+2026-01-06 00:46:37,364 - INFO - ======================================================================
+2026-01-06 00:46:37,364 - INFO - 
+2026-01-06 00:46:37,378 - INFO - ✅ ENCRYPTION_KEY cargada correctamente.
+2026-01-06 00:46:37,379 - INFO - Initializing database...
+2026-01-06 00:46:37,380 - INFO - Database initialized successfully
+2026-01-06 00:46:37,380 - INFO - ✅ Database initialized
+2026-01-06 00:46:37,380 - INFO - 
+2026-01-06 00:46:37,380 - INFO - 📍 Starting health check server...
+2026-01-06 00:46:37,380 - INFO - 🌐 Starting health check server on port 8080...
+2026-01-06 00:46:37,380 - INFO - ✅ Health check server started
+2026-01-06 00:46:37,380 - INFO - 
+2026-01-06 00:46:37,380 - INFO - ✅ TELEGRAM_TOKEN found - starting BOT
+2026-01-06 00:46:37,380 - INFO - 
+2026-01-06 00:46:37,380 - INFO - 📍 Running Bot in MAIN THREAD...
+2026-01-06 00:46:37,381 - INFO - 🤖 Starting Telegram Bot...
+2026-01-06 00:46:37,408 - INFO - Serving on http://0.0.0.0:8080
+2026-01-06 00:46:37,574 - INFO - libssl detected, it will be used for encryption
+2026-01-06 00:46:37,737 - INFO - 🤖 Initializing Telegram Bot (async_main)...
+/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py:4989: PTBUserWarning: If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message. Read this FAQ entry to learn more about the per_* settings: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do.
+  login_handler = ConversationHandler(
+2026-01-06 00:46:37,792 - INFO - Bot started. Waiting for messages...
+2026-01-06 00:46:37,792 - INFO - Initializing bot (attempt 1/5)...
+2026-01-06 00:46:38,160 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getMe "HTTP/1.1 200 OK"
+2026-01-06 00:46:38,161 - INFO - Bot initialized successfully!
+2026-01-06 00:46:38,161 - INFO - ================================================================================
+2026-01-06 00:46:38,161 - INFO - 🚀 TELEGRAM BOT POLLING STARTED
+2026-01-06 00:46:38,161 - INFO - ✅ Listening for incoming messages...
+2026-01-06 00:46:38,162 - INFO - ================================================================================
+2026-01-06 00:46:38,163 - INFO - Initializing database...
+2026-01-06 00:46:38,164 - INFO - Database initialized successfully
+2026-01-06 00:46:38,166 - INFO - Connecting to 149.154.175.55:443/TcpFull...
+2026-01-06 00:46:38,350 - INFO - Connection to 149.154.175.55:443/TcpFull complete!
+/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telethon/client/auth.py:148: UserWarning: the session already had an authorized user so it did not login to the bot account using the provided bot_token (it may not be using the user you expect)
+  warnings.warn(
+2026-01-06 00:46:39,526 - INFO - Telethon Bot Client started successfully
+2026-01-06 00:46:39,731 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setMyCommands "HTTP/1.1 200 OK"
+2026-01-06 00:46:39,733 - INFO - ✅ Bot commands configured: 7 commands
+2026-01-06 00:46:39,936 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setChatMenuButton "HTTP/1.1 200 OK"
+2026-01-06 00:46:39,937 - INFO - Menu button set to: https://bot-bens11-production.up.railway.app/miniapp?v=2
+2026-01-06 00:46:40,140 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/deleteWebhook "HTTP/1.1 200 OK"
+2026-01-06 00:46:40,143 - INFO - Application started
+2026-01-06 00:46:40,755 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:46:40,962 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/sendMessage "HTTP/1.1 200 OK"
+2026-01-06 00:46:52,119 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:46:54,374 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:46:55,686 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:46:55,845 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/editMessageText "HTTP/1.1 200 OK"
+2026-01-06 00:47:00,621 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:00,624 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:00,826 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:00,827 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:00,827 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:00,827 - INFO - Mapped to language: es
+2026-01-06 00:47:00,847 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:00,849 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:00,849 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:02,619 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:02,623 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:02,737 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:02,738 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:02,739 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:02,739 - INFO - Mapped to language: es
+2026-01-06 00:47:02,758 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:02,760 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:02,761 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:03,897 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:03,899 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:04,102 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:04,103 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:04,103 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:04,103 - INFO - Mapped to language: es
+2026-01-06 00:47:04,122 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:04,125 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:04,125 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:05,126 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:05,129 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:05,330 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:05,331 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:05,331 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:05,331 - INFO - Mapped to language: es
+2026-01-06 00:47:05,349 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:05,351 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:05,352 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:05,740 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:05,743 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:05,946 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:05,947 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:05,947 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:05,947 - INFO - Mapped to language: es
+2026-01-06 00:47:05,949 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:05,950 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:05,950 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:06,184 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:06,187 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:06,355 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:06,357 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:06,357 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:06,357 - INFO - Mapped to language: es
+2026-01-06 00:47:06,376 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:06,379 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:06,379 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:15,571 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:15,574 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:15,775 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:15,984 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:16,188 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:16,188 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:16,189 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:16,189 - INFO - Mapped to language: es
+2026-01-06 00:47:16,208 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:16,209 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:16,210 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:16,213 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:16,390 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:16,391 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:16,391 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:16,391 - INFO - Mapped to language: es
+2026-01-06 00:47:16,392 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:16,393 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:16,393 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:16,394 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=1438860917
+2026-01-06 00:47:16,596 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:47:16,598 - INFO - 🚀 /START command from user 1438860917 (@YADIEDD)
+2026-01-06 00:47:16,598 - INFO - User 1438860917 Telegram language_code: es
+2026-01-06 00:47:16,599 - INFO - Mapped to language: es
+2026-01-06 00:47:16,602 - INFO - User 1438860917 language set to es
+2026-01-06 00:47:16,604 - INFO - ✓ Enviando usuario 1438860917 directamente a miniapp con idioma: es
+2026-01-06 00:47:16,605 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:47:26,094 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:36,256 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:39,639 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:44,991 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/sendMessage "HTTP/1.1 200 OK"
+2026-01-06 00:47:49,822 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:51,892 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:47:52,214 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/sendMessage "HTTP/1.1 400 Bad Request"
+2026-01-06 00:47:52,215 - WARNING - Error de red (recuperable): Can't parse entities: can't find end of the entity starting at byte offset 1084
+2026-01-06 00:48:02,015 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:48:08,172 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:48:08,538 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/sendMessage "HTTP/1.1 400 Bad Request"
+2026-01-06 00:48:08,540 - WARNING - Error de red (recuperable): Can't parse entities: can't find end of the entity starting at byte offset 1084
+2026-01-06 00:48:13,173 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:48:13,175 - INFO - Application is stopping. This might take a moment.
+2026-01-06 00:48:13,175 - INFO - Application.stop() complete
+2026-01-06 00:48:13,177 - INFO - Disconnecting from 149.154.175.55:443/TcpFull...
+2026-01-06 00:48:13,178 - INFO - Disconnection from 149.154.175.55:443/TcpFull complete!
+2026-01-06 00:48:13,194 - ERROR - ❌ Bot polling error: Cannot close a running event loop
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 5053, in async_main
+    # This is the ONLY correct way to run the bot
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 818, in run_polling
+    return self.__run(
+           ^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1022, in __run
+    loop.close()
+  File "/usr/lib/python3.12/asyncio/unix_events.py", line 68, in close
+    super().close()
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 101, in close
+    raise RuntimeError("Cannot close a running event loop")
+RuntimeError: Cannot close a running event loop
+2026-01-06 00:48:13,199 - INFO - 🛑 Bot shutting down...
+2026-01-06 00:48:13,199 - INFO - ✅ Bot stopped cleanly

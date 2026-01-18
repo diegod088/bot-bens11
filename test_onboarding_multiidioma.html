@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Onboarding Multiidioma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #0088cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0066aa;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌐 Test Onboarding Multiidioma</h1>
+    
+    <div class="test-section">
+        <h2>🎯 Escenarios de Prueba</h2>
+        <p>Prueba el onboarding en diferentes idiomas para usuarios nuevos:</p>
+        
+        <div class="status info">
+            💡 Los usuarios nuevos verán el onboarding en su idioma detectado automáticamente
+        </div>
+        
+        <h3>🇪🇸 Español (por defecto)</h3>
+        <button class="test-button" onclick="testLanguage('es', 'nuevo')">Usuario Nuevo Español</button>
+        
+        <h3>🇬🇧 English</h3>
+        <button class="test-button" onclick="testLanguage('en', 'nuevo')">New User English</button>
+        
+        <h3>🇧🇷 Português</h3>
+        <button class="test-button" onclick="testLanguage('pt', 'novo')">Novo Usuário Português</button>
+        
+        <h3>🇮🇹 Italiano</h3>
+        <button class="test-button" onclick="testLanguage('it', 'nuovo')">Nuovo Utente Italiano</button>
+        
+        <h3>🔄 Usuario Existente (sin onboarding)</h3>
+        <button class="test-button" onclick="testExistingUser()">Usuario Existente</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📱 Vista Previa de MiniApp</h2>
+        <div id="preview-container">
+            <p>Haz clic en uno de los botones de arriba para probar el onboarding multiidioma.</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Verificaciones</h2>
+        <div id="test-results">
+            <p>Los resultados de las pruebas aparecerán aquí.</p>
+        </div>
+    </div>
+
+    <script>
+        let testFrame = null;
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            const statusClass = type === 'success' ? 'success' : 'info';
+            results.innerHTML += `<div class="status ${statusClass}">[${timestamp}] ${message}</div>`;
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function testLanguage(lang, userType) {
+            log(`🌍 Iniciando prueba de idioma: ${lang.toUpperCase()} - Tipo: ${userType}`);
+            
+            // Limpiar estado anterior
+            localStorage.clear();
+            
+            // Simular detección de idioma
+            const userId = Math.floor(Math.random() * 100000);
+            const url = `http://localhost:8000/miniapp/index.html?v=2&user_id=${userId}&new=true&lang=${lang}`;
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="${url}" onload="onFrameLoad('${lang}', '${userType}')"></iframe>
+                </div>
+            `;
+            
+            log(`📱 MiniApp cargada: ${url}`);
+            log(`⏳ Esperando onboarding en ${lang}...`);
+        }
+        
+        function testExistingUser() {
+            log('👤 Iniciando prueba de USUARIO EXISTENTE');
+            
+            // Limpiar y establecer estado como existente
+            localStorage.clear();
+            localStorage.setItem('onboarding_seen', 'true');
+            
+            const userId = Math.floor(Math.random() * 100000);
+            const url = `http://localhost:8000/miniapp/index.html?v=2&user_id=${userId}&new=false`;
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="${url}" onload="onFrameLoad('es', 'existente')"></iframe>
+                </div>
+            `;
+            
+            log(`📱 MiniApp cargada: ${url}`);
+            log('⏳ Esperando que se salte el onboarding...');
+        }
+        
+        function onFrameLoad(lang, userType) {
+            setTimeout(() => {
+                try {
+                    const frame = document.querySelector('iframe');
+                    const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                    
+                    const onboardingVisible = frameDoc.getElementById('onboarding')?.style.display !== 'none';
+                    const loadingVisible = frameDoc.getElementById('loading')?.style.display !== 'none';
+                    
+                    if (userType === 'existente') {
+                        if (!onboardingVisible && loadingVisible) {
+                            log('✅ ÉXITO: Onboarding omitido para usuario existente', 'success');
+                        } else {
+                            log('❌ ERROR: Onboarding visible para usuario existente');
+                        }
+                    } else {
+                        if (onboardingVisible) {
+                            log(`✅ ÉXITO: Onboarding visible para usuario nuevo en ${lang}`, 'success');
+                            
+                            // Verificar textos en el idioma correcto
+                            const titles = frameDoc.querySelectorAll('.onboarding-title');
+                            const descs = frameDoc.querySelectorAll('.onboarding-desc');
+                            
+                            if (titles.length >= 3 && descs.length >= 3) {
+                                log(`📝 Títulos detectados: ${titles.length}`);
+                                log(`📝 Descripciones detectadas: ${descs.length}`);
+                                
+                                // Verificar botones
+                                const btn = frameDoc.getElementById('onboardingBtn');
+                                const skipBtn = frameDoc.getElementById('skipBtn');
+                                
+                                if (btn && skipBtn) {
+                                    log(`🔘 Botón principal: "${btn.textContent}"`);
+                                    log(`🔘 Botón omitir: "${skipBtn.textContent}"`);
+                                }
+                            }
+                        } else {
+                            log(`❌ ERROR: Onboarding no visible para usuario nuevo en ${lang}`);
+                        }
+                    }
+                } catch (error) {
+                    log(`⚠️ No se pudo verificar el estado: ${error.message}`);
+                    log('💡 Esto puede deberse a políticas de mismo origen. Prueba manualmente.');
+                }
+            }, 1500);
+        }
+        
+        // Instrucciones iniciales
+        log('🚀 Sistema de pruebas multiidioma listo');
+        log('📝 Idiomas soportados: Español (es), Inglés (en), Portugués (pt), Italiano (it)');
+        log('🔍 El bot detecta automáticamente el idioma del usuario y muestra el onboarding correspondiente');
+    </script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+nohup: no se tendrá en cuenta la entrada
+2026-01-06 00:36:06,809 - INFO - ======================================================================
+2026-01-06 00:36:06,810 - INFO - 🚂 RAILWAY DEPLOYMENT - BOT
+2026-01-06 00:36:06,810 - INFO - ======================================================================
+2026-01-06 00:36:06,810 - INFO - 
+2026-01-06 00:36:06,824 - INFO - ✅ ENCRYPTION_KEY cargada correctamente.
+2026-01-06 00:36:06,824 - INFO - Initializing database...
+2026-01-06 00:36:06,825 - INFO - Database initialized successfully
+2026-01-06 00:36:06,825 - INFO - ✅ Database initialized
+2026-01-06 00:36:06,825 - INFO - 
+2026-01-06 00:36:06,825 - INFO - 📍 Starting health check server...
+2026-01-06 00:36:06,825 - INFO - 🌐 Starting health check server on port 8080...
+2026-01-06 00:36:06,825 - INFO - ✅ Health check server started
+2026-01-06 00:36:06,825 - INFO - 
+2026-01-06 00:36:06,826 - INFO - ✅ TELEGRAM_TOKEN found - starting BOT
+2026-01-06 00:36:06,826 - INFO - 
+2026-01-06 00:36:06,826 - INFO - 📍 Running Bot in MAIN THREAD...
+2026-01-06 00:36:06,826 - INFO - 🤖 Starting Telegram Bot...
+2026-01-06 00:36:06,880 - INFO - Serving on http://0.0.0.0:8080
+2026-01-06 00:36:07,050 - INFO - libssl detected, it will be used for encryption
+2026-01-06 00:36:07,222 - INFO - 🤖 Initializing Telegram Bot (async_main)...
+/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py:4923: PTBUserWarning: If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message. Read this FAQ entry to learn more about the per_* settings: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do.
+  login_handler = ConversationHandler(
+2026-01-06 00:36:07,276 - INFO - Bot started. Waiting for messages...
+2026-01-06 00:36:07,276 - INFO - Initializing bot (attempt 1/5)...
+2026-01-06 00:36:08,136 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getMe "HTTP/1.1 200 OK"
+2026-01-06 00:36:08,138 - INFO - Bot initialized successfully!
+2026-01-06 00:36:08,138 - INFO - ================================================================================
+2026-01-06 00:36:08,138 - INFO - 🚀 TELEGRAM BOT POLLING STARTED
+2026-01-06 00:36:08,138 - INFO - ✅ Listening for incoming messages...
+2026-01-06 00:36:08,138 - INFO - ================================================================================
+2026-01-06 00:36:08,139 - INFO - Initializing database...
+2026-01-06 00:36:08,140 - INFO - Database initialized successfully
+2026-01-06 00:36:08,142 - INFO - Connecting to 149.154.175.55:443/TcpFull...
+2026-01-06 00:36:08,544 - INFO - Connection to 149.154.175.55:443/TcpFull complete!
+/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telethon/client/auth.py:148: UserWarning: the session already had an authorized user so it did not login to the bot account using the provided bot_token (it may not be using the user you expect)
+  warnings.warn(
+2026-01-06 00:36:09,730 - INFO - Telethon Bot Client started successfully
+2026-01-06 00:36:09,839 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setMyCommands "HTTP/1.1 200 OK"
+2026-01-06 00:36:09,839 - INFO - ✅ Bot commands configured: 7 commands
+2026-01-06 00:36:09,954 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setChatMenuButton "HTTP/1.1 200 OK"
+2026-01-06 00:36:09,954 - INFO - Menu button set to: https://bot-bens11-production.up.railway.app/miniapp?v=2
+2026-01-06 00:36:10,051 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/deleteWebhook "HTTP/1.1 200 OK"
+2026-01-06 00:36:10,052 - INFO - Application started
+2026-01-06 00:36:14,893 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:36:14,894 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:14,895 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:21,256 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:36:21,257 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:21,258 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:26,362 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:36:26,363 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:26,363 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:37,083 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:36:37,085 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:37,085 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:48,193 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:36:48,193 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:36:48,194 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:00,122 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:37:00,125 - INFO - User 8544570298 Telegram language_code: es
+2026-01-06 00:37:00,125 - INFO - Mapped to language: es
+2026-01-06 00:37:00,126 - INFO - User 8544570298 referred by 8219856216
+2026-01-06 00:37:00,126 - ERROR - Error no manejado: create_user() got an unexpected keyword argument 'language'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2671, in start_command
+    create_user(user_id, first_name=first_name, username=username, language=user_language)
+TypeError: create_user() got an unexpected keyword argument 'language'
+2026-01-06 00:37:05,171 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:37:05,172 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:05,172 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:08,604 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:37:08,955 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:37:12,613 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:37:12,614 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:12,614 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:17,357 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:37:17,358 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:17,359 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:23,802 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:37:23,803 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:23,803 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:31,692 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:37:31,693 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:31,694 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:39,264 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:37:39,265 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:39,265 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:49,650 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:37:49,652 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:37:49,652 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:38:07,736 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:38:17,976 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:38:21,212 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:38:21,213 - INFO - Application is stopping. This might take a moment.
+2026-01-06 00:38:21,213 - INFO - Application.stop() complete
+2026-01-06 00:38:21,213 - INFO - Disconnecting from 149.154.175.55:443/TcpFull...
+2026-01-06 00:38:21,215 - INFO - Disconnection from 149.154.175.55:443/TcpFull complete!
+2026-01-06 00:38:21,236 - ERROR - ❌ Bot polling error: Cannot close a running event loop
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 4987, in async_main
+    await application.run_polling(allowed_updates=Update.ALL_TYPES)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 818, in run_polling
+    return self.__run(
+           ^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1022, in __run
+    loop.close()
+  File "/usr/lib/python3.12/asyncio/unix_events.py", line 68, in close
+    super().close()
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 101, in close
+    raise RuntimeError("Cannot close a running event loop")
+RuntimeError: Cannot close a running event loop
+2026-01-06 00:38:21,239 - INFO - 🛑 Bot shutting down...
+2026-01-06 00:38:21,239 - INFO - ✅ Bot stopped cleanly

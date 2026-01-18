@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Onboarding Slides</title>
+    <style>
+        :root {
+            --bg-deep: #17212B;
+            --bg-primary: #232E3C;
+            --bg-card: #2B3945;
+            --bg-input: #1C2733;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8B9AA5;
+            --text-muted: #708499;
+            --accent-blue: #2AABEE;
+            --accent-green: #6DC26D;
+            --accent-red: #E55B5B;
+            --accent-orange: #E5A958;
+            --accent-purple: #9B7BEA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .onboarding {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-deep);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .onboarding-slides {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .onboarding-slide {
+            min-width: 100%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            text-align: center;
+            border: 2px solid var(--accent-blue); /* Debug border */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .onboarding-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .onboarding-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent-blue); /* Debug color */
+        }
+
+        .onboarding-desc {
+            font-size: 15px;
+            color: var(--text-primary);
+            line-height: 1.5;
+            max-width: 280px;
+        }
+
+        .onboarding-footer {
+            padding: 20px 30px 40px;
+        }
+
+        .onboarding-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--accent-blue);
+            transform: scale(1.2);
+        }
+
+        .onboarding-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent-blue);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .onboarding-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3);
+        }
+
+        .onboarding-skip {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <div>Slide actual: <span id="currentSlideDebug">0</span></div>
+        <div>Slides encontrados: <span id="slidesFound">0</span></div>
+        <div>Transform: <span id="transformDebug">translateX(0%)</span></div>
+    </div>
+
+    <!-- Onboarding -->
+    <div id="onboarding" class="onboarding" style="display: flex;">
+        <div class="onboarding-slides" id="slides">
+            <div class="onboarding-slide">
+                <div class="onboarding-icon">👋</div>
+                <h2 class="onboarding-title">Slide 1 - Título</h2>
+                <p class="onboarding-desc">Slide 1 - Descripción de prueba</p>
+            </div>
+            <div class="onboarding-slide">
+                <div class="onboarding-icon">🔗</div>
+                <h2 class="onboarding-title">Slide 2 - Título</h2>
+                <p class="onboarding-desc">Slide 2 - Descripción de prueba</p>
+            </div>
+            <div class="onboarding-slide">
+                <div class="onboarding-icon">⬇️</div>
+                <h2 class="onboarding-title">Slide 3 - Título</h2>
+                <p class="onboarding-desc">Slide 3 - Descripción de prueba</p>
+            </div>
+        </div>
+        <div class="onboarding-footer">
+            <div class="onboarding-dots">
+                <div class="dot active" data-slide="0"></div>
+                <div class="dot" data-slide="1"></div>
+                <div class="dot" data-slide="2"></div>
+            </div>
+            <button class="onboarding-btn" id="onboardingBtn">Siguiente</button>
+            <button class="onboarding-skip" id="skipBtn">Omitir</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+
+        function updateDebugInfo() {
+            const slides = document.querySelectorAll('.onboarding-slide');
+            const slidesElement = document.getElementById('slides');
+            
+            document.getElementById('currentSlideDebug').textContent = currentSlide;
+            document.getElementById('slidesFound').textContent = slides.length;
+            document.getElementById('transformDebug').textContent = slidesElement.style.transform || 'none';
+        }
+
+        function updateSlideDisplay() {
+            const slides = document.querySelectorAll('.onboarding-slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            console.log(`📊 Actualizando display: slide ${currentSlide}, total slides: ${slides.length}`);
+            
+            // Update each slide position individually
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.style.transform = 'translateX(0)';
+                    slide.style.opacity = '1';
+                    console.log(`Slide ${index}: visible (translateX(0))`);
+                } else if (index < currentSlide) {
+                    slide.style.transform = 'translateX(-100%)';
+                    slide.style.opacity = '0';
+                    console.log(`Slide ${index}: hidden left (translateX(-100%))`);
+                } else {
+                    slide.style.transform = 'translateX(100%)';
+                    slide.style.opacity = '0';
+                    console.log(`Slide ${index}: hidden right (translateX(100%))`);
+                }
+            });
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            
+            updateDebugInfo();
+        }
+
+        function updateButtonText() {
+            const btn = document.getElementById('onboardingBtn');
+            if (currentSlide >= 2) {
+                btn.textContent = 'Comenzar';
+            } else {
+                btn.textContent = 'Siguiente';
+            }
+        }
+
+        function nextSlide() {
+            console.log(`🔄 Avanzando del slide ${currentSlide} al ${currentSlide + 1}`);
+            currentSlide++;
+            
+            if (currentSlide >= 3) {
+                console.log('🎉 Onboarding completado');
+                alert('Onboarding completado!');
+                return;
+            }
+            
+            updateSlideDisplay();
+            updateButtonText();
+        }
+
+        function skipOnboarding() {
+            console.log('⏭️ Onboarding omitido');
+            alert('Onboarding omitido');
+        }
+
+        // Event listeners
+        document.getElementById('onboardingBtn').addEventListener('click', nextSlide);
+        document.getElementById('skipBtn').addEventListener('click', skipOnboarding);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlideDisplay();
+                    updateButtonText();
+                }
+            }
+        });
+
+        // Initialize
+        console.log('🚀 Debug onboarding iniciado');
+        updateDebugInfo();
+        updateSlideDisplay();
+        updateButtonText();
+
+        // Log slide positions
+        setTimeout(() => {
+            const slides = document.querySelectorAll('.onboarding-slide');
+            slides.forEach((slide, index) => {
+                const rect = slide.getBoundingClientRect();
+                console.log(`Slide ${index}: x=${rect.x}, width=${rect.width}, visible=${rect.x >= 0 && rect.x <= window.innerWidth}`);
+            });
+        }, 100);
+    </script>
+</body>
+</html>

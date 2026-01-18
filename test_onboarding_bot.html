@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Onboarding Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #0088cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0066aa;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Onboarding Bot</h1>
+    
+    <div class="test-section">
+        <h2>📋 Escenario de Prueba</h2>
+        <p>Esta página simula diferentes escenarios para probar el onboarding del bot:</p>
+        
+        <h3>🆕 Usuario Nuevo</h3>
+        <p>Simula un usuario que abre el bot por primera vez. Debería ver el onboarding completo.</p>
+        <button class="test-button" onclick="testNewUser()">Probar Usuario Nuevo</button>
+        
+        <h3>👤 Usuario Existente</h3>
+        <p>Simula un usuario que ya usó el bot antes. No debería ver onboarding.</p>
+        <button class="test-button" onclick="testExistingUser()">Probar Usuario Existente</button>
+        
+        <h3>🔄 Limpiar Estado</h3>
+        <p>Limpia el estado local para simular un usuario completamente nuevo.</p>
+        <button class="test-button" onclick="clearState()">Limpiar Estado Local</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📱 Vista Previa de MiniApp</h2>
+        <div id="preview-container">
+            <p>Haz clic en uno de los botones de arriba para probar el onboarding.</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Resultados de Prueba</h2>
+        <div id="test-results">
+            <p>Los resultados de las pruebas aparecerán aquí.</p>
+        </div>
+    </div>
+
+    <script>
+        let testFrame = null;
+        
+        function log(message) {
+            const results = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearState() {
+            localStorage.clear();
+            log('🧹 Estado local limpiado');
+        }
+        
+        function testNewUser() {
+            clearState();
+            log('🆕 Iniciando prueba de USUARIO NUEVO');
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="http://localhost:8000/miniapp/index.html?v=2&user_id=12345&new=true" 
+                            onload="onFrameLoad('nuevo')"></iframe>
+                </div>
+            `;
+            
+            log('📱 MiniApp cargada con parámetros: user_id=12345&new=true');
+            log('⏳ Esperando a que se muestre el onboarding...');
+        }
+        
+        function testExistingUser() {
+            clearState();
+            // Simular que ya vio onboarding
+            localStorage.setItem('onboarding_seen', 'true');
+            log('👤 Iniciando prueba de USUARIO EXISTENTE');
+            log('💾 Estado onboarding_seen establecido como true');
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="http://localhost:8000/miniapp/index.html?v=2&user_id=67890&new=false" 
+                            onload="onFrameLoad('existente')"></iframe>
+                </div>
+            `;
+            
+            log('📱 MiniApp cargada con parámetros: user_id=67890&new=false');
+            log('⏳ Esperando que se salte el onboarding...');
+        }
+        
+        function onFrameLoad(userType) {
+            setTimeout(() => {
+                try {
+                    const frame = document.querySelector('iframe');
+                    const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                    
+                    const onboardingVisible = frameDoc.getElementById('onboarding')?.style.display !== 'none';
+                    const loadingVisible = frameDoc.getElementById('loading')?.style.display !== 'none';
+                    
+                    if (userType === 'nuevo') {
+                        if (onboardingVisible) {
+                            log('✅ ÉXITO: Onboarding visible para usuario nuevo');
+                        } else {
+                            log('❌ ERROR: Onboarding no visible para usuario nuevo');
+                        }
+                    } else {
+                        if (!onboardingVisible && loadingVisible) {
+                            log('✅ ÉXITO: Onboarding omitido para usuario existente');
+                        } else {
+                            log('❌ ERROR: Onboarding visible para usuario existente');
+                        }
+                    }
+                } catch (error) {
+                    log(`⚠️ No se pudo verificar el estado: ${error.message}`);
+                    log('💡 Esto puede deberse a políticas de mismo origen. Prueba manualmente.');
+                }
+            }, 1000);
+        }
+        
+        // Instrucciones
+        log('🚀 Sistema de pruebas listo');
+        log('📝 Para pruebas manuales, abre la miniapp directamente:');
+        log('   - Usuario nuevo: /miniapp/index.html?v=2&user_id=123&new=true');
+        log('   - Usuario existente: /miniapp/index.html?v=2&user_id=456&new=false');
+    </script>
+</body>
+</html>

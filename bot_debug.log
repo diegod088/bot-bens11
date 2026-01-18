@@ -1,0 +1,837 @@
+2026-01-06 00:41:52,265 - INFO - ======================================================================
+2026-01-06 00:41:52,266 - INFO - 🚂 RAILWAY DEPLOYMENT - BOT
+2026-01-06 00:41:52,266 - INFO - ======================================================================
+2026-01-06 00:41:52,266 - INFO - 
+2026-01-06 00:41:52,276 - INFO - ✅ ENCRYPTION_KEY cargada correctamente.
+2026-01-06 00:41:52,276 - INFO - Initializing database...
+2026-01-06 00:41:52,277 - INFO - Database initialized successfully
+2026-01-06 00:41:52,277 - INFO - ✅ Database initialized
+2026-01-06 00:41:52,277 - INFO - 
+2026-01-06 00:41:52,277 - INFO - 📍 Starting health check server...
+2026-01-06 00:41:52,277 - INFO - 🌐 Starting health check server on port 8080...
+2026-01-06 00:41:52,278 - INFO - ✅ Health check server started
+2026-01-06 00:41:52,278 - INFO - 
+2026-01-06 00:41:52,278 - INFO - ✅ TELEGRAM_TOKEN found - starting BOT
+2026-01-06 00:41:52,278 - INFO - 
+2026-01-06 00:41:52,278 - INFO - 📍 Running Bot in MAIN THREAD...
+2026-01-06 00:41:52,278 - INFO - 🤖 Starting Telegram Bot...
+2026-01-06 00:41:52,338 - INFO - Serving on http://0.0.0.0:8080
+2026-01-06 00:41:52,475 - INFO - libssl detected, it will be used for encryption
+2026-01-06 00:41:52,614 - INFO - 🤖 Initializing Telegram Bot (async_main)...
+/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py:4989: PTBUserWarning: If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message. Read this FAQ entry to learn more about the per_* settings: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do.
+  login_handler = ConversationHandler(
+2026-01-06 00:41:52,664 - INFO - Bot started. Waiting for messages...
+2026-01-06 00:41:52,664 - INFO - Initializing bot (attempt 1/5)...
+2026-01-06 00:41:52,947 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getMe "HTTP/1.1 200 OK"
+2026-01-06 00:41:52,949 - INFO - Bot initialized successfully!
+2026-01-06 00:41:52,949 - INFO - ================================================================================
+2026-01-06 00:41:52,949 - INFO - 🚀 TELEGRAM BOT POLLING STARTED
+2026-01-06 00:41:52,949 - INFO - ✅ Listening for incoming messages...
+2026-01-06 00:41:52,949 - INFO - ================================================================================
+2026-01-06 00:41:52,950 - INFO - Initializing database...
+2026-01-06 00:41:52,951 - INFO - Database initialized successfully
+2026-01-06 00:41:52,953 - INFO - Connecting to 149.154.175.55:443/TcpFull...
+2026-01-06 00:41:53,121 - INFO - Connection to 149.154.175.55:443/TcpFull complete!
+/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telethon/client/auth.py:148: UserWarning: the session already had an authorized user so it did not login to the bot account using the provided bot_token (it may not be using the user you expect)
+  warnings.warn(
+2026-01-06 00:41:54,100 - INFO - Telethon Bot Client started successfully
+2026-01-06 00:41:54,206 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setMyCommands "HTTP/1.1 200 OK"
+2026-01-06 00:41:54,207 - INFO - ✅ Bot commands configured: 7 commands
+2026-01-06 00:41:54,328 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setChatMenuButton "HTTP/1.1 200 OK"
+2026-01-06 00:41:54,329 - INFO - Menu button set to: https://bot-bens11-production.up.railway.app/miniapp?v=2
+2026-01-06 00:41:54,425 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/deleteWebhook "HTTP/1.1 200 OK"
+2026-01-06 00:41:54,427 - INFO - Application started
+2026-01-06 00:41:54,737 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:41:54,741 - INFO - 🔘 BUTTON CALLBACK: data=settings, user=8219856216
+2026-01-06 00:41:54,842 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:41:54,843 - INFO - ⚙️ Settings button clicked by user 8219856216
+2026-01-06 00:41:54,946 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:41:55,077 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/editMessageText "HTTP/1.1 200 OK"
+2026-01-06 00:41:55,079 - INFO - 🔘 BUTTON CALLBACK: data=open_miniapp, user=8219856216
+2026-01-06 00:41:55,186 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:41:55,186 - INFO - 📱 Open miniapp clicked by user 8219856216
+2026-01-06 00:41:55,285 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:41:55,405 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/editMessageText "HTTP/1.1 200 OK"
+2026-01-06 00:42:04,843 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:42:05,285 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:42:05,286 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:42:05,584 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:42:05,585 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:42:05,585 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:42:05,585 - INFO - Mapped to language: es
+2026-01-06 00:42:05,604 - INFO - User 8219856216 language set to es
+2026-01-06 00:42:05,604 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:42:05,605 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:42:08,244 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:42:08,247 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:42:08,480 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:42:08,482 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:42:08,482 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:42:08,482 - INFO - Mapped to language: es
+2026-01-06 00:42:08,501 - INFO - User 8219856216 language set to es
+2026-01-06 00:42:08,502 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:42:08,503 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:42:10,012 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:42:10,015 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:42:10,208 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:42:10,209 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:42:10,209 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:42:10,209 - INFO - Mapped to language: es
+2026-01-06 00:42:10,229 - INFO - User 8219856216 language set to es
+2026-01-06 00:42:10,230 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:42:10,231 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:42:20,113 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:42:30,205 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:42:40,305 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:42:50,565 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:00,661 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:02,644 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:02,645 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:02,645 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:07,761 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:07,762 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:07,762 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:12,668 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:12,671 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:13,034 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:13,035 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:13,035 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:13,035 - INFO - Mapped to language: es
+2026-01-06 00:43:13,053 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:13,054 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:13,055 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:14,062 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:14,063 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:14,064 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:15,548 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:15,552 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:15,740 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:15,741 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:15,741 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:15,741 - INFO - Mapped to language: es
+2026-01-06 00:43:15,760 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:15,761 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:15,762 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:15,765 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:15,767 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:15,957 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:15,958 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:15,958 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:15,958 - INFO - Mapped to language: es
+2026-01-06 00:43:15,961 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:15,961 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:15,962 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:15,975 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:15,978 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:16,167 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:16,168 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:16,168 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:16,168 - INFO - Mapped to language: es
+2026-01-06 00:43:16,186 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:16,188 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:16,188 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:19,233 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:19,234 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:19,235 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:23,979 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:23,983 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:23,983 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:23,983 - INFO - Mapped to language: es
+2026-01-06 00:43:24,002 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:24,004 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:24,311 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/sendMessage "HTTP/1.1 200 OK"
+2026-01-06 00:43:24,864 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:24,865 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:24,866 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:29,678 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:29,681 - INFO - 🔘 BUTTON CALLBACK: data=show_premium_plans, user=8219856216
+2026-01-06 00:43:30,293 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:30,294 - WARNING - ⚠️ Unknown callback data: show_premium_plans from user 8219856216
+2026-01-06 00:43:30,497 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:31,226 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:31,227 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:31,227 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:32,986 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:32,989 - INFO - 🔘 BUTTON CALLBACK: data=settings, user=8219856216
+2026-01-06 00:43:33,096 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:33,097 - INFO - ⚙️ Settings button clicked by user 8219856216
+2026-01-06 00:43:33,198 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:33,320 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/editMessageText "HTTP/1.1 200 OK"
+2026-01-06 00:43:37,568 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:37,572 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:37,848 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:37,849 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:37,850 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:37,850 - INFO - Mapped to language: es
+2026-01-06 00:43:37,870 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:37,871 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:37,871 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:38,751 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:38,751 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:38,752 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:42,588 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:42,589 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:42,693 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:42,694 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:42,694 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:42,694 - INFO - Mapped to language: es
+2026-01-06 00:43:42,715 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:42,716 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:42,716 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:44,639 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:44,642 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:44,935 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:44,936 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:44,936 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:44,936 - INFO - Mapped to language: es
+2026-01-06 00:43:44,957 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:44,958 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:44,958 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:45,000 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:45,003 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:45,123 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:45,124 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:45,124 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:45,124 - INFO - Mapped to language: es
+2026-01-06 00:43:45,142 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:45,144 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:45,144 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:45,345 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:45,348 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=8219856216
+2026-01-06 00:43:45,652 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:43:45,653 - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-06 00:43:45,654 - INFO - User 8219856216 Telegram language_code: es
+2026-01-06 00:43:45,654 - INFO - Mapped to language: es
+2026-01-06 00:43:45,656 - INFO - User 8219856216 language set to es
+2026-01-06 00:43:45,656 - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-06 00:43:45,656 - ERROR - Error no manejado: 'NoneType' object has no attribute 'reply_text'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2764, in start_command
+    await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reply_text'
+2026-01-06 00:43:47,959 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:47,960 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:47,960 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:59,073 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:43:59,708 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:43:59,710 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:43:59,710 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:44:10,836 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:44:15,347 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:44:15,348 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:44:15,349 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:44:26,611 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:44:36,755 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:44:36,756 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:44:36,757 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:44:48,022 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:44:55,900 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:44:55,903 - INFO - 🔘 BUTTON CALLBACK: data=start_download, user=5500153050
+2026-01-06 00:44:55,903 - INFO - start_download callback triggered by user 5500153050
+2026-01-06 00:44:56,719 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:44:56,923 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/editMessageText "HTTP/1.1 200 OK"
+2026-01-06 00:45:02,452 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:45:03,067 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/editMessageText "HTTP/1.1 200 OK"
+2026-01-06 00:45:06,539 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:45:06,541 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:45:06,541 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:45:12,329 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:45:12,645 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:45:12,750 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/editMessageText "HTTP/1.1 200 OK"
+2026-01-06 00:45:15,161 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:45:15,164 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=5500153050
+2026-01-06 00:45:15,306 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:45:15,307 - INFO - 🚀 /START command from user 5500153050 (@Rodr1zz)
+2026-01-06 00:45:15,307 - INFO - User 5500153050 Telegram language_code: es
+2026-01-06 00:45:15,307 - INFO - Mapped to language: es
+2026-01-06 00:45:15,308 - ERROR - Error no manejado: create_user() got an unexpected keyword argument 'language'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2736, in start_command
+    create_user(user_id, first_name=first_name, username=username, language=user_language)
+TypeError: create_user() got an unexpected keyword argument 'language'
+2026-01-06 00:45:18,742 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:45:18,745 - INFO - 🔘 BUTTON CALLBACK: data=back_to_menu, user=5500153050
+2026-01-06 00:45:19,135 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-01-06 00:45:19,137 - INFO - 🚀 /START command from user 5500153050 (@Rodr1zz)
+2026-01-06 00:45:19,138 - INFO - User 5500153050 Telegram language_code: es
+2026-01-06 00:45:19,138 - INFO - Mapped to language: es
+2026-01-06 00:45:19,139 - ERROR - Error no manejado: create_user() got an unexpected keyword argument 'language'
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_application.py", line 1234, in process_update
+    await coroutine
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 1360, in button_callback
+    await start_command(update, context)
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 2736, in start_command
+    create_user(user_id, first_name=first_name, username=username, language=user_language)
+TypeError: create_user() got an unexpected keyword argument 'language'
+2026-01-06 00:45:29,075 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:45:39,251 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:45:40,721 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-06 00:45:40,722 - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-06 00:45:40,723 - ERROR - Error no manejado: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 3584, in get_updates
+    await self._post(
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running

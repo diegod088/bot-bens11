@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sistema de Referidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #0088cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0066aa;
+        }
+        .test-button.danger {
+            background: #dc3545;
+        }
+        .test-button.danger:hover {
+            background: #c82333;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .flow-diagram {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .api-test {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .api-result {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>👥 Test Sistema de Referidos</h1>
+    
+    <div class="test-section">
+        <h2>🔄 Flujo del Sistema de Referidos</h2>
+        
+        <div class="flow-diagram">
+            <strong>1. USUARIO A (Referente):</strong><br>
+            • Genera enlace: https://t.me/bot?start=ref_123456<br>
+            • Comparte enlace con amigos<br><br>
+            
+            <strong>2. USUARIO B (Referido):</strong><br>
+            • Usa enlace de referido<br>
+            • Se registra como PENDIENTE<br>
+            • DEBE conectar cuenta + hacer 1 descarga<br><br>
+            
+            <strong>3. CONFIRMACIÓN AUTOMÁTICA:</strong><br>
+            • Cuando USUARIO B cumple requisitos<br>
+            • Sistema confirma referido<br>
+            • USUARIO A recibe +1 en contador<br><br>
+            
+            <strong>4. RECOMPENSA:</strong><br>
+            • Cada 15 referidos confirmados = 1 día Premium<br>
+            • Máximo 15 días acumulables<br>
+            • Se aplica automáticamente
+        </div>
+        
+        <h3>🧪 Escenarios de Prueba</h3>
+        
+        <div class="api-test">
+            <h4>🔍 Test 1: Ver API de Referidos</h4>
+            <p>Verificar que el endpoint /api/miniapp/referrals funcione:</p>
+            <button class="test-button" onclick="testReferralAPI()">Test API Referidos</button>
+            <div id="apiResult" class="api-result"></div>
+        </div>
+        
+        <h4>📱 Test 2: MiniApp - Pestaña Referidos</h4>
+        <button class="test-button" onclick="testReferralTab()">Ver Pestaña Referidos</button>
+        
+        <h4>🔗 Test 3: Generar Enlace de Referido</h4>
+        <button class="test-button" onclick="testReferralLink()">Test Generación Enlace</button>
+        
+        <h4>📊 Test 4: Estadísticas de Referidos</h4>
+        <button class="test-button" onclick="testReferralStats()">Test Estadísticas</button>
+        
+        <h4>⚠️ Test 5: Simular Flujo Completo</h4>
+        <button class="test-button danger" onclick="simulateFullFlow()">Simular Flujo Completo</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📱 Vista Previa de MiniApp</h2>
+        <div id="preview-container">
+            <p>Haz clic en uno de los botones de arriba para probar el sistema de referidos.</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Resultados de Pruebas</h2>
+        <div id="test-results">
+            <p>Los resultados de las pruebas aparecerán aquí.</p>
+        </div>
+    </div>
+
+    <script>
+        let testUserId = 123456; // Usuario de prueba
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            const statusClass = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info';
+            results.innerHTML += `<div class="status ${statusClass}">[${timestamp}] ${message}</div>`;
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        async function testReferralAPI() {
+            log('🔍 Probando API de referidos...');
+            
+            try {
+                const response = await fetch(`http://localhost:8000/api/miniapp/referrals?user_id=${testUserId}`);
+                const data = await response.json();
+                
+                document.getElementById('apiResult').innerHTML = JSON.stringify(data, null, 2);
+                
+                if (response.ok && data.ok) {
+                    log('✅ API de referidos funcionando correctamente', 'success');
+                    log(`📊 Stats: ${data.stats.confirmed} confirmados, ${data.stats.pending} pendientes`);
+                    log(`🔗 Enlace generado: ${data.referral_link}`);
+                } else {
+                    log(`❌ Error en API: ${data.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error de conexión: ${error.message}`, 'error');
+                document.getElementById('apiResult').innerHTML = `Error: ${error.message}`;
+            }
+        }
+        
+        function testReferralTab() {
+            log('📱 Abriendo MiniApp en pestaña de referidos...');
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="http://localhost:8000/miniapp/index.html?v=2&user_id=${testUserId}&new=false#referrals" 
+                            onload="onFrameLoad('referrals')"></iframe>
+                </div>
+            `;
+            
+            log('⏳ Esperando carga de pestaña de referidos...');
+        }
+        
+        function testReferralLink() {
+            log('🔗 Probando generación de enlace de referido...');
+            
+            // Simular generación de enlace
+            const botUsername = 'MEDIA_SAVE_videosbot'; // o el username real
+            const referralLink = `https://t.me/${botUsername}?start=ref_${testUserId}`;
+            
+            log(`✅ Enlace generado: ${referralLink}`, 'success');
+            log('💡 Este enlace se puede compartir para atraer nuevos usuarios');
+            
+            // Copiar al portapapeles
+            navigator.clipboard.writeText(referralLink).then(() => {
+                log('📋 Enlace copiado al portapapeles', 'success');
+            }).catch(() => {
+                log('⚠️ No se pudo copiar al portapapeles', 'warning');
+            });
+        }
+        
+        async function testReferralStats() {
+            log('📊 Probando estadísticas de referidos...');
+            
+            try {
+                const response = await fetch(`http://localhost:8000/api/miniapp/referrals?user_id=${testUserId}`);
+                const data = await response.json();
+                
+                if (response.ok && data.ok) {
+                    const stats = data.stats;
+                    log(`✅ Estadísticas cargadas:`, 'success');
+                    log(`   • Confirmados: ${stats.confirmed}`);
+                    log(`   • Pendientes: ${stats.pending}`);
+                    log(`   • Días ganados: ${stats.days_earned}`);
+                    log(`   • Progreso: ${stats.progress}/${stats.next_reward_at}`);
+                    log(`   • Próxima recompensa en: ${Math.max(0, stats.next_reward_at - stats.progress)} referidos`);
+                } else {
+                    log(`❌ Error al cargar estadísticas: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+        
+        function simulateFullFlow() {
+            log('🎭 Simulando flujo completo de referidos...');
+            
+            log('📝 PASO 1: Usuario A (referente) genera enlace', 'info');
+            const referrerId = 123456;
+            const referralLink = `https://t.me/MEDIA_SAVE_videosbot?start=ref_${referrerId}`;
+            log(`   Enlace: ${referralLink}`);
+            
+            log('📝 PASO 2: Usuario B (referido) usa enlace', 'info');
+            const referredId = 789012;
+            log(`   Usuario B se registra con ref_${referrerId}`);
+            
+            log('📝 PASO 3: Usuario B debe cumplir requisitos', 'warning');
+            log('   ✅ Conectar cuenta de Telegram');
+            log('   ✅ Realizar al menos 1 descarga');
+            
+            log('📝 PASO 4: Sistema confirma referido', 'info');
+            log(`   Cuando Usuario B cumple requisitos → confirm_referral(${referredId})`);
+            log(`   Usuario A recibe +1 en contador de referidos`);
+            
+            log('📝 PASO 5: Verificar recompensa', 'info');
+            log(`   Si Usuario A tiene 15 referidos confirmados → +1 día Premium`);
+            log(`   Máximo 15 días acumulables`);
+            
+            log('🎯 Flujo simulado completado', 'success');
+            log('💡 Para probar real: usa el enlace generado en un usuario nuevo');
+        }
+        
+        function onFrameLoad(testType) {
+            setTimeout(() => {
+                try {
+                    const frame = document.querySelector('iframe');
+                    const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                    
+                    if (testType === 'referrals') {
+                        // Verificar que la pestaña de referidos esté visible
+                        const referralsTab = frameDoc.getElementById('tab-referrals');
+                        const referralLink = frameDoc.getElementById('referralLink');
+                        const confirmedCount = frameDoc.getElementById('confirmedReferrals');
+                        
+                        if (referralsTab) {
+                            log('✅ Pestaña de referidos encontrada', 'success');
+                            
+                            // Intentar cambiar a la pestaña de referidos
+                            if (frame.contentWindow.switchTab) {
+                                frame.contentWindow.switchTab('referrals');
+                                log('🔄 Cambiado a pestaña de referidos');
+                            }
+                            
+                            setTimeout(() => {
+                                if (referralLink && referralLink.textContent !== 'Cargando...') {
+                                    log(`🔗 Enlace de referido cargado: ${referralLink.textContent.substring(0, 50)}...`, 'success');
+                                } else {
+                                    log('⏳ Enlace de referido aún cargando...', 'warning');
+                                }
+                                
+                                if (confirmedCount) {
+                                    log(`📊 Referidos confirmados: ${confirmedCount.textContent}`);
+                                }
+                            }, 2000);
+                        } else {
+                            log('❌ No se encontró la pestaña de referidos', 'error');
+                        }
+                    }
+                } catch (error) {
+                    log(`⚠️ No se pudo verificar el frame: ${error.message}`, 'warning');
+                }
+            }, 1000);
+        }
+        
+        // Instrucciones iniciales
+        log('🚀 Sistema de pruebas de referidos listo');
+        log('📋 Componentes a verificar:');
+        log('   • API endpoint: /api/miniapp/referrals');
+        log('   • Generación de enlaces de referido');
+        log('   • Estadísticas y progreso');
+        log('   • UI de la MiniApp');
+        log('   • Flujo completo de confirmación');
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+2026-01-07 19:43:11,293 - database - INFO - ✅ ENCRYPTION_KEY cargada correctamente.
+2026-01-07 19:43:11,341 - __main__ - INFO - Dashboard iniciando en 0.0.0.0:5000...
+ * Serving Flask app 'dashboard'
+ * Debug mode: off
+2026-01-07 19:43:11,346 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.112.194.152:5000
+2026-01-07 19:43:11,346 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-07 19:43:28,426 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:43:28] "GET /health HTTP/1.1" 200 -
+2026-01-07 19:43:35,062 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:43:35] "GET /health HTTP/1.1" 200 -
+2026-01-07 19:44:13,531 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:44:13] "GET /api/charts/revenue HTTP/1.1" 200 -
+2026-01-07 19:44:21,751 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:44:21] "GET /api/charts/users HTTP/1.1" 200 -
+2026-01-07 19:44:33,821 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:44:33] "GET /api/charts/distribution HTTP/1.1" 200 -
+2026-01-07 19:44:39,788 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:44:39] "GET /api/charts/downloads HTTP/1.1" 200 -
+2026-01-07 19:45:11,755 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:11] "GET /api/stats HTTP/1.1" 200 -
+2026-01-07 19:45:45,126 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:45] "GET /api/charts/revenue HTTP/1.1" 200 -
+2026-01-07 19:45:45,158 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:45] "GET /api/charts/users HTTP/1.1" 200 -
+2026-01-07 19:45:45,189 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:45] "GET /api/charts/distribution HTTP/1.1" 200 -
+2026-01-07 19:45:45,223 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:45] "GET /api/charts/downloads HTTP/1.1" 200 -
+2026-01-07 19:45:51,070 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:51] "GET /?id=31778ddd-7f5a-423c-be26-d9d6517676d7&vscodeBrowserReqId=1767811551048 HTTP/1.1" 200 -
+2026-01-07 19:45:51,595 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:51] "GET /api/charts/distribution HTTP/1.1" 200 -
+2026-01-07 19:45:51,597 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:51] "GET /api/charts/users HTTP/1.1" 200 -
+2026-01-07 19:45:51,598 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:51] "GET /api/charts/downloads HTTP/1.1" 200 -
+2026-01-07 19:45:51,599 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:45:51] "GET /api/charts/revenue HTTP/1.1" 200 -
+2026-01-07 19:46:21,593 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:21] "GET /api/stats HTTP/1.1" 200 -
+2026-01-07 19:46:21,611 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:21] "GET /api/charts/downloads HTTP/1.1" 200 -
+2026-01-07 19:46:21,612 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:21] "GET /api/charts/distribution HTTP/1.1" 200 -
+2026-01-07 19:46:21,614 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:21] "GET /api/charts/users HTTP/1.1" 200 -
+2026-01-07 19:46:21,615 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:21] "GET /api/charts/revenue HTTP/1.1" 200 -
+2026-01-07 19:46:46,967 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:46] "GET /users HTTP/1.1" 200 -
+2026-01-07 19:46:46,998 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:46] "GET /api/users?page=1&per_page=20 HTTP/1.1" 200 -
+2026-01-07 19:46:50,031 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:46:50] "GET /user/7748332213 HTTP/1.1" 200 -
+2026-01-07 19:47:02,476 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:02] "GET /analytics HTTP/1.1" 200 -
+2026-01-07 19:47:02,510 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:02] "GET /api/analytics HTTP/1.1" 200 -
+2026-01-07 19:47:05,451 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:05] "GET /activity HTTP/1.1" 200 -
+2026-01-07 19:47:05,482 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:05] "GET /api/activity/stats HTTP/1.1" 200 -
+2026-01-07 19:47:05,483 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:05] "GET /api/activity?page=1&filter=all HTTP/1.1" 200 -
+2026-01-07 19:47:07,779 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:07] "GET /settings HTTP/1.1" 200 -
+2026-01-07 19:47:07,808 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:07] "GET /api/system-info HTTP/1.1" 200 -
+2026-01-07 19:47:07,810 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 19:47:07] "GET /api/stats HTTP/1.1" 200 -

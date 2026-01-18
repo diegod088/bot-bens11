@@ -2084,7 +2084,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang = get_user_language(user)
         
         # Create WebApp button for miniapp
-        miniapp_url = f"https://bot-bens11-production.up.railway.app/miniapp?v=2&user_id={user_id}"
+        miniapp_url = f"https://bot-bens11-production.up.railway.app/miniapp?v=2&user_id={user_id}&new=false"
         
         miniapp_msg = "📱 *MiniApp*\n\n"
         miniapp_msg += "Haz clic en el botón de abajo para abrir la aplicación.\n\n"
@@ -2776,13 +2776,18 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Direct to miniapp without language selection (auto-detected)
     logger.info(f"✓ Enviando usuario {user_id} directamente a miniapp con idioma: {user_language}")
+    
+    # Create WebApp button for miniapp with new user indicator
+    new_user_param = "&new=true" if is_new_user else "&new=false"
+    miniapp_url = f"https://bot-bens11-production.up.railway.app/miniapp?v=2&user_id={user_id}{new_user_param}"
+    
     welcome_message = (
         f"👋 ¡Hola {first_name}! / Hello {first_name}!\n\n"
         "🚀 Abriendo MiniApp...\n"
     )
     
     keyboard = [
-        [InlineKeyboardButton("📱 Abrir MiniApp", callback_data="open_miniapp")],
+        [InlineKeyboardButton("📱 Abrir MiniApp", web_app=WebAppInfo(url=miniapp_url))],
         [InlineKeyboardButton("⚙️ Configuración", callback_data="settings")],
         [InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans")]
     ]

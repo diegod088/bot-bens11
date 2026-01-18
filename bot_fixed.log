@@ -1,0 +1,47 @@
+nohup: no se tendrá en cuenta la entrada
+2026-01-06 00:48:14,830 - INFO - ======================================================================
+2026-01-06 00:48:14,830 - INFO - 🚂 RAILWAY DEPLOYMENT - BOT
+2026-01-06 00:48:14,830 - INFO - ======================================================================
+2026-01-06 00:48:14,830 - INFO - 
+2026-01-06 00:48:14,843 - INFO - ✅ ENCRYPTION_KEY cargada correctamente.
+2026-01-06 00:48:14,843 - INFO - Initializing database...
+2026-01-06 00:48:14,843 - INFO - Database initialized successfully
+2026-01-06 00:48:14,844 - INFO - ✅ Database initialized
+2026-01-06 00:48:14,844 - INFO - 
+2026-01-06 00:48:14,844 - INFO - 📍 Starting health check server...
+2026-01-06 00:48:14,844 - INFO - 🌐 Starting health check server on port 8080...
+2026-01-06 00:48:14,844 - INFO - ✅ Health check server started
+2026-01-06 00:48:14,844 - INFO - 
+2026-01-06 00:48:14,844 - INFO - ✅ TELEGRAM_TOKEN found - starting BOT
+2026-01-06 00:48:14,845 - INFO - 
+2026-01-06 00:48:14,845 - INFO - 📍 Running Bot in MAIN THREAD...
+2026-01-06 00:48:14,845 - INFO - 🤖 Starting Telegram Bot...
+2026-01-06 00:48:14,907 - INFO - Serving on http://0.0.0.0:8080
+2026-01-06 00:48:15,040 - INFO - libssl detected, it will be used for encryption
+2026-01-06 00:48:15,180 - INFO - 🤖 Initializing Telegram Bot (async_main)...
+/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py:4997: PTBUserWarning: If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message. Read this FAQ entry to learn more about the per_* settings: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do.
+  login_handler = ConversationHandler(
+2026-01-06 00:48:15,230 - INFO - Bot started. Waiting for messages...
+2026-01-06 00:48:15,231 - INFO - Initializing bot (attempt 1/5)...
+2026-01-06 00:48:18,038 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getMe "HTTP/1.1 200 OK"
+2026-01-06 00:48:18,040 - INFO - Bot initialized successfully!
+2026-01-06 00:48:18,040 - INFO - ================================================================================
+2026-01-06 00:48:18,040 - INFO - 🚀 TELEGRAM BOT POLLING STARTED
+2026-01-06 00:48:18,040 - INFO - ✅ Listening for incoming messages...
+2026-01-06 00:48:18,040 - INFO - ================================================================================
+2026-01-06 00:48:18,042 - INFO - Initializing database...
+2026-01-06 00:48:18,043 - INFO - Database initialized successfully
+2026-01-06 00:48:18,045 - INFO - Connecting to 149.154.175.55:443/TcpFull...
+2026-01-06 00:48:18,452 - INFO - Connection to 149.154.175.55:443/TcpFull complete!
+/home/yadied/Escritorio/bot descargar contenido/.venv/lib/python3.12/site-packages/telethon/client/auth.py:148: UserWarning: the session already had an authorized user so it did not login to the bot account using the provided bot_token (it may not be using the user you expect)
+  warnings.warn(
+2026-01-06 00:48:19,674 - INFO - Telethon Bot Client started successfully
+2026-01-06 00:48:19,775 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setMyCommands "HTTP/1.1 200 OK"
+2026-01-06 00:48:19,776 - INFO - ✅ Bot commands configured: 7 commands
+2026-01-06 00:48:19,898 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/setChatMenuButton "HTTP/1.1 200 OK"
+2026-01-06 00:48:19,898 - INFO - Menu button set to: https://bot-bens11-production.up.railway.app/miniapp?v=2
+2026-01-06 00:48:20,005 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/deleteWebhook "HTTP/1.1 200 OK"
+2026-01-06 00:48:20,008 - INFO - Application started
+2026-01-06 00:48:21,674 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-06 00:48:21,781 - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/sendMessage "HTTP/1.1 400 Bad Request"
+2026-01-06 00:48:21,783 - WARNING - Error de red (recuperable): Can't parse entities: can't find end of the entity starting at byte offset 1084
