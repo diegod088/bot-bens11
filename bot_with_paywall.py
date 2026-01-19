@@ -37,25 +37,10 @@ from io import BytesIO
 
 from database import (
     init_database,
-    get_user,
-    create_user,
-    add_user,
-    increment_total_downloads,
-    increment_daily_counter,
-    increment_counters,
-    set_premium,
-    get_user_stats,
-    get_user_usage_stats,
-    check_low_usage_warning,
-    check_and_reset_daily_limits,
-    set_user_language,
-    set_user_session,
-    get_user_session,
-    has_active_session,
-    delete_user_session,
-    confirm_referral,
-    check_and_reward_referrer,
-    get_referral_stats
+    get_user, create_user, add_user, update_user_info, set_user_language,
+    increment_daily_counter, increment_total_downloads, get_user_stats,
+    get_user_session, has_active_session, delete_user_session,
+    confirm_referral, check_and_reward_referrer, get_referral_stats
 )
 
 # Import messages module for multi-language support
@@ -2758,13 +2743,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except ValueError:
                 pass
     
-    # Ensure user exists in database
+    # Create or update user with all information
     if is_new_user:
-        create_user(user_id, first_name=first_name, username=username, language=user_language)
+        # Use add_user instead of create_user to handle language and referrals properly
+        add_user(user_id, language=user_language, referred_by=referred_by)
+        # Update additional info
+        if first_name or username:
+            update_user_info(user_id, first_name, username)
         logger.info(f"✓ New user {user_id} created with language: {user_language}")
-        # Registrar referido PENDIENTE (no cuenta hasta que descargue)
-        if referred_by:
-            add_user(user_id, language=user_language, referred_by=referred_by)
     else:
         # Update language for existing users if it changed
         set_user_language(user_id, user_language)

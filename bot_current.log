@@ -1,0 +1,283 @@
+2026-01-19 02:50:31,133 - database - INFO - ✅ ENCRYPTION_KEY cargada correctamente.
+2026-01-19 02:50:31,133 - database - INFO - Initializing database...
+2026-01-19 02:50:31,134 - database - INFO - Database initialized successfully
+2026-01-19 02:50:31,134 - __main__ - INFO - ✅ Database initialized
+2026-01-19 02:50:31,134 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:31,135 - __main__ - INFO - 🚀 UNIFIED STARTUP - BOT (MAIN) + DASHBOARD (THREAD)
+2026-01-19 02:50:31,135 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:31,135 - __main__ - INFO - ✅ Bot token found
+2026-01-19 02:50:31,135 - __main__ - INFO - 
+2026-01-19 02:50:31,135 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:31,135 - __main__ - INFO - 📍 Starting Dashboard in background thread
+2026-01-19 02:50:31,135 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:31,136 - __main__ - INFO - 📍 Importing dashboard app...
+2026-01-19 02:50:31,140 - __main__ - INFO - ✅ Dashboard thread started: DashboardThread
+2026-01-19 02:50:31,409 - __main__ - INFO - 🌐 Starting Dashboard on 0.0.0.0:5000
+2026-01-19 02:50:31,409 - __main__ - INFO -    Health check will be at http://0.0.0.0:5000/health
+2026-01-19 02:50:31,409 - __main__ - INFO - Using Flask development server (not recommended for production)
+ * Serving Flask app 'dashboard'
+ * Debug mode: off
+2026-01-19 02:50:31,415 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.186.1.152:5000
+2026-01-19 02:50:31,415 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-19 02:50:36,140 - __main__ - INFO - 
+2026-01-19 02:50:36,140 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:36,140 - __main__ - INFO - 📍 Running Bot in MAIN THREAD (after dashboard ready)
+2026-01-19 02:50:36,140 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:36,140 - __main__ - INFO - (This is the correct way - no async.run() in threads)
+2026-01-19 02:50:36,141 - __main__ - INFO - 
+2026-01-19 02:50:36,141 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:36,141 - __main__ - INFO - 🤖 TELEGRAM BOT - MAIN THREAD EXECUTION
+2026-01-19 02:50:36,142 - __main__ - INFO - ================================================================================
+2026-01-19 02:50:36,533 - telethon.crypto.aes - INFO - libssl detected, it will be used for encryption
+2026-01-19 02:50:36,611 - bot_with_paywall - INFO - 🤖 Initializing Telegram Bot (async_main)...
+/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py:4942: PTBUserWarning: If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message. Read this FAQ entry to learn more about the per_* settings: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do.
+  login_handler = ConversationHandler(
+2026-01-19 02:50:36,736 - bot_with_paywall - INFO - Bot started. Waiting for messages...
+2026-01-19 02:50:36,736 - bot_with_paywall - INFO - Initializing bot (attempt 1/5)...
+2026-01-19 02:50:37,227 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getMe "HTTP/1.1 200 OK"
+2026-01-19 02:50:37,228 - bot_with_paywall - INFO - Bot initialized successfully!
+2026-01-19 02:50:37,228 - bot_with_paywall - INFO - ================================================================================
+2026-01-19 02:50:37,229 - bot_with_paywall - INFO - 🚀 TELEGRAM BOT POLLING STARTED
+2026-01-19 02:50:37,229 - bot_with_paywall - INFO - ✅ Listening for incoming messages...
+2026-01-19 02:50:37,229 - bot_with_paywall - INFO - ================================================================================
+2026-01-19 02:50:37,229 - telegram.ext.Application - INFO - Application started
+2026-01-19 02:50:37,345 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/deleteWebhook "HTTP/1.1 200 OK"
+2026-01-19 02:50:42,031 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-19 02:50:42,032 - telegram.ext.Updater - ERROR - Exception happened while polling for updates.
+Traceback (most recent call last):
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-19 02:50:43,225 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 200 OK"
+2026-01-19 02:50:43,229 - bot_with_paywall - INFO - 🚀 /START command from user 8219856216 (@None)
+2026-01-19 02:50:43,229 - bot_with_paywall - INFO - User 8219856216 Telegram language_code: es
+2026-01-19 02:50:43,229 - bot_with_paywall - INFO - Mapped to language: es
+2026-01-19 02:50:43,247 - database - INFO - User 8219856216 language set to es
+2026-01-19 02:50:43,247 - bot_with_paywall - INFO - ✓ Enviando usuario 8219856216 directamente a miniapp con idioma: es
+2026-01-19 02:50:43,593 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/sendMessage "HTTP/1.1 200 OK"
+2026-01-19 02:50:47,185 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-19 02:50:47,187 - telegram.ext.Updater - ERROR - Exception happened while polling for updates.
+Traceback (most recent call last):
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-19 02:50:52,944 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-19 02:50:52,945 - telegram.ext.Updater - ERROR - Exception happened while polling for updates.
+Traceback (most recent call last):
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-19 02:51:00,146 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-19 02:51:00,147 - telegram.ext.Updater - ERROR - Exception happened while polling for updates.
+Traceback (most recent call last):
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-19 02:51:03,451 - bot_with_paywall - INFO - 🛑 Bot shutting down...
+2026-01-19 02:51:06,164 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8520075728:AAFzDgX5eA0SgnJRDbFocWm5vN4clQpjpAo/getUpdates "HTTP/1.1 409 Conflict"
+2026-01-19 02:51:06,167 - telegram.ext.Updater - ERROR - Error while calling `get_updates` one more time to mark all fetched updates as read: %s. Suppressing error to ensure graceful shutdown. When polling for updates is restarted, updates may be fetched again. Please adjust timeouts via `ApplicationBuilder` or the parameter `get_updates_request` of `Bot`.
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1949, in _run_once
+    event_list = self._selector.select(timeout)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/selectors.py", line 468, in select
+    fd_event_list = self._selector.poll(timeout, max_ev)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/start.py", line 114, in <lambda>
+    signal.signal(signal.SIGTERM, lambda s, f: sys.exit(0))
+                                               ^^^^^^^^^^^
+SystemExit: 0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 5012, in async_main
+    await asyncio.sleep(1)
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 665, in sleep
+    return await future
+           ^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_updater.py", line 400, in _get_updates_cleanup
+    await self.bot.get_updates(
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 372, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/_bot.py", line 732, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/request/_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-01-19 02:51:06,175 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2026-01-19 02:51:06,175 - telegram.ext.Application - CRITICAL - Fetching updates was aborted due to CancelledError(). Suppressing exception to ensure graceful shutdown.
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1949, in _run_once
+    event_list = self._selector.select(timeout)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/selectors.py", line 468, in select
+    fd_event_list = self._selector.poll(timeout, max_ev)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yadied/Escritorio/bot descargar contenido/start.py", line 114, in <lambda>
+    signal.signal(signal.SIGTERM, lambda s, f: sys.exit(0))
+                                               ^^^^^^^^^^^
+SystemExit: 0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yadied/Escritorio/bot descargar contenido/bot_with_paywall.py", line 5012, in async_main
+    await asyncio.sleep(1)
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 665, in sleep
+    return await future
+           ^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_application.py", line 673, in stop
+    self.__update_fetcher_task.result()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_application.py", line 1233, in _update_fetcher
+    await self.__update_fetcher()
+  File "/home/yadied/.local/lib/python3.12/site-packages/telegram/ext/_application.py", line 1212, in __update_fetcher
+    update = await self.update_queue.get()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/queues.py", line 158, in get
+    await getter
+asyncio.exceptions.CancelledError
+2026-01-19 02:51:06,178 - telegram.ext.Application - INFO - Application.stop() complete
+2026-01-19 02:51:06,179 - bot_with_paywall - INFO - ✅ Bot stopped cleanly
