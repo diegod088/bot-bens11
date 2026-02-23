@@ -18,7 +18,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Labeled
 from contextlib import asynccontextmanager
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 from telegram.ext import (
     Application, MessageHandler, CommandHandler, ContextTypes, 
     filters, PreCheckoutQueryHandler, CallbackQueryHandler, ConversationHandler
