@@ -40,7 +40,8 @@ from database import (
     get_user, create_user, add_user, update_user_info, set_user_language,
     increment_daily_counter, increment_total_downloads, get_user_stats, get_user_usage_stats,
     get_user_session, has_active_session, delete_user_session, set_user_session,
-    confirm_referral, check_and_reward_referrer, get_referral_stats
+    confirm_referral, check_and_reward_referrer, get_referral_stats,
+    check_and_reset_daily_limits
 )
 
 # Import messages module for multi-language support
