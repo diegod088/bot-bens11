@@ -2823,12 +2823,12 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [
-            InlineKeyboardButton("🇪🇸 Español", callback_data="setlang_es"),
-            InlineKeyboardButton("🇬🇧 English", callback_data="setlang_en")
+            InlineKeyboardButton("🇪🇸 Español", callback_data="set_lang_es"),
+            InlineKeyboardButton("🇬🇧 English", callback_data="set_lang_en")
         ],
         [
-            InlineKeyboardButton("🇧🇷 Português", callback_data="setlang_pt"),
-            InlineKeyboardButton("🇮🇹 Italiano", callback_data="setlang_it")
+            InlineKeyboardButton("🇧🇷 Português", callback_data="set_lang_pt"),
+            InlineKeyboardButton("🇮🇹 Italiano", callback_data="set_lang_it")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
