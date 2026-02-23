@@ -37,25 +37,10 @@ from io import BytesIO
 
 from database import (
     init_database,
-    get_user,
-    create_user,
-    add_user,
-    increment_total_downloads,
-    increment_daily_counter,
-    increment_counters,
-    set_premium,
-    get_user_stats,
-    get_user_usage_stats,
-    check_low_usage_warning,
-    check_and_reset_daily_limits,
-    set_user_language,
-    set_user_session,
-    get_user_session,
-    has_active_session,
-    delete_user_session,
-    confirm_referral,
-    check_and_reward_referrer,
-    get_referral_stats
+    get_user, create_user, add_user, update_user_info, set_user_language,
+    increment_daily_counter, increment_total_downloads, get_user_stats, get_user_usage_stats,
+    get_user_session, has_active_session, delete_user_session, set_user_session,
+    confirm_referral, check_and_reward_referrer, get_referral_stats
 )
 
 # Import messages module for multi-language support
@@ -102,7 +87,7 @@ FREE_PHOTO_LIMIT = 10  # Free users: 10 fotos PERMANENTES (sin reset)
 # Premium Plans (Telegram Stars) - Estrategia de Precios Optimizada
 PREMIUM_PLANS = {
     'trial': {
-        'stars': 25,
+        'stars': 30,
         'days': 3,
         'name': '🎁 Prueba',
         'label': 'Premium 3 días',
@@ -110,7 +95,7 @@ PREMIUM_PLANS = {
         'description': 'Perfecto para probar'
     },
     'weekly': {
-        'stars': 75,
+        'stars': 90,
         'days': 7,
         'name': '🔥 Semanal',
         'label': 'Premium 7 días',
@@ -118,7 +103,7 @@ PREMIUM_PLANS = {
         'description': 'Mejor precio por día'
     },
     'monthly': {
-        'stars': 149,
+        'stars': 179,
         'days': 30,
         'name': '💎 Mensual',
         'label': 'Premium 30 días',
@@ -126,7 +111,7 @@ PREMIUM_PLANS = {
         'description': 'El más elegido'
     },
     'quarterly': {
-        'stars': 399,
+        'stars': 479,
         'days': 90,
         'name': '👑 Trimestral',
         'label': 'Premium 90 días',
@@ -144,12 +129,19 @@ PREMIUM_MUSIC_DAILY_LIMIT = 50
 PREMIUM_APK_DAILY_LIMIT = 50
 
 # Admin User IDs - Pueden ver estadísticas globales del bot
-ADMIN_USER_IDS = [
-    1438860917,  # Admin principal
-    8524907238,  # Admin secundario
-    7727224233,  # Admin adicional
-    8297992519,  # Yadiel - 1 mes premium
-]
+ADMIN_ID_ENV = os.getenv('ADMIN_ID', '')
+ADMIN_USER_IDS = [int(i.strip()) for i in ADMIN_ID_ENV.split(',') if i.strip().isdigit()]
+# Si no hay admins en env, usamos los hardcoded como fallback (opcional, mejor dejar vacío si no hay env)
+if not ADMIN_USER_IDS:
+    ADMIN_USER_IDS = [
+        1438860917,  # Admin principal
+        8524907238,  # Admin secundario
+        7727224233,  # Admin adicional
+        8297992519,  # Yadiel - 1 mes premium
+    ]
+
+# PID File for Conflict 409 protection cross-process
+PID_FILE = ".bot.pid"
 
 # Conversation states
 WAITING_FOR_LINK = 1
@@ -703,7 +695,14 @@ async def receive_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"Error signing in {user_id}: {e}")
         retry_keyboard = [[InlineKeyboardButton(get_msg("btn_back_menu", lang), callback_data="back_to_menu")]]
         retry_markup = InlineKeyboardMarkup(retry_keyboard)
-        await msg.edit_text(get_msg("login_wrong_code", lang), parse_mode='Markdown', reply_markup=retry_markup)
+        
+        # Distinguir entre error de Telethon y error de código
+        if "phone_code_invalid" in str(e).lower() or "expired" in str(e).lower():
+            error_text = get_msg("login_wrong_code", lang)
+        else:
+            error_text = f"❌ *Error inesperado*\n\nOcurrió un error al procesar el código: `{str(e)[:50]}`"
+            
+        await msg.edit_text(error_text, parse_mode='Markdown', reply_markup=retry_markup)
         return ConversationHandler.END
 
 async def receive_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -747,7 +746,14 @@ async def receive_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"Error with 2FA for {user_id}: {e}")
         retry_keyboard = [[InlineKeyboardButton(get_msg("btn_back_menu", lang), callback_data="back_to_menu")]]
         retry_markup = InlineKeyboardMarkup(retry_keyboard)
-        await msg.edit_text(get_msg("login_wrong_password", lang), parse_mode='Markdown', reply_markup=retry_markup)
+        
+        # Distinguir entre error de Telethon y error de código
+        if "password_hash_invalid" in str(e).lower() or "incorrect" in str(e).lower():
+            error_text = get_msg("login_wrong_password", lang)
+        else:
+            error_text = f"❌ *Error inesperado*\n\nOcurrió un error al procesar la contraseña: `{str(e)[:50]}`"
+            
+        await msg.edit_text(error_text, parse_mode='Markdown', reply_markup=retry_markup)
         return ConversationHandler.END
 
 async def cancel_login(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1325,6 +1331,39 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     logger.info(f"🔘 BUTTON CALLBACK: data={query.data}, user={query.from_user.id}")
     
+    if query.data.startswith("setlang_"):
+        await query.answer()
+        lang = query.data.split("_")[1]
+        user_id = query.from_user.id
+        set_user_language(user_id, lang)
+        logger.info(f"User {user_id} selected language: {lang}")
+        
+        # Proceed to the actual welcome message which was deferred from /start
+        user = get_user(user_id)
+        
+        # Send Miniapp button with language included
+        first_name = update.effective_user.first_name
+        base_url = os.getenv('MINIAPP_URL', '').rstrip('/')
+        miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"
+        
+        welcome_message = (
+            f"👋 ¡Hola {first_name}! / Hello {first_name}!\n\n"
+            "🚀 Abriendo MiniApp...\n"
+        )
+        
+        keyboard = [
+            [InlineKeyboardButton("📱 Abrir MiniApp", web_app=WebAppInfo(url=miniapp_url))],
+            [InlineKeyboardButton("⚙️ Configuración", callback_data="settings")],
+            [InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        try:
+            await query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+        except Exception:
+            await query.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+        return
+        
     if query.data == "cancel_login":
         await query.answer()
         await cancel_login(update, context)
@@ -2084,7 +2123,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang = get_user_language(user)
         
         # Create WebApp button for miniapp
-        miniapp_url = f"https://bot-bens11-production.up.railway.app/miniapp?v=2&user_id={user_id}"
+        base_url = os.getenv('MINIAPP_URL', '').rstrip('/')
+        miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"
         
         miniapp_msg = "📱 *MiniApp*\n\n"
         miniapp_msg += "Haz clic en el botón de abajo para abrir la aplicación.\n\n"
@@ -2758,37 +2798,41 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except ValueError:
                 pass
     
-    # Ensure user exists in database
+    # Create or update user with all information
     if is_new_user:
-        create_user(user_id, first_name=first_name, username=username, language=user_language)
+        # Use add_user instead of create_user to handle language and referrals properly
+        add_user(user_id, language=user_language, referred_by=referred_by)
+        # Update additional info
+        if first_name or username:
+            update_user_info(user_id, first_name, username)
         logger.info(f"✓ New user {user_id} created with language: {user_language}")
-        # Registrar referido PENDIENTE (no cuenta hasta que descargue)
-        if referred_by:
-            add_user(user_id, language=user_language, referred_by=referred_by)
     else:
-        # Update language for existing users if it changed
-        set_user_language(user_id, user_language)
+        # We don't forcefully overwrite their selected language if they already chose one
+        user = get_user(user_id)
+        lang = user.get('language') if user and user.get('language') else user_language
+        set_user_language(user_id, lang)
     
     # Ensure admins have premium
     ensure_admin_premium(user_id)
     
-    user = get_user(user_id)
-    
-    # Direct to miniapp without language selection (auto-detected)
-    logger.info(f"✓ Enviando usuario {user_id} directamente a miniapp con idioma: {user_language}")
+    # Show language selection menu
     welcome_message = (
         f"👋 ¡Hola {first_name}! / Hello {first_name}!\n\n"
-        "🚀 Abriendo MiniApp...\n"
+        "🌐 *Selecciona tu idioma / Select your language:*\n"
     )
     
     keyboard = [
-        [InlineKeyboardButton("📱 Abrir MiniApp", callback_data="open_miniapp")],
-        [InlineKeyboardButton("⚙️ Configuración", callback_data="settings")],
-        [InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans")]
+        [
+            InlineKeyboardButton("🇪🇸 Español", callback_data="setlang_es"),
+            InlineKeyboardButton("🇬🇧 English", callback_data="setlang_en")
+        ],
+        [
+            InlineKeyboardButton("🇧🇷 Português", callback_data="setlang_pt"),
+            InlineKeyboardButton("🇮🇹 Italiano", callback_data="setlang_it")
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    # Handle both direct commands and callback queries
     if update.callback_query:
         try:
             await update.callback_query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
@@ -3141,7 +3185,7 @@ async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Add /miniapp path to the URL
     if not miniapp_url.endswith('/'):
         miniapp_url += '/'
-    miniapp_url += 'miniapp?v=2'
+    miniapp_url += f'miniapp?v=2&lang={lang}'
     
     keyboard = [
         [InlineKeyboardButton(
@@ -3149,7 +3193,7 @@ async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             web_app={"url": miniapp_url}
         )],
         [InlineKeyboardButton(
-            "⭐ Premium 199 Stars", 
+            "⭐ Premium 179 Stars", 
             callback_data="pay_premium"
         )]
     ]
@@ -4798,7 +4842,12 @@ async def post_init(application: Application):
     # Initialize Telethon Bot Client
     global bot_client
     try:
-        bot_client = TelegramClient('bot_session', TELEGRAM_API_ID, TELEGRAM_API_HASH)
+        # Usar el mismo directorio que la base de datos para la sesión del bot
+        db_path = os.getenv("DATABASE_PATH", "users.db")
+        db_dir = os.path.dirname(db_path)
+        session_path = os.path.join(db_dir, 'bot_session') if db_dir else 'bot_session'
+        
+        bot_client = TelegramClient(session_path, TELEGRAM_API_ID, TELEGRAM_API_HASH)
         await bot_client.start(bot_token=TELEGRAM_TOKEN)
         logger.info("Telethon Bot Client started successfully")
     except Exception as e:
@@ -4843,7 +4892,17 @@ async def post_init(application: Application):
 
 
 async def post_shutdown(application: Application):
-    """Cleanup on shutdown"""
+    """Acciones a realizar al cerrar el bot"""
+    logger.info("👋 Ejecutando post_shutdown...")
+    
+    # Remove PID file
+    if os.path.exists(PID_FILE):
+        try:
+            os.remove(PID_FILE)
+            logger.info(f"🗑️ PID file {PID_FILE} removed.")
+        except Exception as e:
+            logger.error(f"❌ Error removing PID file: {e}")
+
     # Close any active login clients
     for user_id, data in login_clients.items():
         try:
@@ -4917,12 +4976,38 @@ async def async_main():
     """Start the bot asynchronously (for use in non-main threads)"""
     global _bot_instance_running
     
-    # Prevent multiple bot instances (Conflict 409 protection)
+    # 1. Cross-process Protection (PID File)
+    if os.path.exists(PID_FILE):
+        try:
+            with open(PID_FILE, 'r') as f:
+                old_pid = int(f.read().strip())
+            
+            # Check if process actually exists
+            import psutil
+            if psutil.pid_exists(old_pid):
+                logger.warning(f"⚠️ Bot already running (PID {old_pid}). Skipping to prevent Conflict 409.")
+                return
+            else:
+                logger.info(f"ℹ️ Found stale PID file (PID {old_pid} no longer exists). Cleaning up.")
+                os.remove(PID_FILE)
+        except (ValueError, Exception) as e:
+            logger.error(f"❌ Error checking PID file: {e}")
+            if os.path.exists(PID_FILE): os.remove(PID_FILE)
+
+    # 2. Thread-safe Protection (Flag)
     with _bot_instance_lock:
         if _bot_instance_running:
-            logger.warning("⚠️ Bot instance already running. Skipping to prevent Conflict 409.")
+            logger.warning("⚠️ Bot instance already running in this process. Skipping.")
             return
         _bot_instance_running = True
+
+    # Write current PID
+    try:
+        with open(PID_FILE, 'w') as f:
+            f.write(str(os.getpid()))
+        logger.info(f"📝 PID {os.getpid()} written to {PID_FILE}")
+    except Exception as e:
+        logger.error(f"❌ Could not write PID file: {e}")
     
     logger.info("🤖 Initializing Telegram Bot (async_main)...")
     
@@ -5003,32 +5088,41 @@ async def async_main():
                 logger.error(f"Failed to initialize bot after {max_retries} attempts")
                 raise
     
-# Start the application with polling (PTB v20+)
-    # Compatible with nest_asyncio using await application.start() + stop()
+    # Manual startup to be compatible with existing event loop in start.py
     try:
+        await application.initialize()
+        # Manually call post_init as initialize() might not call it in some contexts or we want to be sure
+        await post_init(application)
+        await application.start()
+        await application.updater.start_polling(
+            allowed_updates=Update.ALL_TYPES,
+            drop_pending_updates=True
+        )
+        
         logger.info("=" * 80)
-        logger.info("🚀 TELEGRAM BOT POLLING STARTED")
+        logger.info("🚀 TELEGRAM BOT POLLING STARTED (Manual Mode)")
         logger.info("✅ Listening for incoming messages...")
         logger.info("=" * 80)
         
-        # Initialize and start application
-        await application.initialize()
-        await application.start()
-        await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
+        # Keep the bot running until cancelled
+        stop_event = asyncio.Event()
         
-        # Keep running until interrupted
-        while True:
-            await asyncio.sleep(1)
+        # Helper to stop the event
+        def stop_bot(*args):
+            logger.info("🛑 Stop signal received...")
+            stop_event.set()
         
-    except KeyboardInterrupt:
-        logger.info("⚠️ Keyboard interrupt received")
+        # Wait until stop_event is set
+        try:
+            await stop_event.wait()
+        except (asyncio.CancelledError, KeyboardInterrupt):
+            logger.info("🛑 Bot execution cancelled.")
+        
     except Exception as e:
         logger.error(f"❌ Bot polling error: {e}", exc_info=True)
     finally:
         logger.info("🛑 Bot shutting down...")
         try:
-            # Stop polling
-            await application.updater.stop()
             # Stop application
             await application.stop()
             # Shutdown application

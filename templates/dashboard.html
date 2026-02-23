@@ -23,18 +23,38 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         animation: fadeIn 0.5s ease-out forwards;
         opacity: 0;
+        position: relative;
+        overflow: hidden;
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     /* Stagger animation */
-    .stat-card:nth-child(1) { animation-delay: 0.1s; }
-    .stat-card:nth-child(2) { animation-delay: 0.2s; }
-    .stat-card:nth-child(3) { animation-delay: 0.3s; }
-    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    .stat-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .stat-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .stat-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .stat-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
 
     .stat-card:active {
         box-shadow: var(--shadow-md);
@@ -48,6 +68,183 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+
+    .stat-change {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .stat-change.positive {
+        background: var(--success-bg);
+        color: var(--success);
+    }
+
+    .stat-change.negative {
+        background: var(--danger-bg);
+        color: var(--danger);
+    }
+
+    /* === CHARTS MOBILE === */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .chart-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.4;
+    }
+
+    .chart-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+
+    .chart-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    .chart-action {
+        padding: 0.5rem;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .chart-action:active {
+        background: var(--bg-body);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 200px;
+        /* Shorter on mobile */
+        margin-top: 1rem;
+    }
+
+    /* === RESPONSIVE UTILITIES === */
+    .mobile-grid-1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .mobile-grid-1 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* === BROADCAST SECTION MOBILE === */
+    .broadcast-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .broadcast-header {
+        margin-bottom: 1rem;
+    }
+
+    .broadcast-info {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+
+    .broadcast-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+
+    .form-input,
+    .form-textarea {
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .form-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .form-actions .btn {
+        flex: 1;
+        min-width: 120px;
     }
 
     .stat-label svg {
@@ -69,9 +266,14 @@
         gap: 0.25rem;
         color: var(--text-tertiary);
     }
-    
-    .trend-up { color: var(--success); }
-    .trend-neutral { color: var(--text-tertiary); }
+
+    .trend-up {
+        color: var(--success);
+    }
+
+    .trend-neutral {
+        color: var(--text-tertiary);
+    }
 
     /* === BROADCAST CARD === */
     .broadcast-card {
@@ -263,25 +465,38 @@
 <div class="grid-stats">
     <div class="stat-card">
         <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
             Usuarios Totales
         </div>
         <div class="stat-value" id="total-users">{{ stats.total_users }}</div>
         <div class="stat-trend trend-neutral">Base completa</div>
     </div>
-    
+
     <div class="stat-card">
         <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                </polygon>
+            </svg>
             Premium
         </div>
         <div class="stat-value" id="premium-users">{{ stats.premium_users }}</div>
         <div class="stat-trend trend-up">Activos</div>
     </div>
-    
+
     <div class="stat-card">
         <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
             Descargas
         </div>
         <div class="stat-value" id="total-downloads">{{ stats.total_downloads }}</div>
@@ -290,7 +505,10 @@
 
     <div class="stat-card">
         <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
             Ingresos Est.
         </div>
         <div class="stat-value" id="estimated-revenue">{{ stats.estimated_revenue }}</div>
@@ -303,42 +521,42 @@
     <div class="section-header" style="margin-bottom: 1rem;">
         <h2 class="section-title">📈 Gráficos</h2>
     </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 1rem;">
+
+    <div class="mobile-grid-1" style="margin-bottom: 1rem;">
         <!-- Revenue Chart -->
         <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">💰 Ingresos (Últimos 7 días)</h3>
-            <canvas id="revenueChart" style="max-height: 250px;"></canvas>
+            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">💰 Ingresos (7 días)</h3>
+            <canvas id="revenueChart" style="max-height: 200px;"></canvas>
         </div>
-        
+
         <!-- Users Chart -->
         <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">👥 Usuarios Nuevos (Últimos 7 días)</h3>
-            <canvas id="usersChart" style="max-height: 250px;"></canvas>
+            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">👥 Usuarios (7 días)</h3>
+            <canvas id="usersChart" style="max-height: 200px;"></canvas>
         </div>
     </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+    <div class="mobile-grid-1">
         <!-- Distribution Chart -->
         <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
             <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">🎯 Distribución</h3>
-            <canvas id="distributionChart" style="max-height: 200px;"></canvas>
+            <canvas id="distributionChart" style="max-height: 180px;"></canvas>
         </div>
-        
+
         <!-- Downloads Chart -->
         <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">📥 Descargas por Tipo</h3>
-            <canvas id="downloadsChart" style="max-height: 200px;"></canvas>
+            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">📥 Descargas</h3>
+            <canvas id="downloadsChart" style="max-height: 180px;"></canvas>
         </div>
     </div>
 </div>
 
-<!-- Activity Card - Hidden on small screens, visible on desktop -->
-<div class="card" style="margin-bottom: 1.5rem; display: none;" id="activity-section">
+<!-- Activity Card -->
+<div class="card" style="margin-bottom: 1.5rem;" id="activity-section">
     <div class="section-header" style="margin-bottom: 1rem;">
         <h2 class="section-title">📈 Actividad Diaria</h2>
     </div>
-    
+
     <div class="activity-grid">
         <div class="activity-card">
             <div class="activity-icon">📸</div>
@@ -347,7 +565,7 @@
                 <div class="activity-value" id="daily-photos">{{ stats.daily_stats.photos }}</div>
             </div>
         </div>
-        
+
         <div class="activity-card">
             <div class="activity-icon">🎬</div>
             <div>
@@ -355,7 +573,7 @@
                 <div class="activity-value" id="daily-videos">{{ stats.daily_stats.videos }}</div>
             </div>
         </div>
-        
+
         <div class="activity-card">
             <div class="activity-icon">🎵</div>
             <div>
@@ -363,7 +581,7 @@
                 <div class="activity-value" id="daily-music">{{ stats.daily_stats.music }}</div>
             </div>
         </div>
-        
+
         <div class="activity-card">
             <div class="activity-icon">📱</div>
             <div>
@@ -397,28 +615,32 @@
 <div class="broadcast-card">
     <h2 class="section-title" style="margin-bottom: 0.5rem;">📢 Mensaje Masivo</h2>
     <div class="broadcast-info">Envía mensajes a todos tus usuarios</div>
-    
-    <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0.5rem;">Destinatarios</label>
+
+    <label
+        style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0.5rem;">Destinatarios</label>
     <select id="broadcast-target" onchange="updateBroadcastCount()">
         <option value="all">Todos los usuarios ({{ stats.total_users }})</option>
         <option value="premium">Solo Premium ({{ stats.premium_users }})</option>
         <option value="free">Solo Free ({{ stats.total_users - stats.premium_users }})</option>
     </select>
-    
-    <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0.5rem;">Mensaje</label>
+
+    <label
+        style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0.5rem;">Mensaje</label>
     <textarea id="broadcast-message" placeholder="Escribe tu mensaje aquí..."></textarea>
-    
+
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <span class="broadcast-info" id="char-count">0 / 4096</span>
         <span class="broadcast-info" id="broadcast-count">{{ stats.total_users }} destinatarios</span>
     </div>
-    
+
     <div style="display: flex; gap: 0.75rem; flex-direction: column;">
         <button onclick="previewBroadcast()" class="btn btn-outline" style="width: 100%;">👁 Previsualizar</button>
-        <button onclick="sendBroadcast()" class="btn btn-primary" style="width: 100%;" id="send-broadcast-btn">📤 Enviar</button>
+        <button onclick="sendBroadcast()" class="btn btn-primary" style="width: 100%;" id="send-broadcast-btn">📤
+            Enviar</button>
     </div>
-    
-    <div id="broadcast-result" style="margin-top: 1rem; padding: 1rem; border-radius: var(--radius-md); display: none;"></div>
+
+    <div id="broadcast-result" style="margin-top: 1rem; padding: 1rem; border-radius: var(--radius-md); display: none;">
+    </div>
 </div>
 {% endblock %}
 
@@ -427,7 +649,7 @@
 <script>
     // Chart instances
     let revenueChart, usersChart, distributionChart, downloadsChart;
-    
+
     function initCharts() {
         // Revenue Chart
         fetch('/api/charts/revenue')
@@ -538,23 +760,11 @@
                 });
             });
     }
-    
+
     // Initialize charts on load
     window.addEventListener('load', initCharts);
-    
-    // Show activity section on desktop
-    const activitySection = document.getElementById('activity-section');
-    if (window.innerWidth >= 768) {
-        activitySection.style.display = 'block';
-    }
-    
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 768) {
-            activitySection.style.display = 'block';
-        } else {
-            activitySection.style.display = 'none';
-        }
-    });
+
+    // Activity section is now always visible but responsive via CSS
 
     function updateStats() {
         fetch('/api/stats')
@@ -582,7 +792,7 @@
 
                 const now = new Date();
                 document.getElementById('last-updated').textContent = now.toLocaleTimeString();
-                
+
                 // Refresh charts every 5 minutes
                 initCharts();
             })
@@ -595,14 +805,21 @@
     setInterval(initCharts, 300000);
 
     // === BROADCAST ===
-    document.getElementById('broadcast-message').addEventListener('input', function() {
+    // Pasar variables de Django a JavaScript de forma segura
+    const statsData = {{ stats| tojson | safe }};
+
+    document.getElementById('broadcast-message').addEventListener('input', function () {
         const count = this.value.length;
         document.getElementById('char-count').textContent = count + ' / 4096';
     });
 
     function updateBroadcastCount() {
         const target = document.getElementById('broadcast-target').value;
-        const counts = { all: {{ stats.total_users }}, premium: {{ stats.premium_users }}, free: {{ stats.total_users - stats.premium_users }} };
+        const counts = {
+            all: statsData.total_users,
+            premium: statsData.premium_users,
+            free: statsData.total_users - statsData.premium_users
+        };
         document.getElementById('broadcast-count').textContent = counts[target] + ' destinatarios';
     }
 
@@ -610,7 +827,7 @@
         const message = document.getElementById('broadcast-message').value;
         const target = document.getElementById('broadcast-target').value;
         const resultDiv = document.getElementById('broadcast-result');
-        
+
         if (!message.trim()) {
             resultDiv.innerHTML = '<span style="color: var(--danger);">⚠️ El mensaje no puede estar vacío</span>';
             resultDiv.style.display = 'block';
@@ -618,9 +835,9 @@
             return;
         }
 
-        const counts = { all: {{ stats.total_users }}, premium: {{ stats.premium_users }}, free: {{ stats.total_users - stats.premium_users }} };
+        const counts = { all: statsData.total_users, premium: statsData.premium_users, free: statsData.total_users - statsData.premium_users };
         const labels = { all: 'todos', premium: 'premium', free: 'free' };
-        
+
         resultDiv.innerHTML = `
             <div style="font-weight: 600; margin-bottom: 0.5rem;">📊 Vista previa:</div>
             <div style="font-size: 0.875rem;">Destinatarios: <strong>${counts[target]}</strong> (${labels[target]})</div>
@@ -637,7 +854,7 @@
         const target = document.getElementById('broadcast-target').value;
         const resultDiv = document.getElementById('broadcast-result');
         const btn = document.getElementById('send-broadcast-btn');
-        
+
         if (!message.trim()) {
             resultDiv.innerHTML = '<span style="color: var(--danger);">⚠️ El mensaje no puede estar vacío</span>';
             resultDiv.style.display = 'block';
@@ -658,27 +875,27 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: message, target: target })
         })
-        .then(res => res.json())
-        .then(data => {
-            btn.disabled = false;
-            btn.innerHTML = '📤 Enviar';
-            
-            if (data.success) {
-                resultDiv.innerHTML = `✅ ¡Completado! Enviados: <strong>${data.sent}</strong>`;
-                resultDiv.style.background = 'rgba(109, 194, 109, 0.1)';
-                document.getElementById('broadcast-message').value = '';
-                document.getElementById('char-count').textContent = '0 / 4096';
-            } else {
-                resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error: ${data.error}</span>`;
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '📤 Enviar';
+
+                if (data.success) {
+                    resultDiv.innerHTML = `✅ ¡Completado! Enviados: <strong>${data.sent}</strong>`;
+                    resultDiv.style.background = 'rgba(109, 194, 109, 0.1)';
+                    document.getElementById('broadcast-message').value = '';
+                    document.getElementById('char-count').textContent = '0 / 4096';
+                } else {
+                    resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error: ${data.error}</span>`;
+                    resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = '📤 Enviar';
+                resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error: ${err.message}</span>`;
                 resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
-            }
-        })
-        .catch(err => {
-            btn.disabled = false;
-            btn.innerHTML = '📤 Enviar';
-            resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error: ${err.message}</span>`;
-            resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
-        });
+            });
     }
 </script>
 {% endblock %}
@@ -728,9 +945,14 @@
         align-items: center;
         gap: 0.25rem;
     }
-    
-    .trend-up { color: var(--success); }
-    .trend-neutral { color: var(--text-tertiary); }
+
+    .trend-up {
+        color: var(--success);
+    }
+
+    .trend-neutral {
+        color: var(--text-tertiary);
+    }
 
     .section-header {
         display: flex;
@@ -776,18 +998,18 @@
         width: 100%;
         border-collapse: collapse;
     }
-    
+
     .system-info-table td {
         padding: 1rem 0;
         border-bottom: 1px solid var(--border);
         color: var(--text-secondary);
         font-size: 0.875rem;
     }
-    
+
     .system-info-table tr:last-child td {
         border-bottom: none;
     }
-    
+
     .system-info-table strong {
         color: var(--text-primary);
         font-weight: 500;

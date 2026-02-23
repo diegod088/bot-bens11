@@ -56,3 +56,6 @@ compressed/
 # OS
 .DS_Store
 Thumbs.db
+
+# PID files
+.bot.pid*

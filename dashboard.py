@@ -14,7 +14,7 @@ from functools import wraps
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import sqlite3
-from database import get_user_stats
+from database import get_user_stats, has_active_session, delete_user_session
 import logging
 import requests
 
@@ -39,7 +39,7 @@ ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "admin123")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 BOT_USERNAME_CACHE = None
 
-DB_FILE = "users.db"
+from database import DB_FILE
 
 
 def get_db_connection():
@@ -1216,9 +1216,11 @@ def broadcast_preview():
 # ============================================================
 
 @app.route('/miniapp')
-def miniapp():
-    """Serve the Telegram MiniApp"""
-    return send_file('miniapp/index.html')
+@app.route('/miniapp/<path:filename>')
+def miniapp(filename="index.html"):
+    """Serve the Telegram MiniApp and its files"""
+    from flask import send_from_directory
+    return send_from_directory('miniapp', filename)
 
 
 @app.route('/api/miniapp/user', methods=['POST'])
@@ -1232,9 +1234,8 @@ def miniapp_get_user():
         if not user_id:
             return jsonify({'error': 'User ID required'}), 400
         
-        # Check if user has a session file (connected account)
-        session_file = f"sessions/session_{user_id}.session"
-        has_session = os.path.exists(session_file)
+        # Check if user has a session in database
+        has_session = has_active_session(user_id)
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -1414,8 +1415,7 @@ def miniapp_download():
             return jsonify({'error': 'Valid Telegram link required'}), 400
         
         # Check if user has session
-        session_file = f"sessions/session_{user_id}.session"
-        if not os.path.exists(session_file):
+        if not has_active_session(user_id):
             return jsonify({
                 'ok': False, 
                 'error': 'no_session',
@@ -1490,10 +1490,9 @@ def miniapp_disconnect():
         if not user_id:
             return jsonify({'error': 'User ID required'}), 400
         
-        # Remove session file
-        session_file = f"sessions/session_{user_id}.session"
-        if os.path.exists(session_file):
-            os.remove(session_file)
+        # Remove session from database
+        if has_active_session(user_id):
+            delete_user_session(user_id)
             
             # Notify user
             send_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"

@@ -31,7 +31,16 @@ if not ENCRYPTION_KEY:
 else:
     logger.info("✅ ENCRYPTION_KEY cargada correctamente.")
 
-DB_FILE = "users.db"
+DB_FILE = os.getenv("DATABASE_PATH", "users.db")
+
+# Asegurar que el directorio de la base de datos existe
+db_dir = os.path.dirname(DB_FILE)
+if db_dir and not os.path.exists(db_dir):
+    try:
+        os.makedirs(db_dir, exist_ok=True)
+        logger.info(f"✅ Directorio de base de datos creado: {db_dir}")
+    except Exception as e:
+        logger.error(f"❌ Error creando directorio de base de datos {db_dir}: {e}")
 
 
 # ==================== CONTEXT MANAGER PARA CONEXIONES ====================
@@ -465,7 +474,7 @@ def get_user(user_id: int, auto_reset: bool = True) -> Optional[Dict]:
         return user_data
 
 
-def create_user(user_id: int, first_name: str = None, username: str = None) -> bool:
+def create_user(user_id: int, first_name: str = None, username: str = None, language: str = 'es') -> bool:
     """
     Create a new user in the database or update existing info
     
@@ -473,6 +482,7 @@ def create_user(user_id: int, first_name: str = None, username: str = None) -> b
         user_id: Telegram user ID
         first_name: User's first name
         username: User's username (optional)
+        language: User's preferred language (optional, defaults to 'es')
         
     Returns:
         True si se creó, False si ya existía (pero se actualizó info)
@@ -483,22 +493,44 @@ def create_user(user_id: int, first_name: str = None, username: str = None) -> b
         # Intentar insertar
         try:
             cursor.execute(
-                "INSERT INTO users (user_id, first_name, username, downloads, premium) VALUES (?, ?, ?, 0, 0)",
-                (user_id, first_name, username)
+                "INSERT INTO users (user_id, first_name, username, language, downloads, premium) VALUES (?, ?, ?, ?, 0, 0)",
+                (user_id, first_name, username, language)
             )
+            logger.info(f"Created new user: {user_id}")
             return True
         except sqlite3.IntegrityError:
-            # Si ya existe, actualizar nombre y username
-            if first_name or username:
+            # Si ya existe, actualizar nombre, username y language
+            if first_name or username or language:
                 cursor.execute(
-                    "UPDATE users SET first_name = ?, username = ? WHERE user_id = ?",
-                    (first_name, username, user_id)
+                    "UPDATE users SET first_name = ?, username = ?, language = ? WHERE user_id = ?",
+                    (first_name, username, language, user_id)
                 )
             return False
-        if created:
-            logger.info(f"Created new user: {user_id}")
+
+
+def update_user_info(user_id: int, first_name: str = None, username: str = None) -> bool:
+    """
+    Update user's first_name and username
+    
+    Args:
+        user_id: Telegram user ID
+        first_name: User's first name (optional)
+        username: User's username (optional)
         
-        return created
+    Returns:
+        True if updated, False if no changes
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        if first_name or username:
+            cursor.execute(
+                "UPDATE users SET first_name = ?, username = ?, updated_at = ? WHERE user_id = ?",
+                (first_name, username, datetime.now(), user_id)
+            )
+            logger.info(f"Updated user info for {user_id}: {first_name}, @{username}")
+            return True
+        return False
 
 
 def ensure_user_exists(user_id: int):

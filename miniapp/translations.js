@@ -1,31 +1,31 @@
-// Translations for MiniApp - Synchronized with bot messages.py
+// Translations for MiniApp - Synchronized with bot messages.js
 const TRANSLATIONS = {
     "es": {
         // Onboarding
-        "onboarding_title_1": "Descarga contenido",
-        "onboarding_desc_1": "Descarga videos, fotos, música y archivos de cualquier canal de Telegram",
-        "onboarding_title_2": "Solo pega el enlace",
-        "onboarding_desc_2": "Copia cualquier enlace t.me/ y pégalo aquí. ¡Es así de fácil!",
-        "onboarding_title_3": "Hazte Premium",
-        "onboarding_desc_3": "Desbloquea descargas ilimitadas, música, APKs y mucho más",
+        "onboarding_title_1": "¡Bienvenido al Bot!",
+        "onboarding_desc_1": "Soy tu asistente para descargar contenido de Telegram. Te enseñaré cómo funciono en 3 pasos sencillos.",
+        "onboarding_title_2": "Pega cualquier enlace",
+        "onboarding_desc_2": "Encuentra un video, foto o archivo en Telegram, copia su enlace (t.me/...) y pégalo aquí. ¡Así de simple!",
+        "onboarding_title_3": "Recibe tu contenido",
+        "onboarding_desc_3": "Videos: 3 gratis, luego obtén Premium para ilimitados. Fotos y archivos: Siempre gratis. ¡Disfruta!",
         "onboarding_next": "Siguiente",
-        "onboarding_start": "¡Empezar!",
+        "onboarding_start": "Comenzar",
         "onboarding_skip": "Omitir",
-        
+
         // Loading
         "loading_text": "Cargando...",
-        
+
         // Header
         "app_brand": "Bot de Descargas",
         "plan_free": "Plan Free",
         "plan_premium": "Plan Premium ⭐",
-        
+
         // Navigation
         "nav_home": "Inicio",
         "nav_premium": "Premium",
         "nav_referrals": "Referir",
         "nav_account": "Cuenta",
-        
+
         // Home Tab
         "welcome_text": "¡Hola",
         "welcome_hint": "Pega un enlace de Telegram para descargar",
@@ -38,7 +38,7 @@ const TRANSLATIONS = {
         "btn_paste": "📋 Pegar",
         "btn_help": "❓ Ayuda",
         "premium_banner_title": "¡Hazte Premium!",
-        "premium_banner_desc": "Desbloquea todo por solo 199 ⭐",
+        "premium_banner_desc": "Desbloquea todo por solo 179 ⭐",
         "error_no_link": "Pega un enlace de Telegram",
         "error_invalid_link": "Enlace no válido",
         "error_not_connected": "Configura tu cuenta primero",
@@ -47,7 +47,7 @@ const TRANSLATIONS = {
         "status_error": "Error al procesar",
         "help_text": "📌 Formatos válidos:\n\n• t.me/canal/123\n• t.me/c/123456/789\n• t.me/+ABC123/456\n\nCopia el enlace desde Telegram y pégalo aquí.",
         "help_title": "Ayuda",
-        
+
         // Premium Tab
         "premium_title": "Elige tu Plan Premium",
         "premium_desc": "4 opciones para ti",
@@ -67,22 +67,22 @@ const TRANSLATIONS = {
         "referral_bonus_desc": "15 referidos confirmados = +1 día Premium\nMáximo acumulable: 15 días",
         "referral_bonus_btn": "👥 Ver Mis Referidos",
         "plan_trial_name": "🎁 Prueba",
-        "plan_trial_desc": "Perfecto para probar (8.3⭐/día)",
+        "plan_trial_desc": "Perfecto para probar",
         "plan_trial_btn": "⭐ Obtener Prueba",
         "plan_weekly_name": "🔥 Semanal",
-        "plan_weekly_desc": "Mejor precio/día (10.7⭐/día)",
+        "plan_weekly_desc": "Mejor precio/día",
         "plan_weekly_btn": "🔥 Obtener Semanal",
         "plan_weekly_badge": "🔥 MÁS POPULAR",
         "plan_monthly_name": "💎 Mensual",
-        "plan_monthly_desc": "El más elegido (5.0⭐/día)",
+        "plan_monthly_desc": "El más elegido",
         "plan_monthly_btn": "💎 Obtener Mensual",
         "plan_monthly_badge": "⭐ RECOMENDADO",
         "plan_quarterly_name": "👑 Trimestral",
-        "plan_quarterly_desc": "Ahorra 11% (4.4⭐/día)",
+        "plan_quarterly_desc": "Ahorra un 11%",
         "plan_quarterly_btn": "👑 Obtener Trimestral",
         "plan_quarterly_badge": "💰 MEJOR VALOR",
-        "plan_quarterly_savings": "💰 AHORRAS 48⭐ vs 3 meses separados",
-        
+        "plan_quarterly_savings": "💰 AHORRAS 58⭐ vs 3 meses separados",
+
         // Account Tab
         "connection_status": "Estado de conexión",
         "connection_verifying": "Verificando...",
@@ -108,7 +108,7 @@ const TRANSLATIONS = {
         "disconnecting_text": "Desconectando...",
         "disconnect_confirm": "¿Desconectar tu cuenta?",
         "disconnect_success": "✅ Cuenta desconectada. La MiniApp se actualizará.",
-        
+
         // Referrals Tab
         "referrals_title": "Sistema de Referidos",
         "referrals_desc": "Invita amigos y gana Premium gratis",
@@ -132,7 +132,7 @@ const TRANSLATIONS = {
         "referrals_loading": "Cargando enlace...",
         "referrals_generate_error": "❌ Error al generar enlace",
         "referrals_share_text": "¡Descarga contenido de Telegram con este bot! 🚀",
-        
+
         // Toasts and Alerts
         "toast_payment_preparing": "Preparando pago...",
         "toast_payment_success": "¡Gracias! Tu Premium se activará en segundos ✨",
@@ -142,34 +142,48 @@ const TRANSLATIONS = {
         "toast_payment_error_text": "Error al procesar el pago",
         "toast_connection_failed": "❌ Error al generar enlace",
         "toast_no_plan": "¿Necesitas ayuda?",
+        "app_title": "Bot de Descargas",
+        "home_hint": "Pega un enlace de Telegram para descargar",
+        "home_input_placeholder": "Pega el enlace t.me/ aquí...",
+        "premium_mini_title": "¡Hazte Premium!",
+        "premium_mini_desc": "Desbloquea todo por solo 179 ⭐",
+        "account_connection_status": "Estado de conexión",
+        "account_premium_active": "👑 Premium Activo",
+        "account_premium_buy": "⭐ Obtener Premium",
+        "panel_plan_free": "Plan Free",
+        "panel_plan_premium": "Plan Premium ⭐",
+        "plan_trial_period": "3 días",
+        "plan_weekly_period": "7 días",
+        "plan_monthly_period": "30 días",
+        "plan_quarterly_period": "90 días",
     },
-    
+
     "en": {
         // Onboarding
-        "onboarding_title_1": "Download Content",
-        "onboarding_desc_1": "Download videos, photos, music and files from any Telegram channel",
-        "onboarding_title_2": "Just paste the link",
-        "onboarding_desc_2": "Copy any t.me/ link and paste it here. That's it!",
-        "onboarding_title_3": "Get Premium",
-        "onboarding_desc_3": "Unlock unlimited downloads, music, APKs and much more",
+        "onboarding_title_1": "Welcome to the Bot!",
+        "onboarding_desc_1": "I'm your assistant for downloading Telegram content. I'll teach you how I work in 3 simple steps.",
+        "onboarding_title_2": "Paste any link",
+        "onboarding_desc_2": "Find a video, photo or file in Telegram, copy its link (t.me/...) and paste it here. It's that simple!",
+        "onboarding_title_3": "Get your content",
+        "onboarding_desc_3": "Videos: 3 free, then get Premium for unlimited. Photos and files: Always free. Enjoy!",
         "onboarding_next": "Next",
-        "onboarding_start": "Get Started!",
+        "onboarding_start": "Start",
         "onboarding_skip": "Skip",
-        
+
         // Loading
         "loading_text": "Loading...",
-        
+
         // Header
         "app_brand": "Download Bot",
         "plan_free": "Free Plan",
         "plan_premium": "Premium Plan ⭐",
-        
+
         // Navigation
         "nav_home": "Home",
         "nav_premium": "Premium",
         "nav_referrals": "Refer",
         "nav_account": "Account",
-        
+
         // Home Tab
         "welcome_text": "Hello",
         "welcome_hint": "Paste a Telegram link to download",
@@ -182,7 +196,7 @@ const TRANSLATIONS = {
         "btn_paste": "📋 Paste",
         "btn_help": "❓ Help",
         "premium_banner_title": "Get Premium!",
-        "premium_banner_desc": "Unlock everything for just 199 ⭐",
+        "premium_banner_desc": "Unlock everything for just 179 ⭐",
         "error_no_link": "Paste a Telegram link",
         "error_invalid_link": "Invalid link",
         "error_not_connected": "Setup your account first",
@@ -191,7 +205,7 @@ const TRANSLATIONS = {
         "status_error": "Error processing",
         "help_text": "📌 Valid formats:\n\n• t.me/channel/123\n• t.me/c/123456/789\n• t.me/+ABC123/456\n\nCopy the link from Telegram and paste it here.",
         "help_title": "Help",
-        
+
         // Premium Tab
         "premium_title": "Choose Your Premium Plan",
         "premium_desc": "4 options for you",
@@ -211,22 +225,22 @@ const TRANSLATIONS = {
         "referral_bonus_desc": "15 confirmed referrals = +1 Premium day\nMax cumulative: 15 days",
         "referral_bonus_btn": "👥 View My Referrals",
         "plan_trial_name": "🎁 Trial",
-        "plan_trial_desc": "Perfect for testing (8.3⭐/day)",
+        "plan_trial_desc": "Perfect for testing",
         "plan_trial_btn": "⭐ Get Trial",
         "plan_weekly_name": "🔥 Weekly",
-        "plan_weekly_desc": "Best price/day (10.7⭐/day)",
+        "plan_weekly_desc": "Best price/day",
         "plan_weekly_btn": "🔥 Get Weekly",
         "plan_weekly_badge": "🔥 MOST POPULAR",
         "plan_monthly_name": "💎 Monthly",
-        "plan_monthly_desc": "Most popular (5.0⭐/day)",
+        "plan_monthly_desc": "Most popular",
         "plan_monthly_btn": "💎 Get Monthly",
         "plan_monthly_badge": "⭐ RECOMMENDED",
         "plan_quarterly_name": "👑 Quarterly",
-        "plan_quarterly_desc": "Save 11% (4.4⭐/day)",
+        "plan_quarterly_desc": "Save 11%",
         "plan_quarterly_btn": "👑 Get Quarterly",
         "plan_quarterly_badge": "💰 BEST VALUE",
-        "plan_quarterly_savings": "💰 SAVE 48⭐ vs 3 months separately",
-        
+        "plan_quarterly_savings": "💰 SAVE 58⭐ vs 3 months separately",
+
         // Account Tab
         "connection_status": "Connection Status",
         "connection_verifying": "Verifying...",
@@ -252,7 +266,7 @@ const TRANSLATIONS = {
         "disconnecting_text": "Disconnecting...",
         "disconnect_confirm": "Disconnect your account?",
         "disconnect_success": "✅ Account disconnected. MiniApp will refresh.",
-        
+
         // Referrals Tab
         "referrals_title": "Referral System",
         "referrals_desc": "Invite friends and earn free Premium",
@@ -276,7 +290,7 @@ const TRANSLATIONS = {
         "referrals_loading": "Loading link...",
         "referrals_generate_error": "❌ Error generating link",
         "referrals_share_text": "Download Telegram content with this bot! 🚀",
-        
+
         // Toasts and Alerts
         "toast_payment_preparing": "Preparing payment...",
         "toast_payment_success": "Thank you! Your Premium will activate in seconds ✨",
@@ -286,34 +300,48 @@ const TRANSLATIONS = {
         "toast_payment_error_text": "Error processing payment",
         "toast_connection_failed": "❌ Error generating link",
         "toast_no_plan": "Need help?",
+        "app_title": "Download Bot",
+        "home_hint": "Paste a Telegram link to download",
+        "home_input_placeholder": "Paste t.me/ link here...",
+        "premium_mini_title": "Get Premium!",
+        "premium_mini_desc": "Unlock everything for just 179 ⭐",
+        "account_connection_status": "Connection Status",
+        "account_premium_active": "👑 Premium Active",
+        "account_premium_buy": "⭐ Get Premium",
+        "panel_plan_free": "Free Plan",
+        "panel_plan_premium": "Premium Plan ⭐",
+        "plan_trial_period": "3 days",
+        "plan_weekly_period": "7 days",
+        "plan_monthly_period": "30 days",
+        "plan_quarterly_period": "90 days",
     },
-    
+
     "pt": {
         // Onboarding
-        "onboarding_title_1": "Baixe conteúdo",
-        "onboarding_desc_1": "Baixe vídeos, fotos, músicas e arquivos de qualquer canal do Telegram",
-        "onboarding_title_2": "Apenas cole o link",
-        "onboarding_desc_2": "Copie qualquer link t.me/ e cole aqui. É assim tão fácil!",
-        "onboarding_title_3": "Seja Premium",
-        "onboarding_desc_3": "Desbloqueie downloads ilimitados, música, APKs e muito mais",
+        "onboarding_title_1": "Bem-vindo ao Bot!",
+        "onboarding_desc_1": "Sou seu assistente para baixar conteúdo do Telegram. Vou ensinar como funciono em 3 passos simples.",
+        "onboarding_title_2": "Cole qualquer link",
+        "onboarding_desc_2": "Encontre um vídeo, foto ou arquivo no Telegram, copie o link (t.me/...) e cole aqui. É assim tão simples!",
+        "onboarding_title_3": "Receba seu conteúdo",
+        "onboarding_desc_3": "Vídeos: 3 grátis, depois obtenha Premium para ilimitados. Fotos e arquivos: Sempre grátis. Aproveite!",
         "onboarding_next": "Próximo",
-        "onboarding_start": "Começar!",
+        "onboarding_start": "Começar",
         "onboarding_skip": "Pular",
-        
+
         // Loading
         "loading_text": "Carregando...",
-        
+
         // Header
         "app_brand": "Bot de Downloads",
         "plan_free": "Plano Gratuito",
         "plan_premium": "Plano Premium ⭐",
-        
+
         // Navigation
         "nav_home": "Início",
         "nav_premium": "Premium",
         "nav_referrals": "Referir",
         "nav_account": "Conta",
-        
+
         // Home Tab
         "welcome_text": "Olá",
         "welcome_hint": "Cole um link do Telegram para baixar",
@@ -326,7 +354,7 @@ const TRANSLATIONS = {
         "btn_paste": "📋 Colar",
         "btn_help": "❓ Ajuda",
         "premium_banner_title": "Seja Premium!",
-        "premium_banner_desc": "Desbloqueie tudo por apenas 199 ⭐",
+        "premium_banner_desc": "Desbloqueie tudo por apenas 179 ⭐",
         "error_no_link": "Cole um link do Telegram",
         "error_invalid_link": "Link inválido",
         "error_not_connected": "Configure sua conta primeiro",
@@ -335,7 +363,7 @@ const TRANSLATIONS = {
         "status_error": "Erro ao processar",
         "help_text": "📌 Formatos válidos:\n\n• t.me/canal/123\n• t.me/c/123456/789\n• t.me/+ABC123/456\n\nCopie o link do Telegram e cole aqui.",
         "help_title": "Ajuda",
-        
+
         // Premium Tab
         "premium_title": "Escolha seu Plano Premium",
         "premium_desc": "4 opções para você",
@@ -355,22 +383,22 @@ const TRANSLATIONS = {
         "referral_bonus_desc": "15 referidos confirmados = +1 dia Premium\nMáximo acumulado: 15 dias",
         "referral_bonus_btn": "👥 Ver Meus Referidos",
         "plan_trial_name": "🎁 Teste",
-        "plan_trial_desc": "Perfeito para testar (8.3⭐/dia)",
+        "plan_trial_desc": "Perfeito para testar",
         "plan_trial_btn": "⭐ Obter Teste",
         "plan_weekly_name": "🔥 Semanal",
-        "plan_weekly_desc": "Melhor preço/dia (10.7⭐/dia)",
+        "plan_weekly_desc": "Melhor preço/dia",
         "plan_weekly_btn": "🔥 Obter Semanal",
         "plan_weekly_badge": "🔥 MAIS POPULAR",
         "plan_monthly_name": "💎 Mensal",
-        "plan_monthly_desc": "O mais escolhido (5.0⭐/dia)",
+        "plan_monthly_desc": "O mais escolhido",
         "plan_monthly_btn": "💎 Obter Mensal",
         "plan_monthly_badge": "⭐ RECOMENDADO",
         "plan_quarterly_name": "👑 Trimestral",
-        "plan_quarterly_desc": "Economize 11% (4.4⭐/dia)",
+        "plan_quarterly_desc": "Economize 11%",
         "plan_quarterly_btn": "👑 Obter Trimestral",
         "plan_quarterly_badge": "💰 MELHOR VALOR",
-        "plan_quarterly_savings": "💰 ECONOMIZE 48⭐ vs 3 meses separados",
-        
+        "plan_quarterly_savings": "💰 ECONOMIZE 58⭐ vs 3 meses separados",
+
         // Account Tab
         "connection_status": "Status da Conexão",
         "connection_verifying": "Verificando...",
@@ -396,7 +424,7 @@ const TRANSLATIONS = {
         "disconnecting_text": "Desconectando...",
         "disconnect_confirm": "Desconectar sua conta?",
         "disconnect_success": "✅ Conta desconectada. MiniApp será atualizado.",
-        
+
         // Referrals Tab
         "referrals_title": "Sistema de Referidos",
         "referrals_desc": "Convide amigos e ganhe Premium grátis",
@@ -420,7 +448,7 @@ const TRANSLATIONS = {
         "referrals_loading": "Carregando link...",
         "referrals_generate_error": "❌ Erro ao gerar link",
         "referrals_share_text": "Baixe conteúdo do Telegram com este bot! 🚀",
-        
+
         // Toasts and Alerts
         "toast_payment_preparing": "Preparando pagamento...",
         "toast_payment_success": "Obrigado! Seu Premium será ativado em segundos ✨",
@@ -430,34 +458,48 @@ const TRANSLATIONS = {
         "toast_payment_error_text": "Erro ao processar pagamento",
         "toast_connection_failed": "❌ Erro ao gerar link",
         "toast_no_plan": "Precisa de ajuda?",
+        "app_title": "Bot de Downloads",
+        "home_hint": "Cole um link do Telegram para baixar",
+        "home_input_placeholder": "Cole o link t.me/ aqui...",
+        "premium_mini_title": "Seja Premium!",
+        "premium_mini_desc": "Desbloqueie tudo por apenas 179 ⭐",
+        "account_connection_status": "Status da Conexão",
+        "account_premium_active": "👑 Premium Ativo",
+        "account_premium_buy": "⭐ Obter Premium",
+        "panel_plan_free": "Plano Gratuito",
+        "panel_plan_premium": "Plano Premium ⭐",
+        "plan_trial_period": "3 dias",
+        "plan_weekly_period": "7 dias",
+        "plan_monthly_period": "30 dias",
+        "plan_quarterly_period": "90 dias",
     },
-    
+
     "it": {
         // Onboarding
-        "onboarding_title_1": "Scarica contenuti",
-        "onboarding_desc_1": "Scarica video, foto, musica e file da qualsiasi canale Telegram",
-        "onboarding_title_2": "Incolla semplicemente il link",
-        "onboarding_desc_2": "Copia qualsiasi link t.me/ e incollalo qui. È così facile!",
-        "onboarding_title_3": "Diventa Premium",
-        "onboarding_desc_3": "Sblocca download illimitati, musica, APK e molto altro",
+        "onboarding_title_1": "Benvenuto nel Bot!",
+        "onboarding_desc_1": "Sono il tuo assistente per scaricare contenuti da Telegram. Ti insegnerò come funziono in 3 semplici passaggi.",
+        "onboarding_title_2": "Incolla qualsiasi link",
+        "onboarding_desc_2": "Trova un video, foto o file in Telegram, copia il suo link (t.me/...) e incollalo qui. È così semplice!",
+        "onboarding_title_3": "Ricevi il tuo contenuto",
+        "onboarding_desc_3": "Video: 3 gratis, poi ottieni Premium per illimitati. Foto e file: Sempre gratis. Goditi!",
         "onboarding_next": "Avanti",
-        "onboarding_start": "Inizia!",
+        "onboarding_start": "Inizia",
         "onboarding_skip": "Salta",
-        
+
         // Loading
         "loading_text": "Caricamento...",
-        
+
         // Header
         "app_brand": "Bot Download",
         "plan_free": "Piano Gratuito",
         "plan_premium": "Piano Premium ⭐",
-        
+
         // Navigation
         "nav_home": "Home",
         "nav_premium": "Premium",
         "nav_referrals": "Refer",
         "nav_account": "Account",
-        
+
         // Home Tab
         "welcome_text": "Ciao",
         "welcome_hint": "Incolla un link Telegram per scaricare",
@@ -470,7 +512,7 @@ const TRANSLATIONS = {
         "btn_paste": "📋 Incolla",
         "btn_help": "❓ Aiuto",
         "premium_banner_title": "Diventa Premium!",
-        "premium_banner_desc": "Sblocca tutto per soli 199 ⭐",
+        "premium_banner_desc": "Sblocca tutto per soli 179 ⭐",
         "error_no_link": "Incolla un link Telegram",
         "error_invalid_link": "Link non valido",
         "error_not_connected": "Configura il tuo account prima",
@@ -479,7 +521,7 @@ const TRANSLATIONS = {
         "status_error": "Errore durante l'elaborazione",
         "help_text": "📌 Formati validi:\n\n• t.me/canale/123\n• t.me/c/123456/789\n• t.me/+ABC123/456\n\nCopia il link da Telegram e incollalo qui.",
         "help_title": "Aiuto",
-        
+
         // Premium Tab
         "premium_title": "Scegli il tuo Piano Premium",
         "premium_desc": "4 opzioni per te",
@@ -499,22 +541,22 @@ const TRANSLATIONS = {
         "referral_bonus_desc": "15 referral confermati = +1 giorno Premium\nMassimo cumulabile: 15 giorni",
         "referral_bonus_btn": "👥 Visualizza i miei referral",
         "plan_trial_name": "🎁 Prova",
-        "plan_trial_desc": "Perfetto per provare (8.3⭐/giorno)",
+        "plan_trial_desc": "Perfetto per provare",
         "plan_trial_btn": "⭐ Ottieni Prova",
         "plan_weekly_name": "🔥 Settimanale",
-        "plan_weekly_desc": "Miglior prezzo/giorno (10.7⭐/giorno)",
+        "plan_weekly_desc": "Miglior prezzo/giorno",
         "plan_weekly_btn": "🔥 Ottieni Settimanale",
         "plan_weekly_badge": "🔥 PIÙ POPOLARE",
         "plan_monthly_name": "💎 Mensile",
-        "plan_monthly_desc": "Il più scelto (5.0⭐/giorno)",
+        "plan_monthly_desc": "Il più scelto",
         "plan_monthly_btn": "💎 Ottieni Mensile",
         "plan_monthly_badge": "⭐ CONSIGLIATO",
         "plan_quarterly_name": "👑 Trimestrale",
-        "plan_quarterly_desc": "Risparmia 11% (4.4⭐/giorno)",
+        "plan_quarterly_desc": "Risparmia l'11%",
         "plan_quarterly_btn": "👑 Ottieni Trimestrale",
         "plan_quarterly_badge": "💰 MIGLIOR VALORE",
-        "plan_quarterly_savings": "💰 RISPARMIA 48⭐ vs 3 mesi separati",
-        
+        "plan_quarterly_savings": "💰 RISPARMIA 58⭐ vs 3 mesi separati",
+
         // Account Tab
         "connection_status": "Stato della Connessione",
         "connection_verifying": "Verifica...",
@@ -540,7 +582,7 @@ const TRANSLATIONS = {
         "disconnecting_text": "Disconnessione...",
         "disconnect_confirm": "Disconnettere il tuo account?",
         "disconnect_success": "✅ Account disconnesso. MiniApp verrà aggiornata.",
-        
+
         // Referrals Tab
         "referrals_title": "Sistema Referral",
         "referrals_desc": "Invita amici e guadagna Premium gratis",
@@ -564,7 +606,7 @@ const TRANSLATIONS = {
         "referrals_loading": "Caricamento link...",
         "referrals_generate_error": "❌ Errore generazione link",
         "referrals_share_text": "Scarica contenuti Telegram con questo bot! 🚀",
-        
+
         // Toasts and Alerts
         "toast_payment_preparing": "Preparazione pagamento...",
         "toast_payment_success": "Grazie! Il tuo Premium si attiverà tra poco ✨",
@@ -574,7 +616,21 @@ const TRANSLATIONS = {
         "toast_payment_error_text": "Errore elaborazione pagamento",
         "toast_connection_failed": "❌ Errore generazione link",
         "toast_no_plan": "Hai bisogno di aiuto?",
-    }
+        "app_title": "Bot Download",
+        "home_hint": "Incolla un link Telegram per scaricare",
+        "home_input_placeholder": "Incolla il link t.me/ qui...",
+        "premium_mini_title": "Diventa Premium!",
+        "premium_mini_desc": "Sblocca tutto per soli 179 ⭐",
+        "account_connection_status": "Stato della Connessione",
+        "account_premium_active": "👑 Premium Attivo",
+        "account_premium_buy": "⭐ Ottieni Premium",
+        "panel_plan_free": "Piano Gratuito",
+        "panel_plan_premium": "Piano Premium ⭐",
+        "plan_trial_period": "3 giorni",
+        "plan_weekly_period": "7 giorni",
+        "plan_monthly_period": "30 giorni",
+        "plan_quarterly_period": "90 giorni",
+    },
 };
 
 // Get translation function

@@ -68,7 +68,7 @@ def run_dashboard():
         sys.exit(1)
 
 
-async def run_bot_async():
+async def run_bot():
     """
     Bot execution (ASYNC ONLY - NO THREADING)
     This runs in the MAIN thread's event loop
@@ -157,7 +157,7 @@ def main():
     logger.info("")
     
     try:
-        asyncio.run(run_bot_async())
+        asyncio.run(run_bot())
     except KeyboardInterrupt:
         logger.info("🛑 Shutting down...")
         sys.exit(0)

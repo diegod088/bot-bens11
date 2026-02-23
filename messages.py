@@ -6,7 +6,7 @@ Supports: Spanish (es), English (en), Portuguese (pt), Italian (it)
 MESSAGES = {
     "es": {
         # Start command
-        "start_welcome": "� BOT DE DESCARGAS\n\n",
+        "start_welcome": "📥 BOT DE DESCARGAS\n\n",
         "start_description": "Descarga fotos y videos de Telegram, incluidos canales privados y restringidos.\n\n",
         "start_divider": "🔐 Para acceder a contenido privado, el bot usa tu cuenta\nsolo para descargar el contenido que tú ves en Telegram.\nNo lee chats, no envía mensajes ni modifica tu cuenta.\n\n",
         "start_how_to": "🚀 *Cómo usarlo:*\n1️⃣ Copia el enlace del mensaje\n2️⃣ Pégalo aquí y envíalo\n\n",
@@ -31,7 +31,7 @@ MESSAGES = {
         
         # Panel
         "panel_title": "⚙️ *PANEL DE CONTROL*\n👤 *Usuario:* {user_name}\n\n",
-        "panel_plan_free": "� *Plan:* Gratuito\n",
+        "panel_plan_free": "👤 *Plan:* Gratuito\n",
         "panel_plan_premium": "💎 *Plan:* Premium\n📅 *Vence:* {expiry} ({days_left} días)\n",
         "panel_expires": "",
         "panel_photos": "📸 Fotos: {count}/{limit}\n",

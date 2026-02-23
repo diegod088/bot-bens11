@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Bot de Descargas</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="translations.js"></script>
+    <script src="miniapp/translations.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -81,22 +82,15 @@
             flex-direction: column;
         }
 
-        .onboarding-slides {
+        .onboarding-content {
             flex: 1;
-            display: flex;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        .onboarding-slide {
-            min-width: 100%;
-            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 40px 30px;
             text-align: center;
+            overflow-y: auto;
         }
 
         .onboarding-icon {
@@ -106,46 +100,79 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .onboarding-title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+        }
+
+        .onboarding-description {
+            max-width: 320px;
+            width: 100%;
         }
 
         .onboarding-desc {
-            font-size: 15px;
-            color: var(--text-primary); /* Fix: Ensure text is always white */
+            font-size: 16px;
+            color: var(--text-primary);
             line-height: 1.5;
-            max-width: 280px;
+            margin-bottom: 30px;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(42, 171, 238, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(42, 171, 238, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-text {
+            flex: 1;
+        }
+
+        .feature-text strong {
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .feature-text small {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.4;
         }
 
         .onboarding-footer {
             padding: 20px 30px 40px;
-        }
-
-        .onboarding-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--bg-card);
-            transition: all 0.3s;
-        }
-
-        .dot.active {
-            width: 24px;
-            border-radius: 4px;
-            background: var(--accent-blue);
         }
 
         .onboarding-btn {
@@ -157,8 +184,14 @@
             color: white;
             font-size: 16px;
             font-weight: 600;
-            font-family: inherit;
             cursor: pointer;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .onboarding-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3);
         }
 
         .onboarding-skip {
@@ -166,8 +199,11 @@
             border: none;
             color: var(--text-muted);
             font-size: 14px;
-            font-family: inherit;
             cursor: pointer;
+            padding: 8px;
+        }
+
+        .onboarding-skip {
             margin-top: 12px;
             width: 100%;
         }
@@ -280,14 +316,14 @@
                 padding: 6px 0;
                 padding-bottom: calc(6px + env(safe-area-inset-bottom));
             }
-            
+
             .nav-item {
                 min-width: 50px;
                 padding: 4px 8px;
                 font-size: 9px;
                 gap: 2px;
             }
-            
+
             .nav-item .nav-icon {
                 font-size: 20px;
             }
@@ -374,8 +410,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ========== TAB: INICIO ========== */
@@ -464,10 +507,26 @@
             display: none;
         }
 
-        .download-status.show { display: flex; align-items: center; gap: 10px; }
-        .download-status.loading { background: rgba(42, 171, 238, 0.1); color: var(--accent-blue); }
-        .download-status.success { background: rgba(109, 194, 109, 0.1); color: var(--accent-green); }
-        .download-status.error { background: rgba(229, 91, 91, 0.1); color: var(--accent-red); }
+        .download-status.show {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-status.loading {
+            background: rgba(42, 171, 238, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .download-status.success {
+            background: rgba(109, 194, 109, 0.1);
+            color: var(--accent-green);
+        }
+
+        .download-status.error {
+            background: rgba(229, 91, 91, 0.1);
+            color: var(--accent-red);
+        }
 
         .action-btns {
             display: flex;
@@ -604,7 +663,8 @@
             font-size: 13px;
         }
 
-        .compare-free, .compare-premium {
+        .compare-free,
+        .compare-premium {
             width: 60px;
             text-align: center;
             font-size: 13px;
@@ -686,7 +746,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s;
         }
 
@@ -1041,10 +1101,21 @@
             transition: width 0.3s;
         }
 
-        .limit-fill.blue { background: var(--accent-blue); }
-        .limit-fill.green { background: var(--accent-green); }
-        .limit-fill.orange { background: var(--accent-orange); }
-        .limit-fill.purple { background: var(--accent-purple); }
+        .limit-fill.blue {
+            background: var(--accent-blue);
+        }
+
+        .limit-fill.green {
+            background: var(--accent-green);
+        }
+
+        .limit-fill.orange {
+            background: var(--accent-orange);
+        }
+
+        .limit-fill.purple {
+            background: var(--accent-purple);
+        }
 
         .limit-count {
             font-size: 13px;
@@ -1119,7 +1190,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loader-text {
@@ -1157,33 +1230,43 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Onboarding -->
     <div id="onboarding" class="onboarding" style="display: flex;">
-        <div class="onboarding-slides" id="slides">
-            <div class="onboarding-slide">
-                <div class="onboarding-icon">📥</div>
-                <h2 class="onboarding-title">Descarga contenido</h2>
-                <p class="onboarding-desc">Descarga videos, fotos, música y archivos de cualquier canal de Telegram</p>
-            </div>
-            <div class="onboarding-slide">
-                <div class="onboarding-icon">🔗</div>
-                <h2 class="onboarding-title">Solo pega el enlace</h2>
-                <p class="onboarding-desc">Copia cualquier enlace t.me/ y pégalo aquí. ¡Es así de fácil!</p>
-            </div>
-            <div class="onboarding-slide">
-                <div class="onboarding-icon">⭐</div>
-                <h2 class="onboarding-title">Hazte Premium</h2>
-                <p class="onboarding-desc">Desbloquea descargas ilimitadas, música, APKs y mucho más</p>
+        <div class="onboarding-content">
+            <div class="onboarding-icon">👋</div>
+            <h2 class="onboarding-title">¡Bienvenido al Bot!</h2>
+            <div class="onboarding-description">
+                <p class="onboarding-desc">Soy tu asistente para descargar contenido de Telegram.</p>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">🔗</span>
+                        <div class="feature-text">
+                            <strong>Pega cualquier enlace</strong><br>
+                            <small>Copia el enlace t.me/ y pégalo aquí</small>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⬇️</span>
+                        <div class="feature-text">
+                            <strong>Recibe tu contenido</strong><br>
+                            <small>Videos: 3 gratis, luego Premium. Fotos: siempre gratis</small>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⭐</span>
+                        <div class="feature-text">
+                            <strong>Beneficios Premium</strong><br>
+                            <small>Descargas ilimitadas por solo 179 ⭐</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="onboarding-footer">
-            <div class="onboarding-dots">
-                <div class="dot active" data-slide="0"></div>
-                <div class="dot" data-slide="1"></div>
-                <div class="dot" data-slide="2"></div>
-            </div>
-            <button class="onboarding-btn" id="onboardingBtn">Siguiente</button>
+            <button class="onboarding-btn" id="onboardingBtn">Comenzar</button>
             <button class="onboarding-skip" id="skipBtn">Omitir</button>
         </div>
     </div>
@@ -1196,13 +1279,13 @@
 
     <!-- App -->
     <div id="app" class="container" style="display: none;">
-        
+
         <!-- Header -->
         <div class="app-header">
             <div class="app-brand">
                 <div class="app-logo">📥</div>
                 <div>
-                    <div class="app-title">Bot de Descargas</div>
+                    <div class="app-title" id="appTitleText">Bot de Descargas</div>
                     <div class="app-subtitle" id="userPlan">Plan Free</div>
                 </div>
             </div>
@@ -1211,21 +1294,20 @@
 
         <!-- ==================== TAB: INICIO ==================== -->
         <div id="tab-home" class="tab-panel active">
-            
+
             <!-- Welcome -->
             <div class="welcome-banner" id="welcomeBanner">
                 <div class="welcome-emoji">👋</div>
                 <div class="welcome-text" id="welcomeText">¡Hola!</div>
-                <div class="welcome-hint">Pega un enlace de Telegram para descargar</div>
+                <div class="welcome-hint" id="welcomeHint">Pega un enlace de Telegram para descargar</div>
             </div>
 
             <!-- Download Box -->
             <div class="card">
                 <div class="card-body">
                     <div class="download-box">
-                        <input type="text" class="download-input" id="linkInput" 
-                               placeholder="Pega el enlace t.me/ aquí..."
-                               autocomplete="off">
+                        <input type="text" class="download-input" id="linkInput"
+                            placeholder="Pega el enlace t.me/ aquí..." autocomplete="off">
                         <button class="download-btn" id="downloadBtn" onclick="startDownload()">
                             ➤
                         </button>
@@ -1280,8 +1362,8 @@
             <div class="premium-mini" id="premiumBanner" onclick="switchTab('premium')">
                 <span class="premium-mini-icon">⭐</span>
                 <div class="premium-mini-text">
-                    <div class="premium-mini-title">¡Hazte Premium!</div>
-                    <div class="premium-mini-desc">Desbloquea todo por solo 199 ⭐</div>
+                    <div class="premium-banner-title" id="premiumTitleText">¡Hazte Premium!</div>
+                    <div class="premium-banner-desc" id="premiumDescText">Desbloquea todo por solo 179 ⭐</div>
                 </div>
                 <span class="premium-mini-arrow">›</span>
             </div>
@@ -1290,7 +1372,7 @@
 
         <!-- ==================== TAB: PREMIUM ==================== -->
         <div id="tab-premium" class="tab-panel">
-            
+
             <!-- Si ya es premium -->
             <div id="premiumActive" style="display: none;">
                 <div class="premium-active">
@@ -1320,7 +1402,8 @@
                     <div style="font-size: 40px; margin-bottom: 12px;">🎁</div>
                     <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">BONUS REFERIDOS GRATIS</div>
                     <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
-                        15 referidos confirmados = <span style="color: var(--accent-green); font-weight: 700;">+1 día Premium</span><br>
+                        15 referidos confirmados = <span style="color: var(--accent-green); font-weight: 700;">+1 día
+                            Premium</span><br>
                         Máximo acumulable: 15 días
                     </div>
                     <button class="referral-bonus-btn" onclick="switchTab('referrals')">
@@ -1333,7 +1416,9 @@
                     <div class="card-body">
                         <div class="plan-header">
                             <div class="plan-info">
-                                <div style="font-size: 12px; color: var(--accent-purple); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;">✨ PRUEBA</div>
+                                <div
+                                    style="font-size: 12px; color: var(--accent-purple); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;">
+                                    ✨ PRUEBA</div>
                                 <h3>🎁 Prueba</h3>
                                 <p class="plan-desc">Perfecto para probar (8.3⭐/día)</p>
                             </div>
@@ -1341,7 +1426,7 @@
                                 <div class="plan-price-main" style="color: var(--accent-blue);">
                                     25 <span class="plan-price-star">⭐</span>
                                 </div>
-                                <div class="plan-price-sub">3 días · ~$0.25</div>
+                                <div class="plan-price-sub" id="trialPlanPeriod">3 días</div>
                             </div>
                         </div>
                         <button class="buy-button" onclick="buyPremium('trial')">
@@ -1365,10 +1450,12 @@
                                 <div class="plan-price-main" style="color: var(--accent-blue);">
                                     75 <span class="plan-price-star">⭐</span>
                                 </div>
-                                <div class="plan-price-sub">7 días · ~$0.75</div>
+                                <div class="plan-price-sub" id="weeklyPlanPeriod">7 días</div>
                             </div>
                         </div>
-                        <button class="buy-button" style="background: linear-gradient(135deg, var(--accent-blue), #1E96D1);" onclick="buyPremium('weekly')">
+                        <button class="buy-button" id="weeklyPlanBtn"
+                            style="background: linear-gradient(135deg, var(--accent-blue), #1E96D1);"
+                            onclick="buyPremium('weekly')">
                             🔥 Obtener Semanal
                         </button>
                     </div>
@@ -1389,10 +1476,12 @@
                                 <div class="plan-price-main" style="color: var(--accent-green);">
                                     149 <span class="plan-price-star">⭐</span>
                                 </div>
-                                <div class="plan-price-sub">30 días · ~$1.49</div>
+                                <div class="plan-price-sub" id="monthlyPlanPeriod">30 días</div>
                             </div>
                         </div>
-                        <button class="buy-button" style="background: linear-gradient(135deg, var(--accent-green), #5BB05B);" onclick="buyPremium('monthly')">
+                        <button class="buy-button" id="monthlyPlanBtn"
+                            style="background: linear-gradient(135deg, var(--accent-green), #5BB05B);"
+                            onclick="buyPremium('monthly')">
                             💎 Obtener Mensual
                         </button>
                     </div>
@@ -1413,13 +1502,16 @@
                                 <div class="plan-price-main" style="color: var(--accent-orange);">
                                     399 <span class="plan-price-star">⭐</span>
                                 </div>
-                                <div class="plan-price-sub">90 días · ~$3.99</div>
+                                <div class="plan-price-sub" id="quarterlyPlanPeriod">90 días</div>
                             </div>
                         </div>
                         <div class="plan-savings">
-                            <span style="font-size: 12px; color: var(--accent-orange); font-weight: 700;">💰 AHORRAS 48⭐ vs 3 meses separados</span>
+                            <span style="font-size: 12px; color: var(--accent-orange); font-weight: 700;">💰 AHORRAS 48⭐
+                                vs 3 meses separados</span>
                         </div>
-                        <button class="buy-button" style="background: linear-gradient(135deg, var(--accent-orange), #D89640);" onclick="buyPremium('quarterly')">
+                        <button class="buy-button" id="quarterlyPlanBtn"
+                            style="background: linear-gradient(135deg, var(--accent-orange), #D89640);"
+                            onclick="buyPremium('quarterly')">
                             👑 Obtener Trimestral
                         </button>
                     </div>
@@ -1428,18 +1520,21 @@
                 <!-- Comparativa de beneficios -->
                 <div class="card" style="margin-top: 16px;">
                     <div class="card-header">
-                        <span class="card-title">✨ Beneficios Premium</span>
+                        <span class="card-title" id="premiumBenefitsTitle">✨ Beneficios Premium</span>
                     </div>
                     <div class="card-body">
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div
+                            style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <div style="font-size: 24px;">📸</div>
                             <div style="flex: 1;">
                                 <div style="font-size: 13px; font-weight: 600;">Fotos Ilimitadas</div>
-                                <div style="font-size: 11px; color: var(--text-muted);">Descarga todas las que quieras</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Descarga todas las que quieras
+                                </div>
                             </div>
                             <div style="color: var(--accent-green); font-weight: 600;">∞</div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div
+                            style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <div style="font-size: 24px;">🎬</div>
                             <div style="flex: 1;">
                                 <div style="font-size: 13px; font-weight: 600;">50 Videos/día</div>
@@ -1447,7 +1542,8 @@
                             </div>
                             <div style="color: var(--accent-green); font-weight: 600;">50</div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div
+                            style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <div style="font-size: 24px;">🎵</div>
                             <div style="flex: 1;">
                                 <div style="font-size: 13px; font-weight: 600;">50 Canciones/día</div>
@@ -1470,7 +1566,7 @@
 
         <!-- ==================== TAB: CUENTA ==================== -->
         <div id="tab-account" class="tab-panel">
-            
+
             <!-- Connection Status -->
             <div class="card">
                 <div class="account-card">
@@ -1565,7 +1661,7 @@
 
         <!-- ==================== TAB: REFERIDOS ==================== -->
         <div id="tab-referrals" class="tab-panel">
-            
+
             <!-- Header -->
             <div class="card">
                 <div class="card-body" style="text-align: center; padding: 24px;">
@@ -1582,31 +1678,41 @@
                 </div>
                 <div class="card-body">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div style="background: rgba(42, 171, 238, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 28px; font-weight: 700; color: var(--accent-blue);" id="confirmedReferrals">0</div>
+                        <div
+                            style="background: rgba(42, 171, 238, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 28px; font-weight: 700; color: var(--accent-blue);"
+                                id="confirmedReferrals">0</div>
                             <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Confirmados</div>
                         </div>
-                        <div style="background: rgba(229, 165, 88, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 28px; font-weight: 700; color: var(--accent-orange);" id="pendingReferrals">0</div>
+                        <div
+                            style="background: rgba(229, 165, 88, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 28px; font-weight: 700; color: var(--accent-orange);"
+                                id="pendingReferrals">0</div>
                             <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Pendientes</div>
                         </div>
                     </div>
 
                     <!-- Barra de progreso -->
                     <div style="margin-bottom: 8px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
                             <span>Progreso hacia recompensa</span>
                             <span id="progressText">0/15</span>
                         </div>
                         <div style="background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div id="progressBar" style="height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); width: 0%; transition: width 0.3s;"></div>
+                            <div id="progressBar"
+                                style="height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); width: 0%; transition: width 0.3s;">
+                            </div>
                         </div>
                     </div>
 
                     <!-- Días ganados -->
-                    <div style="background: rgba(109, 194, 109, 0.1); padding: 14px; border-radius: 10px; margin-top: 12px; text-align: center;">
-                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">🎁 Días Premium Ganados</div>
-                        <div style="font-size: 24px; font-weight: 700; color: var(--accent-green);" id="daysEarned">0</div>
+                    <div
+                        style="background: rgba(109, 194, 109, 0.1); padding: 14px; border-radius: 10px; margin-top: 12px; text-align: center;">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">🎁 Días Premium
+                            Ganados</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--accent-green);" id="daysEarned">0
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1618,24 +1724,31 @@
                 </div>
                 <div class="card-body">
                     <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">1️⃣</div>
+                        <div
+                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                            1️⃣</div>
                         <div style="font-size: 13px; line-height: 1.5;">
                             <div style="font-weight: 600; margin-bottom: 2px;">Comparte tu enlace</div>
                             <div style="color: var(--text-muted);">Invita a tus amigos a usar el bot</div>
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">2️⃣</div>
+                        <div
+                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                            2️⃣</div>
                         <div style="font-size: 13px; line-height: 1.5;">
                             <div style="font-weight: 600; margin-bottom: 2px;">Ellos usan el bot</div>
                             <div style="color: var(--text-muted);">Deben conectar su cuenta y hacer 1 descarga</div>
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">3️⃣</div>
+                        <div
+                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                            3️⃣</div>
                         <div style="font-size: 13px; line-height: 1.5;">
                             <div style="font-weight: 600; margin-bottom: 2px;">Ganas recompensas</div>
-                            <div style="color: var(--text-muted);">Cada 15 referidos = 1 día Premium (máx. 15 días)</div>
+                            <div style="color: var(--text-muted);">Cada 15 referidos = 1 día Premium (máx. 15 días)
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1647,13 +1760,16 @@
                     <span class="card-title">🔗 Tu Enlace Personal</span>
                 </div>
                 <div class="card-body">
-                    <div style="background: var(--bg-input); padding: 14px; border-radius: 10px; margin-bottom: 12px; word-break: break-all; font-size: 12px; font-family: 'Courier New', monospace; color: var(--accent-blue);" id="referralLink">
+                    <div style="background: var(--bg-input); padding: 14px; border-radius: 10px; margin-bottom: 12px; word-break: break-all; font-size: 12px; font-family: 'Courier New', monospace; color: var(--accent-blue);"
+                        id="referralLink">
                         Cargando...
                     </div>
                     <button class="account-btn primary" onclick="copyReferralLink()">
                         📋 Copiar Enlace
                     </button>
-                    <button class="account-btn" style="background: rgba(42, 171, 238, 0.1); color: var(--accent-blue); margin-top: 8px;" onclick="shareReferralLink()">
+                    <button class="account-btn"
+                        style="background: rgba(42, 171, 238, 0.1); color: var(--accent-blue); margin-top: 8px;"
+                        onclick="shareReferralLink()">
                         📤 Compartir
                     </button>
                 </div>
@@ -1699,48 +1815,135 @@
         let currentSlide = 0;
         let currentLanguage = 'es'; // Default language
 
-        // ========== AUTO-DETECT LANGUAGE & SKIP ONBOARDING ==========
+        // ========== AUTO-DETECT LANGUAGE & SHOW ONBOARDING FOR NEW USERS ==========
         function initializeApp() {
             console.log('Inicializando app...');
-            // Skip onboarding - go directly to app
-            document.getElementById('onboarding').style.display = 'none';
-            document.getElementById('loading').style.display = 'flex';
-            
-            // Mark onboarding as seen
-            try {
-                localStorage.setItem('onboarding_seen', 'true');
-                console.log('✓ Onboarding marcado como visto');
-            } catch (error) {
-                console.warn('No se pudo guardar estado de onboarding:', error);
+
+            // Extract language from URL if provided
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlLang = urlParams.get('lang');
+            if (urlLang && ['es', 'en', 'pt', 'it'].includes(urlLang)) {
+                currentLanguage = urlLang;
+                console.log(`🌐 Idioma configurado desde URL: ${currentLanguage}`);
             }
-            
-            loadUserData();
+
+            // Check if user is new from URL parameters
+            const isNewUser = urlParams.get('new') === 'true';
+            const hasSeenOnboarding = localStorage.getItem('onboarding_seen') === 'true';
+
+            console.log(`¿Usuario nuevo? ${isNewUser}`);
+            console.log(`¿Ya vio onboarding? ${hasSeenOnboarding}`);
+
+            if (isNewUser && !hasSeenOnboarding) {
+                // Show onboarding for new users
+                console.log('🎓 Mostrando onboarding para usuario nuevo');
+                document.getElementById('onboarding').style.display = 'flex';
+                document.getElementById('loading').style.display = 'none';
+                startOnboarding();
+            } else {
+                // Skip onboarding for existing users
+                console.log('⏭️ Saltando onboarding - usuario existente o ya vio tutorial');
+                document.getElementById('onboarding').style.display = 'none';
+                document.getElementById('loading').style.display = 'flex';
+
+                // Mark onboarding as seen for consistency
+                try {
+                    localStorage.setItem('onboarding_seen', 'true');
+                    console.log('✓ Onboarding marcado como visto');
+                } catch (error) {
+                    console.warn('No se pudo guardar estado de onboarding:', error);
+                }
+
+                loadUserData();
+            }
         }
 
-        // ========== ONBOARDING (Legacy - puede ser removido en futuro) ==========
-        function checkOnboarding() {
-            // Not used anymore - directly initialize app
-            initializeApp();
+        // ========== TRANSLATION SYSTEM ==========
+        function t(key) {
+            if (TRANSLATIONS && TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key]) {
+                return TRANSLATIONS[currentLanguage][key];
+            }
+            // Fallback to Spanish if translation not found
+            if (TRANSLATIONS && TRANSLATIONS['es'] && TRANSLATIONS['es'][key]) {
+                return TRANSLATIONS['es'][key];
+            }
+            // Final fallback - return the key itself
+            return key;
         }
 
-        function nextSlide() {
-            const slides = document.getElementById('slides');
-            const dots = document.querySelectorAll('.dot');
-            const btn = document.getElementById('onboardingBtn');
-            
-            currentSlide++;
-            
-            if (currentSlide >= 3) {
-                finishOnboarding();
-                return;
+        function updateLanguage(lang) {
+            if (['es', 'en', 'pt', 'it'].includes(lang)) {
+                currentLanguage = lang;
+                console.log(`🌐 Idioma cambiado a: ${currentLanguage}`);
+                updateUI();
+                updateOnboardingTexts();
             }
-            
-            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
-            dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-            
-            if (currentSlide === 2) {
-                btn.textContent = '¡Empezar!';
+        }
+
+        function updateOnboardingTexts() {
+            // Update onboarding content if visible
+            const onboardingElement = document.getElementById('onboarding');
+            if (onboardingElement && onboardingElement.style.display !== 'none') {
+                console.log('📊 Actualizando texto del onboarding');
+
+                try {
+                    // Update main title and description
+                    const title = onboardingElement.querySelector('.onboarding-title');
+                    const desc = onboardingElement.querySelector('.onboarding-desc');
+
+                    if (title && desc) {
+                        title.textContent = t('onboarding_title_1');
+                        desc.textContent = t('onboarding_desc_1');
+                        console.log('✅ Título y descripción actualizados');
+                    }
+
+                    // Update feature items
+                    const featureItems = onboardingElement.querySelectorAll('.feature-item');
+                    if (featureItems.length >= 3) {
+                        // Feature 1: Paste link
+                        const feature1Text = featureItems[0].querySelector('.feature-text');
+                        if (feature1Text) {
+                            feature1Text.querySelector('strong').textContent = t('onboarding_title_2');
+                            feature1Text.querySelector('small').textContent = t('onboarding_desc_2');
+                        }
+
+                        // Feature 2: Get content  
+                        const feature2Text = featureItems[1].querySelector('.feature-text');
+                        if (feature2Text) {
+                            feature2Text.querySelector('strong').textContent = t('onboarding_title_3');
+                            feature2Text.querySelector('small').textContent = t('onboarding_desc_3');
+                        }
+
+                        // Feature 3: Premium (using existing translation)
+                        const feature3Text = featureItems[2].querySelector('.feature-text');
+                        if (feature3Text) {
+                            feature3Text.querySelector('strong').textContent = 'Beneficios Premium';
+                            feature3Text.querySelector('small').textContent = 'Descargas ilimitadas por solo 179 ⭐';
+                        }
+
+                        console.log('✅ Características actualizadas');
+                    }
+
+                    // Update buttons
+                    const btn = document.getElementById('onboardingBtn');
+                    const skipBtn = document.getElementById('skipBtn');
+                    if (btn) btn.textContent = t('onboarding_start');
+                    if (skipBtn) skipBtn.textContent = t('onboarding_skip');
+
+                } catch (error) {
+                    console.error('❌ Error al actualizar onboarding:', error);
+                }
             }
+        }
+
+        // ========== ONBOARDING MANAGEMENT ==========
+        function startOnboarding() {
+            console.log('🎓 Iniciando onboarding simplificado');
+
+            // Esperar un poco para asegurar que el DOM esté listo antes de traducir
+            setTimeout(() => {
+                updateOnboardingTexts(); // Apply translations
+            }, 100);
         }
 
         function finishOnboarding() {
@@ -1750,23 +1953,30 @@
             } catch (error) {
                 console.error('Error saving onboarding state:', error);
             }
-            
+
             document.getElementById('onboarding').style.display = 'none';
             document.getElementById('loading').style.display = 'flex';
             loadUserData();
         }
 
-        document.getElementById('onboardingBtn')?.addEventListener('click', nextSlide);
+        // ========== ONBOARDING (Legacy - puede ser removido en futuro) ==========
+        function checkOnboarding() {
+            // Not used anymore - directly initialize app
+            initializeApp();
+        }
+
+        // Event listeners for onboarding buttons
+        document.getElementById('onboardingBtn')?.addEventListener('click', finishOnboarding);
         document.getElementById('skipBtn')?.addEventListener('click', finishOnboarding);
 
         // ========== NAVIGATION ==========
         function switchTab(tabId) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
+
             document.getElementById('tab-' + tabId).classList.add('active');
             document.querySelector(`[onclick="switchTab('${tabId}')"]`)?.classList.add('active');
-            
+
             if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
@@ -1783,7 +1993,7 @@
             try {
                 const telegramUser = tg.initDataUnsafe?.user || {};
                 console.log('📱 Datos de usuario Telegram:', telegramUser);
-                
+
                 const response = await fetch(`${API_BASE}/api/miniapp/user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1792,15 +2002,16 @@
                         user: telegramUser
                     })
                 });
-                
+
                 console.log('API /api/miniapp/user response status:', response.status);
-                
+
                 if (response.ok) {
                     userData = await response.json();
                     console.log('✓ Datos de usuario obtenidos del servidor:', userData);
-                    
-                    // Extract language from userData
-                    if (userData.language) {
+
+                    // Extract language from userData only if not set in URL
+                    const urlLang = new URLSearchParams(window.location.search).get('lang');
+                    if (!urlLang && userData.language) {
                         currentLanguage = userData.language;
                         console.log(`📍 Idioma detectado: ${currentLanguage}`);
                     }
@@ -1815,16 +2026,17 @@
             if (!userData) {
                 const telegramUser = tg.initDataUnsafe?.user || {};
                 const telegramUserId = telegramUser.id;
-                
+
                 console.warn('⚠️ Usando datos por defecto con user_id de Telegram:', telegramUserId);
-                
+
                 // Detectar idioma de Telegram (fallback)
-                if (telegramUser.language_code) {
-                    currentLanguage = ['es', 'en', 'pt', 'it'].includes(telegramUser.language_code) ? 
+                const urlLang = new URLSearchParams(window.location.search).get('lang');
+                if (!urlLang && telegramUser.language_code) {
+                    currentLanguage = ['es', 'en', 'pt', 'it'].includes(telegramUser.language_code) ?
                         telegramUser.language_code : 'es';
                     console.log(`📍 Idioma de Telegram: ${currentLanguage}`);
                 }
-                
+
                 userData = {
                     user_id: telegramUserId || null,
                     first_name: telegramUser.first_name || 'Usuario',
@@ -1857,44 +2069,98 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             document.getElementById('bottomNav').style.display = 'flex';
-            
+
             console.log('bottomNav visibility:', document.getElementById('bottomNav').style.display);
 
             // User info
             const name = userData.first_name || 'Usuario';
             document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('welcomeText').textContent = `¡Hola, ${name}!`;
-            
+            document.getElementById('welcomeText').textContent = `${t('welcome_text')}, ${name}!`;
+
             // Cargar stats de referidos automáticamente (con delay para asegurar que userData esté listo)
             setTimeout(() => {
                 console.log('Intentando cargar referral stats...');
                 console.log('userData:', userData);
                 loadReferralStats();
             }, 500);
-            
+
             // Plan
             if (userData.premium) {
-                document.getElementById('userPlan').textContent = 'Plan Premium ⭐';
+                document.getElementById('userPlan').textContent = t('panel_plan_premium');
                 document.getElementById('planBadge').textContent = 'PREMIUM';
                 document.getElementById('planBadge').style.color = '#E5A958';
-                document.getElementById('premiumStatus').textContent = 'Activo';
+                document.getElementById('premiumStatus').textContent = t('account_premium_active');
                 document.getElementById('premiumBanner').style.display = 'none';
-                
+
                 document.getElementById('premiumActive').style.display = 'block';
                 document.getElementById('premiumOffer').style.display = 'none';
-                
+
                 if (userData.premium_until) {
-                    const days = Math.ceil((new Date(userData.premium_until) - new Date()) / (1000*60*60*24));
+                    const days = Math.ceil((new Date(userData.premium_until) - new Date()) / (1000 * 60 * 60 * 24));
                     document.getElementById('daysLeft').textContent = Math.max(0, days);
                 }
             } else {
-                document.getElementById('userPlan').textContent = 'Plan Free';
+                document.getElementById('userPlan').textContent = t('panel_plan_free');
                 document.getElementById('planBadge').textContent = 'FREE';
-                document.getElementById('premiumStatus').textContent = 'Ver planes';
+                document.getElementById('premiumStatus').textContent = t('account_premium_buy');
                 document.getElementById('premiumBanner').style.display = 'flex';
                 document.getElementById('premiumActive').style.display = 'none';
                 document.getElementById('premiumOffer').style.display = 'block';
             }
+
+            // Translation of UI elements
+            document.getElementById('appTitleText').textContent = t('app_title');
+            document.getElementById('welcomeHint').textContent = t('home_hint');
+            document.getElementById('linkInput').placeholder = t('home_input_placeholder');
+            document.getElementById('premiumTitleText').textContent = t('premium_mini_title');
+            document.getElementById('premiumDescText').textContent = t('premium_mini_desc');
+            document.getElementById('premiumBenefitsTitle').textContent = t('premium_benefits_title');
+
+            // Plan names and descriptions
+            // Trial
+            const trialName = document.querySelector('#tab-premium .plan-card:nth-of-type(1) h3');
+            if (trialName) trialName.textContent = t('plan_trial_name');
+            const trialDesc = document.querySelector('#tab-premium .plan-card:nth-of-type(1) .plan-desc');
+            if (trialDesc) trialDesc.textContent = t('plan_trial_desc');
+            const trialBtn = document.querySelector('#tab-premium .plan-card:nth-of-type(1) .buy-button');
+            if (trialBtn) trialBtn.textContent = t('plan_trial_btn');
+            document.getElementById('trialPlanPeriod').textContent = t('plan_trial_period');
+
+            // Weekly
+            const weeklyName = document.querySelector('#tab-premium .featured:nth-of-type(3) h3');
+            if (weeklyName) weeklyName.textContent = t('plan_weekly_name');
+            const weeklyDesc = document.querySelector('#tab-premium .featured:nth-of-type(3) .plan-desc');
+            if (weeklyDesc) weeklyDesc.textContent = t('plan_weekly_desc');
+            document.getElementById('weeklyPlanBtn').textContent = t('plan_weekly_btn');
+            document.getElementById('weeklyPlanPeriod').textContent = t('plan_weekly_period');
+
+            // Monthly
+            const monthlyName = document.querySelector('#tab-premium .featured:nth-of-type(4) h3');
+            if (monthlyName) monthlyName.textContent = t('plan_monthly_name');
+            const monthlyDesc = document.querySelector('#tab-premium .featured:nth-of-type(4) .plan-desc');
+            if (monthlyDesc) monthlyDesc.textContent = t('plan_monthly_desc');
+            document.getElementById('monthlyPlanBtn').textContent = t('plan_monthly_btn');
+            document.getElementById('monthlyPlanPeriod').textContent = t('plan_monthly_period');
+
+            // Quarterly
+            const quarterlyName = document.querySelector('#tab-premium .featured:nth-of-type(5) h3');
+            if (quarterlyName) quarterlyName.textContent = t('plan_quarterly_name');
+            const quarterlyDesc = document.querySelector('#tab-premium .featured:nth-of-type(5) .plan-desc');
+            if (quarterlyDesc) quarterlyDesc.textContent = t('plan_quarterly_desc');
+            document.getElementById('quarterlyPlanBtn').textContent = t('plan_quarterly_btn');
+            document.getElementById('quarterlyPlanPeriod').textContent = t('plan_quarterly_period');
+
+            // Translate bottom nav
+            const navItems = document.querySelectorAll('.nav-item span:last-child');
+            if (navItems.length >= 4) {
+                navItems[0].textContent = t('nav_home');
+                navItems[1].textContent = t('nav_premium');
+                navItems[2].textContent = t('nav_referrals');
+                navItems[3].textContent = t('nav_account');
+            }
+
+            // Connection status title
+            document.getElementById('connectionTitle').textContent = t('account_connection_status');
 
             // Quick Stats
             document.getElementById('todayVideos').textContent = userData.daily_video || 0;
@@ -1904,10 +2170,10 @@
 
             // Limits
             const limits = userData.limits || {};
-            updateLimit('Video', limits.video || {used: 0, max: 3});
-            updateLimit('Photo', limits.photo || {used: 0, max: 10});
-            updateLimit('Music', limits.music || {used: 0, max: 0});
-            updateLimit('Apk', limits.apk || {used: 0, max: 0});
+            updateLimit('Video', limits.video || { used: 0, max: 3 });
+            updateLimit('Photo', limits.photo || { used: 0, max: 10 });
+            updateLimit('Music', limits.music || { used: 0, max: 0 });
+            updateLimit('Apk', limits.apk || { used: 0, max: 0 });
 
             // Connection status
             isConnected = userData.has_session || false;
@@ -1917,7 +2183,7 @@
         function updateLimit(type, data) {
             const countEl = document.getElementById('count' + type);
             const limitEl = document.getElementById('limit' + type);
-            
+
             if (data.max === 0) {
                 countEl.textContent = '🔒';
                 limitEl.style.width = '0%';
@@ -1993,9 +2259,9 @@
                         link: link
                     })
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.ok) {
                     status.className = 'download-status show success';
                     document.getElementById('statusIcon').textContent = '✅';
@@ -2014,7 +2280,7 @@
                 document.getElementById('statusIcon').textContent = '❌';
                 document.getElementById('statusText').textContent = 'Error al procesar';
             }
-            
+
             btn.disabled = false;
         }
 
@@ -2041,7 +2307,7 @@
         // ========== ACCOUNT ==========
         async function configureAccount() {
             showToast('Enviando instrucciones...');
-            
+
             try {
                 const response = await fetch(`${API_BASE}/api/miniapp/configure`, {
                     method: 'POST',
@@ -2050,9 +2316,9 @@
                         user_id: userData?.user_id || tg.initDataUnsafe?.user?.id
                     })
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.ok) {
                     tg.showAlert('📱 Revisa el chat del bot para configurar tu cuenta');
                     setTimeout(() => tg.close(), 1500);
@@ -2068,7 +2334,7 @@
             tg.showConfirm('¿Desconectar tu cuenta?', async (confirmed) => {
                 if (confirmed) {
                     showToast('Desconectando...');
-                    
+
                     try {
                         const response = await fetch(`${API_BASE}/api/miniapp/disconnect`, {
                             method: 'POST',
@@ -2077,9 +2343,9 @@
                                 user_id: userData?.user_id || tg.initDataUnsafe?.user?.id
                             })
                         });
-                        
+
                         const result = await response.json();
-                        
+
                         if (result.ok) {
                             tg.showAlert('✅ Cuenta desconectada. La MiniApp se actualizará.');
                             isConnected = false;
@@ -2158,9 +2424,9 @@
         async function loadReferralStats() {
             try {
                 const userId = userData?.user_id || tg.initDataUnsafe?.user?.id;
-                
+
                 console.log('loadReferralStats called with userId:', userId);
-                
+
                 if (!userId || userId === 12345) {
                     console.error('No valid user ID available (userId:', userId, ')');
                     // Mostrar mensaje en el UI
@@ -2171,17 +2437,17 @@
                     }
                     return false;
                 }
-                
+
                 const url = `${API_BASE}/api/miniapp/referrals?user_id=${userId}`;
                 console.log('Fetching:', url);
-                
+
                 const response = await fetch(url);
                 console.log('Response status:', response.status);
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     console.log('API response:', result);
-                    
+
                     if (result.ok) {
                         referralData = result;
                         updateReferralUI();
@@ -2226,21 +2492,21 @@
                 console.warn('updateReferralUI called but referralData is null');
                 return;
             }
-            
+
             console.log('Updating referral UI with data:', referralData);
-            
+
             const stats = referralData.stats;
-            
+
             // Actualizar números
             document.getElementById('confirmedReferrals').textContent = stats.confirmed || 0;
             document.getElementById('pendingReferrals').textContent = stats.pending || 0;
             document.getElementById('daysEarned').textContent = stats.days_earned || 0;
             document.getElementById('progressText').textContent = `${stats.progress || 0}/${stats.next_reward_at || 15}`;
-            
+
             // Actualizar barra de progreso
             const progressPercent = ((stats.progress || 0) / (stats.next_reward_at || 15)) * 100;
             document.getElementById('progressBar').style.width = `${Math.min(progressPercent, 100)}%`;
-            
+
             // Actualizar enlace
             const linkEl = document.getElementById('referralLink');
             if (linkEl) {
@@ -2259,7 +2525,7 @@
                     return;
                 }
             }
-            
+
             try {
                 await navigator.clipboard.writeText(referralData.referral_link);
                 showToast('✅ Enlace copiado');
@@ -2280,9 +2546,9 @@
                     return;
                 }
             }
-            
+
             const text = `¡Descarga contenido de Telegram con este bot! 🚀\n\n${referralData.referral_link}`;
-            
+
             if (tg.openTelegramLink) {
                 tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralData.referral_link)}&text=${encodeURIComponent('¡Descarga contenido de Telegram con este bot! 🚀')}`);
             } else {
@@ -2292,17 +2558,17 @@
 
         // ========== INIT ==========
         // Ejecutar inmediatamente cuando el script se carga
-        (function() {
+        (function () {
             console.log('=== INIT MINIAPP ===');
             console.log('ReadyState:', document.readyState);
-            
+
             // Si el DOM ya está listo, ejecutar inmediatamente
             if (document.readyState !== 'loading') {
                 console.log('DOM ya listo, ejecutando checkOnboarding...');
                 checkOnboarding();
             } else {
                 // Esperar a que el DOM esté listo
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function () {
                     console.log('DOMContentLoaded fired, ejecutando checkOnboarding...');
                     checkOnboarding();
                 });
@@ -2311,7 +2577,7 @@
 
         // Cargar stats de referidos al cambiar a la pestaña
         const originalSwitchTab = switchTab;
-        switchTab = function(tabId) {
+        switchTab = function (tabId) {
             originalSwitchTab(tabId);
             if (tabId === 'referrals' && !referralData) {
                 loadReferralStats();
@@ -2324,4 +2590,5 @@
         });
     </script>
 </body>
+
 </html>
