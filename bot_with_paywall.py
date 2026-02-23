@@ -19,6 +19,12 @@ from contextlib import asynccontextmanager
 
 # Load environment variables from .env file
 load_dotenv(override=True)
+
+# FORCE RAILWAY URLS - Definitive fix for ngrok persistence
+if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID') or os.getenv('RAILWAY_STATIC_URL'):
+    os.environ['DASHBOARD_URL'] = 'https://bot-bens11.up.railway.app'
+    os.environ['MINIAPP_URL'] = 'https://bot-bens11.up.railway.app'
+
 from telegram.ext import (
     Application, MessageHandler, CommandHandler, ContextTypes, 
     filters, PreCheckoutQueryHandler, CallbackQueryHandler, ConversationHandler
