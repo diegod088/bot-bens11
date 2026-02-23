@@ -71,6 +71,12 @@ missing = [k for k, v in REQUIRED_VARS.items() if v is None]
 if missing:
     raise ValueError(f"Missing required environment variables: {missing}")
 
+# LOGS DE DEPURACIÓN PARA URLs
+logger.info("=" * 80)
+logger.info(f"DASHBOARD_URL: {os.getenv('DASHBOARD_URL')}")
+logger.info(f"MINIAPP_URL: {os.getenv('MINIAPP_URL')}")
+logger.info("=" * 80)
+
 # Store temporary clients during login process
 login_clients = {}
 

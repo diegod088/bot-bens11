@@ -23,7 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger("RailwayStart")
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 def run_bot_in_thread():
     """
