@@ -1422,17 +1422,26 @@ def miniapp_download():
                 'message': 'Necesitas configurar tu cuenta primero'
             })
         
-        # Send message to user via bot
+        # Send message to user via bot (asíncrono via API de Telegram)
         send_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         message_payload = {
             "chat_id": user_id,
             "text": f"📥 *Descarga solicitada desde MiniApp*\n\n🔗 Procesando: {link}\n\n⏳ Espera un momento...",
             "parse_mode": "Markdown"
         }
-        requests.post(send_url, json=message_payload)
+        try:
+            requests.post(send_url, json=message_payload, timeout=5)
+        except Exception as msg_e:
+            logger.error(f"Error sending confirmation message: {msg_e}")
+        
+        # AGREGAR A LA COLA DE DESCARGAS
+        from database import add_pending_download
+        download_id = add_pending_download(user_id, link)
+        logger.info(f"Download {download_id} enqueued for user {user_id}")
         
         return jsonify({
             'ok': True,
+            'download_id': download_id,
             'message': 'Descarga iniciada. Revisa el chat del bot.'
         })
         

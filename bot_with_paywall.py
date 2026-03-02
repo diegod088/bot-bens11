@@ -45,7 +45,8 @@ from database import (
     increment_daily_counter, increment_total_downloads, get_user_stats, get_user_usage_stats,
     get_user_session, has_active_session, delete_user_session, set_user_session,
     confirm_referral, check_and_reward_referrer, get_referral_stats,
-    check_and_reset_daily_limits
+    check_and_reset_daily_limits,
+    get_next_pending_download, update_download_status
 )
 
 # Import messages module for multi-language support
@@ -3727,10 +3728,18 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
 
 
-async def handle_message_logic(update, context, client, link, parsed, user_id, user):
+async def handle_message_logic(update, context_or_bot, client, link, parsed, user_id, user):
     """Lógica principal de manejo de mensajes con cliente de usuario"""
     channel_id, message_id = parsed
     joined_automatically = False
+    
+    # Helper local para responder unificado (soporta Update o Bot directo)
+    async def reply(text, parse_mode='Markdown', **kwargs):
+        if update and update.message:
+            return await update.message.reply_text(text, parse_mode=parse_mode, **kwargs)
+        else:
+            bot = context_or_bot.bot if hasattr(context_or_bot, 'bot') else context_or_bot
+            return await bot.send_message(user_id, text, parse_mode=parse_mode, **kwargs)
     
     if message_id is None:
         if channel_id.startswith('+'):
@@ -3739,26 +3748,26 @@ async def handle_message_logic(update, context, client, link, parsed, user_id, u
                 result = await client(ImportChatInviteRequest(invite_hash))
                 await asyncio.sleep(1)
                 channel_name = getattr(result.chats[0], 'title', 'canal') if result.chats else 'canal'
-                await update.message.reply_text(f"✅ *Unido Exitosamente*\n\nMe uní al canal: *{channel_name}*\n\nAhora puedes enviarme enlaces de mensajes específicos del canal para descargar contenido.\n\n📝 Ejemplo: t.me/+HASH/123", parse_mode='Markdown')
+                await reply(f"✅ *Unido Exitosamente*\n\nMe uní al canal: *{channel_name}*\n\nAhora puedes enviarme enlaces de mensajes específicos del canal para descargar contenido.\n\n📝 Ejemplo: t.me/+HASH/123")
                 return
             except UserAlreadyParticipantError:
-                await update.message.reply_text("ℹ️ *Ya Estoy en el Canal*\n\nYa soy miembro de este canal.\n\nPuedes enviarme enlaces de mensajes específicos para descargar contenido.\n\n📝 Ejemplo: t.me/+HASH/123", parse_mode='Markdown')
+                await reply("ℹ️ *Ya Estoy en el Canal*\n\nYa soy miembro de este canal.\n\nPuedes enviarme enlaces de mensajes específicos para descargar contenido.\n\n📝 Ejemplo: t.me/+HASH/123")
                 return
             except InviteHashExpiredError:
-                await update.message.reply_text("La invitación ha expirado\n\nPide al administrador del canal un enlace nuevo (debe empezar con t.me/+) y envíamelo otra vez.")
+                await reply("La invitación ha expirado\n\nPide al administrador del canal un enlace nuevo (debe empezar con t.me/+) y envíamelo otra vez.")
                 return
             except InviteHashInvalidError:
-                await update.message.reply_text("Enlace de invitación inválido o ya usado\n\nAsegúrate de copiar el enlace completo que empieza con t.me/+")
+                await reply("Enlace de invitación inválido o ya usado\n\nAsegúrate de copiar el enlace completo que empieza con t.me/+")
                 return
             except FloodWaitError as e:
-                await update.message.reply_text(f"⏳ *Límite de Velocidad*\n\nDemasiadas solicitudes. Espera {e.seconds} segundos e inténtalo nuevamente.", parse_mode='Markdown')
+                await reply(f"⏳ *Límite de Velocidad*\n\nDemasiadas solicitudes. Espera {e.seconds} segundos e inténtalo nuevamente.")
                 return
             except Exception as join_e:
                 logger.error(f"Error joining channel: {join_e}")
-                await update.message.reply_text("❌ *Error al Unirse al Canal*\n\nNo pude unirme al canal automáticamente.\n\n🔍 *Qué puedes hacer:*\n1️⃣ Verifica que el enlace sea correcto\n2️⃣ Pide un nuevo enlace de invitación al admin\n3️⃣ Intenta agregar el bot manualmente al canal\n\n💡 Si el problema persiste, contacta al administrador del canal.", parse_mode='Markdown')
+                await reply("❌ *Error al Unirse al Canal*\n\nNo pude unirme al canal automáticamente.\n\n🔍 *Qué puedes hacer:*\n1️⃣ Verifica que el enlace sea correcto\n2️⃣ Pide un nuevo enlace de invitación al admin\n3️⃣ Intenta agregar el bot manualmente al canal\n\n💡 Si el problema persiste, contacta al administrador del canal.")
                 return
         else:
-            await update.message.reply_text("❌ *Enlace Incompleto*\n\nEste enlace no tiene el número de mensaje.\n\n📝 *Necesito el enlace completo:*\n• Para canales públicos: t.me/canal/123\n• Para canales privados: t.me/c/123456/789\n\n💡 Toca el mensaje específico → Copiar enlace", parse_mode='Markdown')
+            await reply("❌ *Enlace Incompleto*\n\nEste enlace no tiene el número de mensaje.\n\n📝 *Necesito el enlace completo:*\n• Para canales públicos: t.me/canal/123\n• Para canales privados: t.me/c/123456/789\n\n💡 Toca el mensaje específico → Copiar enlace")
             return
     
     try:
@@ -3806,29 +3815,29 @@ async def handle_message_logic(update, context, client, link, parsed, user_id, u
                     await asyncio.sleep(1)
                     entity = await get_entity_from_identifier(client, channel_id)
                     message = await client.get_messages(entity, ids=message_id)
-                    await update.message.reply_text("Unido al canal automáticamente. Descargando...")
+                    await reply("Unido al canal automáticamente. Descargando...")
                     joined_automatically = True
                 except InviteHashExpiredError:
-                    await update.message.reply_text("La invitación ha expirado\n\nPide al administrador del canal un enlace nuevo (debe empezar con t.me/+) y envíamelo otra vez.")
+                    await reply("La invitación ha expirado\n\nPide al administrador del canal un enlace nuevo (debe empezar con t.me/+) y envíamelo otra vez.")
                     return
                 except InviteHashInvalidError:
-                    await update.message.reply_text("Enlace de invitación inválido o ya usado\n\nAsegúrate de copiar el enlace completo que empieza con t.me/+")
+                    await reply("Enlace de invitación inválido o ya usado\n\nAsegúrate de copiar el enlace completo que empieza con t.me/+")
                     return
                 except FloodWaitError as flood_e:
-                    await update.message.reply_text(f"⏳ *Límite de Velocidad*\n\nDemasiadas solicitudes. Espera {flood_e.seconds} segundos e inténtalo nuevamente.", parse_mode='Markdown')
+                    await reply(f"⏳ *Límite de Velocidad*\n\nDemasiadas solicitudes. Espera {flood_e.seconds} segundos e inténtalo nuevamente.")
                     return
                 except Exception as join_e:
                     logger.error(f"Error joining channel: {join_e}")
-                    await update.message.reply_text("❌ *Error al Unirse al Canal*\n\nNo pude unirme al canal automáticamente.\n\n🔍 *Qué puedes hacer:*\n1️⃣ Verifica que el enlace sea correcto\n2️⃣ Pide un nuevo enlace de invitación al admin\n3️⃣ Intenta agregar el bot manualmente al canal\n\n💡 Si el problema persiste, contacta al administrador del canal.", parse_mode='Markdown')
+                    await reply("❌ *Error al Unirse al Canal*\n\nNo pude unirme al canal automáticamente.\n\n🔍 *Qué puedes hacer:*\n1️⃣ Verifica que el enlace sea correcto\n2️⃣ Pide un nuevo enlace de invitación al admin\n3️⃣ Intenta agregar el bot manualmente al canal\n\n💡 Si el problema persiste, contacta al administrador del canal.")
                     return
             else:
                 me = await client.get_me()
                 username = f"@{me.username}" if me.username else "el bot"
-                await update.message.reply_text(f"Este es un canal privado y no tengo acceso\n\nPara que pueda descargar:\n\nOpción 1 → Envíame un enlace de invitación (empieza con t.me/+) \nOpción 2 → Agrégame manualmente al canal con mi cuenta {username}")
+                await reply(f"Este es un canal privado y no tengo acceso\n\nPara que pueda descargar:\n\nOpción 1 → Envíame un enlace de invitación (empieza con t.me/+) \nOpción 2 → Agrégame manualmente al canal con mi cuenta {username}")
                 return
         
         if not message:
-            await update.message.reply_text("❌ *Mensaje No Encontrado*\n\nNo pude encontrar este mensaje en el canal.\n\n🔍 *Posibles razones:*\n• El mensaje fue eliminado\n• El enlace está incorrecto\n• El canal no existe\n\n💡 Verifica el enlace y envíamelo otra vez.", parse_mode='Markdown')
+            await reply("❌ *Mensaje No Encontrado*\n\nNo pude encontrar este mensaje en el canal.\n\n🔍 *Posibles razones:*\n• El mensaje fue eliminado\n• El enlace está incorrecto\n• El canal no existe\n\n💡 Verifica el enlace y envíamelo otra vez.")
             return
 
         # Check if message is part of an album (grouped media)
@@ -3880,7 +3889,7 @@ async def handle_message_logic(update, context, client, link, parsed, user_id, u
                             logger.warning(f"Could not process nested link: {nested_ex}")
 
         if not message:
-            await update.message.reply_text("❌ *Mensaje No Encontrado*\n\nNo pude encontrar este mensaje en el canal.", parse_mode='Markdown')
+            await reply("❌ *Mensaje No Encontrado*\n\nNo pude encontrar este mensaje en el canal.")
             return
         
         if not message.media:
@@ -3888,10 +3897,10 @@ async def handle_message_logic(update, context, client, link, parsed, user_id, u
                 text_to_send = message.text
                 if hasattr(message, 'caption') and message.caption:
                     text_to_send = f"{message.caption}\n\n{text_to_send}"
-                await update.message.reply_text(f"📄 *Contenido del Mensaje:*\n\n{text_to_send}", parse_mode='Markdown')
+                await reply(f"📄 *Contenido del Mensaje:*\n\n{text_to_send}")
                 return
             else:
-                await update.message.reply_text("❌ *Sin Contenido*\n\nEste mensaje no contiene texto ni archivos para descargar.", parse_mode='Markdown')
+                await reply("❌ *Sin Contenido*\n\nEste mensaje no contiene texto ni archivos para descargar.")
                 return
         
         content_type = detect_content_type(message)
@@ -3911,18 +3920,20 @@ async def handle_message_logic(update, context, client, link, parsed, user_id, u
             # BLOQUEO para usuarios FREE
             if not user['premium']:
                 if content_type == 'video' and user['downloads'] >= FREE_DOWNLOAD_LIMIT:
-                    await update.message.reply_text(f"⚠️ Límite de videos alcanzado ({user['downloads']}/{FREE_DOWNLOAD_LIMIT}).\n\n💎 /premium para descargas ilimitadas.")
+                    await reply(f"⚠️ Límite de videos alcanzado ({user['downloads']}/{FREE_DOWNLOAD_LIMIT}).\n\n💎 /premium para descargas ilimitadas.")
                     break
                 if content_type == 'photo' and user['daily_photo'] >= FREE_PHOTO_LIMIT:
-                    await update.message.reply_text(f"⚠️ Límite de fotos alcanzado ({user['daily_photo']}/{FREE_PHOTO_LIMIT}).\n\n💎 /premium para fotos ilimitadas.")
+                    await reply(f"⚠️ Límite de fotos alcanzado ({user['daily_photo']}/{FREE_PHOTO_LIMIT}).\n\n💎 /premium para fotos ilimitadas.")
                     break
             if len(messages_to_process) > 1:
-                status = await update.message.reply_text(f"📥 Descargando {idx}/{len(messages_to_process)}...")
+                status = await reply(f"📥 Descargando {idx}/{len(messages_to_process)}...")
             else:
-                status = await update.message.reply_text("📥 Descargando...")
+                status = await reply("📥 Descargando...")
             try:
-                await download_and_send_media(msg, user_id, context.bot)
-                await status.delete()
+                bot = context_or_bot.bot if hasattr(context_or_bot, 'bot') else context_or_bot
+                await download_and_send_media(msg, user_id, bot)
+                if update and update.message:
+                    await status.delete()
                 downloaded_count += 1
                 # Incrementar contadores SOLO si fue exitoso
                 user = get_user(user_id)
@@ -3933,13 +3944,18 @@ async def handle_message_logic(update, context, client, link, parsed, user_id, u
                         increment_daily_counter(user_id, 'photo')
             except Exception as e:
                 logger.error(f"Error downloading media: {e}")
-                await status.edit_text(f"❌ Error al descargar: {str(e)[:50]}")
+                err_text = f"❌ Error al descargar: {str(e)[:50]}"
+                if update and update.message:
+                    await status.edit_text(err_text)
+                else:
+                    await reply(err_text)
+
         if downloaded_count > 0:
-            await update.message.reply_text("✅ *Descarga Completada*", parse_mode='Markdown')
+            await reply("✅ *Descarga Completada*")
 
     except Exception as e:
-        logger.error(f"Error in handle_message_logic: {e}")
-        await update.message.reply_text("❌ *Error Inesperado*", parse_mode='Markdown')
+        logger.error(f"Error in handle_message_logic: {e}", exc_info=True)
+        await reply("❌ *Error Inesperado*")
 
 
 async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -4846,6 +4862,59 @@ async def handle_message_old(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 logger.error("Failed to send error message to user")
 
 
+
+async def miniapp_queue_observer(application: Application):
+    """
+    Background task that polls the database for pending downloads from the MiniApp
+    """
+    logger.info("🚀 MiniApp Queue Observer started and waiting for items...")
+    while True:
+        try:
+            # Poll for next pending download
+            item = get_next_pending_download()
+            
+            if item:
+                download_id = item['id']
+                user_id = item['user_id']
+                link = item['link']
+                
+                logger.info(f"📥 Processing queued download {download_id} for user {user_id}: {link}")
+                
+                # Check user existence and data
+                user = get_user(user_id)
+                if not user:
+                    update_download_status(download_id, 'error', 'User not found')
+                    continue
+                
+                # Mark as processing
+                update_download_status(download_id, 'processing')
+                
+                # Parse link
+                parsed = parse_telegram_link(link)
+                if not parsed:
+                    await application.bot.send_message(user_id, "❌ El enlace enviado desde la MiniApp no es válido.")
+                    update_download_status(download_id, 'error', 'Invalid link')
+                    continue
+                
+                # Use handle_message_logic but adapted for no update object
+                try:
+                    async with get_user_client(user_id) as client:
+                        # Passing None as update to indicate background task
+                        await handle_message_logic(None, application, client, link, parsed, user_id, user)
+                        update_download_status(download_id, 'processed')
+                        logger.info(f"✅ Download {download_id} processed successfully")
+                except Exception as proc_e:
+                    logger.error(f"Error processing queued download {download_id}: {proc_e}")
+                    update_download_status(download_id, 'error', str(proc_e))
+                    await application.bot.send_message(user_id, f"❌ Error al procesar descarga: {str(proc_e)[:50]}")
+            
+        except Exception as queue_e:
+            logger.error(f"Error in miniapp_queue_observer: {queue_e}")
+            
+        # Wait before next poll
+        await asyncio.sleep(5)
+
+
 async def post_init(application: Application):
     """Initialize database and bot client"""
     init_database()
@@ -4863,6 +4932,10 @@ async def post_init(application: Application):
         logger.info("Telethon Bot Client started successfully")
     except Exception as e:
         logger.error(f"Failed to start Telethon Bot Client: {e}")
+
+    # Start MiniApp Download Queue Observer
+    asyncio.create_task(miniapp_queue_observer(application))
+    logger.info("✅ MiniApp Queue Observer hooked into event loop")
 
     # Set bot commands menu
     from telegram import BotCommand, MenuButtonWebApp, WebAppInfo

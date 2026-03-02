@@ -186,6 +186,20 @@ def init_database():
                 FOREIGN KEY(user_id) REFERENCES users(user_id)
             )
         """)
+
+        # Crear tabla de descargas pendientes (cola para MiniApp)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS pending_downloads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                link TEXT NOT NULL,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                processed_at TIMESTAMP DEFAULT NULL,
+                error TEXT DEFAULT NULL,
+                FOREIGN KEY(user_id) REFERENCES users(user_id)
+            )
+        """)
         
         logger.info("Database initialized successfully")
 
@@ -1051,4 +1065,43 @@ def has_active_session(user_id: int) -> bool:
         cursor.execute("SELECT session_string FROM users WHERE user_id = ?", (user_id,))
         row = cursor.fetchone()
         return bool(row and row['session_string'])
+
+
+# ==================== COLA DE DESCARGAS (MINIAPP) ====================
+
+def add_pending_download(user_id: int, link: str) -> Optional[int]:
+    """Agrega una descarga a la cola"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO pending_downloads (user_id, link) VALUES (?, ?)",
+            (user_id, link)
+        )
+        return cursor.lastrowid
+
+def get_next_pending_download() -> Optional[Dict]:
+    """Obtiene el siguiente elemento pendiente de la cola"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM pending_downloads WHERE status = 'pending' ORDER BY created_at ASC LIMIT 1"
+        )
+        row = cursor.fetchone()
+        return dict(row) if row else None
+
+def update_download_status(download_id: int, status: str, error: str = None) -> bool:
+    """Actualiza el estado de una descarga en la cola"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        if status == 'processed':
+            cursor.execute(
+                "UPDATE pending_downloads SET status = ?, processed_at = ? WHERE id = ?",
+                (status, datetime.now(), download_id)
+            )
+        else:
+            cursor.execute(
+                "UPDATE pending_downloads SET status = ?, error = ? WHERE id = ?",
+                (status, error, download_id)
+            )
+        return cursor.rowcount > 0
 
