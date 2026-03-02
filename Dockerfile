@@ -20,8 +20,8 @@ COPY . .
 # Variables de entorno por defecto
 ENV PYTHONUNBUFFERED=1
 
-# Exponer puerto por defecto (Railway asignará su propio puerto via variable PORT)
-EXPOSE 5000
+# Exponer puerto 8080 explícitamente para Railway
+EXPOSE 8080
 
 # Health check para Railway (usa variable de entorno PORT)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
