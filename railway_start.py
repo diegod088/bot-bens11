@@ -11,7 +11,6 @@ import threading
 import logging
 import asyncio
 import time
-from waitress import serve
 from dotenv import load_dotenv
 
 # Configure logging to stdout
@@ -81,12 +80,41 @@ def main():
         logger.info(f"🌐 Starting Dashboard on {host}:{port}")
         logger.info(f"🏥 Health check: http://{host}:{port}/health")
         
-        # We use Waitress for production - this is what BLOCKS and keeps process alive
-        logger.info("📦 Server: Waitress (8 threads)")
+        # We use Gunicorn for production - this is what BLOCKS and keeps process alive
+        logger.info("📦 Server: Gunicorn (4 workers)")
         print(f"\n✅ SERVICE IS READY AND LISTENING ON {host}:{port}\n", flush=True)
         
-        serve(app, host=host, port=port, threads=8, _quiet=True)
+        # Iniciar Gunicorn programáticamente
+        import multiprocessing
+        import gunicorn.app.base
+
+        class StandaloneApplication(gunicorn.app.base.BaseApplication):
+            def __init__(self, app, options=None):
+                self.options = options or {}
+                self.application = app
+                super().__init__()
+
+            def load_config(self):
+                config = {key: value for key, value in self.options.items()
+                          if key in self.cfg.settings and value is not None}
+                for key, value in config.items():
+                    self.cfg.set(key.lower(), value)
+
+            def load(self):
+                return self.application
+
+        options = {
+            'bind': f'{host}:{port}',
+            'workers': 4,
+            'threads': 2,
+            'timeout': 120,
+            'accesslog': '-',
+            'errorlog': '-',
+            'loglevel': 'info'
+        }
         
+        StandaloneApplication(app, options).run()
+
     except KeyboardInterrupt:
         logger.info("🛑 Manually stopped")
     except Exception as e:
