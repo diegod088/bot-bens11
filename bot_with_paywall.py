@@ -4882,11 +4882,10 @@ async def post_init(application: Application):
         logger.error(f"❌ Failed to set bot commands: {e}")
     
     # Set Menu Button to open MiniApp
-    miniapp_url = os.getenv('MINIAPP_URL', os.getenv('DASHBOARD_URL', ''))
+    miniapp_url = os.getenv('MINIAPP_URL', os.getenv('DASHBOARD_URL', '')).strip()
     if miniapp_url:
-        if not miniapp_url.endswith('/'):
-            miniapp_url += '/'
-        full_miniapp_url = miniapp_url + 'miniapp?v=2'
+        miniapp_url = miniapp_url.rstrip('/')
+        full_miniapp_url = miniapp_url + '/miniapp?v=2'
         try:
             await application.bot.set_chat_menu_button(
                 menu_button=MenuButtonWebApp(
