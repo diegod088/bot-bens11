@@ -76,7 +76,7 @@ def main():
         from dashboard import app
         
         port = int(os.environ.get('PORT', 5000))
-        host = '::' # Required for Railway
+        host = '0.0.0.0' # Required for Railway
         
         logger.info(f"🌐 Starting Dashboard on {host}:{port}")
         logger.info(f"🏥 Health check: http://{host}:{port}/health")
