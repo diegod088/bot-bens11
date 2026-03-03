@@ -41,7 +41,7 @@ from io import BytesIO
 
 from database import (
     init_database,
-    get_user, create_user, add_user, update_user_info, set_user_language,
+    get_user, create_user, add_user, update_user_info, set_user_language, set_premium,
     increment_daily_counter, increment_total_downloads, get_user_stats, get_user_usage_stats,
     get_user_session, has_active_session, delete_user_session, set_user_session,
     confirm_referral, check_and_reward_referrer, get_referral_stats,
@@ -1355,7 +1355,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # Send Miniapp button with language included
         first_name = update.effective_user.first_name
-        base_url = os.getenv('MINIAPP_URL', '').rstrip('/')
+        base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
         miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"
         
         welcome_message = (
@@ -1933,7 +1933,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
-            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -1988,7 +1988,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
-            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -2036,7 +2036,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
-            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -2084,7 +2084,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
-            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -2138,8 +2138,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = get_user(user_id)
         lang = get_user_language(user)
         
-        # Create WebApp button for miniapp
-        base_url = os.getenv('MINIAPP_URL', '').rstrip('/')
+        # Prepare MiniApp URL with language
+        base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
         miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"
         
         miniapp_msg = "📱 *MiniApp*\n\n"
@@ -3169,7 +3169,7 @@ async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = get_user_language(user)
     
     # Get the MiniApp URL from environment or use default
-    miniapp_url = os.getenv('MINIAPP_URL', os.getenv('DASHBOARD_URL', ''))
+    miniapp_url = (os.getenv('MINIAPP_URL') or os.getenv('DASHBOARD_URL', '')).strip()
     
     if not miniapp_url:
         if lang == 'es':
