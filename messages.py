@@ -63,6 +63,7 @@ MESSAGES = {
         "btn_change_language": "🌐 Idioma / Language",
         "btn_support": "💬 Soporte",
         "btn_official_channel": "📢 Canal Oficial",
+        "btn_open_miniapp": "Abrir MiniApp",
         "btn_pay_stars": "⭐ Pagar con Estrellas",
         "btn_join_channel": "📢 Únete al Canal Oficial",
         
@@ -233,6 +234,7 @@ MESSAGES = {
         "btn_change_language": "🌐 Change language",
         "btn_support": "💬 Support",
         "btn_official_channel": "📢 Official Channel",
+        "btn_open_miniapp": "Open MiniApp",
         "btn_pay_stars": "⭐ Pay with Stars",
         "btn_join_channel": "📢 Join Official Channel",
         "btn_connect": "🔐 Connect Account",
@@ -453,6 +455,7 @@ MESSAGES = {
         "btn_change_language": "🌐 Idioma / Language",
         "btn_support": "💬 Suporte",
         "btn_official_channel": "📢 Canal Oficial",
+        "btn_open_miniapp": "Abrir MiniApp",
         "btn_pay_stars": "⭐ Pagar com Estrelas",
         "btn_join_channel": "📢 Entre no Canal Oficial",
         
@@ -648,6 +651,7 @@ MESSAGES = {
         "btn_change_language": "🌐 Lingua / Language",
         "btn_support": "💬 Supporto",
         "btn_official_channel": "📢 Canale Ufficiale",
+        "btn_open_miniapp": "Apri MiniApp",
         "btn_pay_stars": "⭐ Paga con Stelle",
         "btn_join_channel": "📢 Unisciti al Canale Ufficiale",
         
