@@ -1933,6 +1933,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -1987,6 +1988,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -2034,6 +2036,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -2081,6 +2084,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{os.getenv('MINIAPP_URL', '').rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
@@ -2518,23 +2522,13 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
                     parse_mode='Markdown'
                 )
                 
-                # Obtener todos los mensajes del álbum
+                # Obtener todos los mensajes del álbum (ventana de +/- 10 alrededor del mensaje original)
                 album_messages = []
-                async for msg in client.iter_messages(channel, limit=20, offset_id=message_id + 1):
+                async for msg in client.iter_messages(channel, limit=20, offset_id=message_id + 11):
                     if hasattr(msg, 'grouped_id') and msg.grouped_id == message.grouped_id:
                         album_messages.append(msg)
-                    elif msg.id == message_id:
-                        album_messages.append(msg)
-                    elif len(album_messages) > 0:
-                        break
                 
-                # Añadir mensajes anteriores al ID actual
-                async for msg in client.iter_messages(channel, limit=20, min_id=message_id - 20, max_id=message_id):
-                    if hasattr(msg, 'grouped_id') and msg.grouped_id == message.grouped_id:
-                        if msg not in album_messages:
-                            album_messages.append(msg)
-                
-                # Ordenar por ID
+                # Ordenar por ID para consistencia
                 album_messages.sort(key=lambda m: m.id)
                 
                 await status_msg.edit_text(
