@@ -1932,15 +1932,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_message += get_msg("start_cta", lang)
         
         keyboard = [
-            [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
             [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
-            [
-                InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
-                InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-            ],
-            [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
-            [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
+            [InlineKeyboardButton(get_msg("btn_panel", lang), callback_data="panel_menu")],
+            [InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -1987,15 +1981,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_message += get_msg("start_cta", lang)
         
         keyboard = [
-            [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
             [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
-            [
-                InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
-                InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-            ],
-            [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
-            [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
+            [InlineKeyboardButton(get_msg("btn_panel", lang), callback_data="panel_menu")],
+            [InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -2035,15 +2023,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             welcome_message += get_msg("start_upgrade", lang)
         
         keyboard = [
-            [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
             [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
-            [
-                InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
-                InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-            ],
-            [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
-            [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
+            [InlineKeyboardButton(get_msg("btn_panel", lang), callback_data="panel_menu")],
+            [InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -2083,15 +2065,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             welcome_message += get_msg("start_upgrade", lang)
         
         keyboard = [
-            [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
             [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=f"{(os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"))],
-            [
-                InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
-                InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-            ],
-            [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
-            [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
+            [InlineKeyboardButton(get_msg("btn_panel", lang), callback_data="panel_menu")],
+            [InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
