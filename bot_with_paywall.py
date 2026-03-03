@@ -2494,7 +2494,7 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
                 # Es un álbum, obtener todos los mensajes del grupo
                 await status_msg.edit_text(
                     "📸 *Álbum detectado*\n\n"
-                    "🔄 Descargando todas las fotos/videos del álbum...",
+                    "🔄 Analizando contenido del álbum...",
                     parse_mode='Markdown'
                 )
                 
@@ -2507,30 +2507,124 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
                 # Ordenar por ID para consistencia
                 album_messages.sort(key=lambda m: m.id)
                 
+                # Filtrar solo los mensajes que tienen medios y extraer caption
+                media_messages = []
+                shared_caption = ""
+                media_counts = {'photo': 0, 'video': 0, 'music': 0, 'apk': 0, 'other': 0}
+                
+                for msg in album_messages:
+                    if not msg.media:
+                        continue
+                    
+                    c_type = detect_content_type(msg)
+                    if c_type != 'other':
+                        media_messages.append(msg)
+                        media_counts[c_type] += 1
+                        # Buscar el primer caption disponible en todo el álbum
+                        if not shared_caption:
+                            shared_caption = extract_message_caption(msg)
+                
+                if not media_messages:
+                    await BotError.unsupported_content(status_msg, is_message=True)
+                    return
+
+                # Verificación PREVIA de límites para TODO el álbum
+                check_and_reset_daily_limits(user_id)
+                user = get_user(user_id)
+                is_premium = user['premium']
+                
+                # Simular descargas para verificar límites
+                can_batch_download = True
+                failing_reason = None
+                
+                # Copia de contadores para simulación
+                sim_photo = user.get('daily_photo', 0)
+                sim_video = user.get('daily_video', 0)
+                sim_downloads = user.get('downloads', 0)
+                
+                for c_type, count in media_counts.items():
+                    if count == 0: continue
+                    
+                    if c_type == 'photo':
+                        if not is_premium and sim_photo + count > FREE_PHOTO_LIMIT:
+                            can_batch_download = False
+                            failing_reason = f"Límite de fotos superado ({sim_photo + count}/{FREE_PHOTO_LIMIT})"
+                            break
+                        sim_photo += count
+                    elif c_type == 'video':
+                        if is_premium:
+                            if sim_video + count > PREMIUM_VIDEO_DAILY_LIMIT:
+                                can_batch_download = False
+                                failing_reason = f"Límite de videos premium superado ({sim_video + count}/{PREMIUM_VIDEO_DAILY_LIMIT})"
+                                break
+                            sim_video += count
+                        else:
+                            if sim_downloads + count > FREE_DOWNLOAD_LIMIT:
+                                can_batch_download = False
+                                failing_reason = f"Límite de videos gratuitos superado ({sim_downloads + count}/{FREE_DOWNLOAD_LIMIT})"
+                                break
+                            sim_downloads += count
+                    elif c_type in ['music', 'apk']:
+                        if not is_premium:
+                            can_batch_download = False
+                            failing_reason = "requeire_premium"
+                            break
+
+                if not can_batch_download:
+                    if failing_reason == "requeire_premium":
+                        await BotError.premium_required(status_msg, 'music/apk', is_message=True)
+                    else:
+                        limit_msg = (
+                            f"⚠️ *Límite insuficiente*\n\n"
+                            f"El álbum contiene {media_counts['photo']} fotos y {media_counts['video']} videos.\n"
+                            f"No tienes suficiente saldo disponible para descargar todo el álbum.\n\n"
+                            f"❌ *Motivo:* {failing_reason}\n\n"
+                            f"💡 Usa /premium para obtener descargas ilimitadas."
+                        )
+                        await status_msg.edit_text(limit_msg, parse_mode='Markdown')
+                    return
+
+                # Si llegamos aquí, podemos descargar todo
                 await status_msg.edit_text(
-                    f"📸 *Álbum con {len(album_messages)} archivos*\n\n"
-                    f"⏳ Descargando 1/{len(album_messages)}...",
+                    f"📸 *Álbum con {len(media_messages)} archivos*\n\n"
+                    f"⏳ Descargando 1/{len(media_messages)}...",
                     parse_mode='Markdown'
                 )
                 
                 # Descargar cada archivo del álbum
-                for idx, album_msg in enumerate(album_messages, 1):
+                for idx, album_msg in enumerate(media_messages, 1):
+                    msg_type = detect_content_type(album_msg)
                     await status_msg.edit_text(
-                        f"📸 *Álbum con {len(album_messages)} archivos*\n\n"
-                        f"⏳ Descargando {idx}/{len(album_messages)}...",
+                        f"📸 *Álbum con {len(media_messages)} archivos*\n\n"
+                        f"⏳ Descargando {idx}/{len(media_messages)}...\n"
+                        f"📦 Tipo: {msg_type.capitalize()}",
                         parse_mode='Markdown'
                     )
-                    await handle_media_download(update, context, album_msg, user, status_msg, is_album=True, album_index=idx, album_total=len(album_messages))
+                    # Bypass limits porque ya los verificamos en lote
+                    await handle_media_download(
+                        update, context, album_msg, user, status_msg, 
+                        is_album=True, album_index=idx, album_total=len(media_messages),
+                        bypass_limits=True, custom_caption=shared_caption
+                    )
                 
                 # Mensaje final
-                await status_msg.edit_text(
-                    f"✅ *Álbum completado*\n\n"
-                    f"📥 {len(album_messages)} archivos descargados",
-                    parse_mode='Markdown'
-                )
+                try:
+                    await status_msg.edit_text(
+                        f"✅ *Álbum completado*\n\n"
+                        f"📥 {len(media_messages)} archivos descargados exitosamente.",
+                        parse_mode='Markdown'
+                    )
+                except Exception:
+                    # Si el mensaje fue borrado o no se puede editar, enviar uno nuevo
+                    await context.bot.send_message(
+                        chat_id=user_id,
+                        text=f"✅ *Álbum completado*\n\n📥 {len(media_messages)} archivos descargados.",
+                        parse_mode='Markdown'
+                    )
             else:
                 # Mensaje individual
                 await handle_media_download(update, context, message, user, status_msg)
+
             
     except FloodWaitError as e:
         await BotError.flood_wait(status_msg, e.seconds, is_message=True)
@@ -2541,7 +2635,8 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
                                 message, user: dict, status_msg, is_album: bool = False, 
-                                album_index: int = 1, album_total: int = 1):
+                                album_index: int = 1, album_total: int = 1,
+                                bypass_limits: bool = False, custom_caption: str = None):
     """Maneja la descarga según el tipo de medio con validaciones optimizadas"""
     user_id = update.effective_user.id
     
@@ -2573,25 +2668,26 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
         await BotError.file_too_large(status_msg, file_size_mb, is_message=True)
         return
     
-    # Verificar límites de usuario
-    check_and_reset_daily_limits(user_id)
-    user = get_user(user_id)  # Refrescar
-    
-    # Log para depuración de límites
-    logger.info(f"Checking limits for user {user_id}: Premium={user['premium']}, Downloads={user['downloads']}, Limit={FREE_DOWNLOAD_LIMIT}")
+    # Verificar límites de usuario (solo si no se saltan)
+    if not bypass_limits:
+        check_and_reset_daily_limits(user_id)
+        user = get_user(user_id)  # Refrescar
+        
+        # Log para depuración de límites
+        logger.info(f"Checking limits for user {user_id}: Premium={user['premium']}, Downloads={user['downloads']}, Limit={FREE_DOWNLOAD_LIMIT}")
 
-    # Verificar si puede descargar
-    can_download, error_type, error_data = check_download_limits(user, content_type)
-    
-    if not can_download:
-        if error_type == 'daily_limit':
-            await BotError.daily_limit_reached(status_msg, content_type, error_data['current'], error_data['limit'], is_message=True)
-        elif error_type == 'total_limit':
-            await BotError.total_limit_reached(status_msg, is_message=True)
-        elif error_type == 'premium_required':
-            await BotError.premium_required(status_msg, content_type, is_message=True)
-        return
-    
+        # Verificar si puede descargar
+        can_download, error_type, error_data = check_download_limits(user, content_type)
+        
+        if not can_download:
+            if error_type == 'daily_limit':
+                await BotError.daily_limit_reached(status_msg, content_type, error_data['current'], error_data['limit'], is_message=True)
+            elif error_type == 'total_limit':
+                await BotError.total_limit_reached(status_msg, is_message=True)
+            elif error_type == 'premium_required':
+                await BotError.premium_required(status_msg, content_type, is_message=True)
+            return
+
     # Descargar y enviar
     await status_msg.edit_text(
         f"📥 *Descargando {content_type}...*\n\n"
@@ -2606,8 +2702,11 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
         else:
             caption_prefix = "✅ *Descarga completada*\n\n"
         
-        # Get original caption if any
-        original_caption = extract_message_caption(message) or ""
+        # Use custom caption if provided, otherwise extract from message
+        if custom_caption:
+            original_caption = custom_caption
+        else:
+            original_caption = extract_message_caption(message) or ""
         
         # Combine
         final_caption = f"{caption_prefix}{original_caption}"
@@ -2663,17 +2762,28 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
                     except Exception as e:
                         logger.warning(f"Could not notify referrer {referrer_id}: {e}")
             
-            # Éxito - eliminar mensaje de estado
-            try:
-                await status_msg.delete()
-            except Exception as e:
-                logger.debug(f"Could not delete status message: {e}")
+            # Éxito - eliminar mensaje de estado (solo si no es parte de un álbum, 
+            # ya que process_download manejará el mensaje final para álbumes)
+            if not is_album:
+                try:
+                    await status_msg.delete()
+                except Exception as e:
+                    logger.debug(f"Could not delete status message: {e}")
             
             # Verificar si debe mostrar advertencia de uso bajo (solo usuarios gratuitos)
-            if not user['premium']:
-                warning = check_low_usage_warning(user_id, FREE_DOWNLOAD_LIMIT, FREE_PHOTO_LIMIT)
-                if warning.get('show_warning'):
-                    await UsageNotification.send_low_usage_warning(update.message, warning)
+            # NOTA: En álbumes esto se mostrará por cada archivo, lo cual es molesto.
+            # Podríamos mejorarlo para mostrarlo solo al final, pero por ahora mantenemos consistencia.
+            if not user['premium'] and not is_album:
+                # Importar aquí para evitar problemas si no está disponible
+                try:
+                    from database import check_low_usage_warning
+                    warning = check_low_usage_warning(user_id, FREE_DOWNLOAD_LIMIT, FREE_PHOTO_LIMIT)
+                    if warning.get('show_warning'):
+                        # update.message puede ser None si viene de MiniApp o Callback
+                        msg_to_reply = update.message if update.message else status_msg
+                        await UsageNotification.send_low_usage_warning(msg_to_reply, warning)
+                except Exception as e:
+                    logger.warning(f"Error checking low usage warning: {e}")
         else:
             # El error ya fue enviado por download_and_send_media
             pass
@@ -2681,6 +2791,7 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
     except Exception as e:
         logger.error(f"Error en handle_media_download: {e}")
         await BotError.download_failed(status_msg, is_message=True)
+
 
 
 def check_download_limits(user: dict, content_type: str) -> tuple[bool, str, dict]:
