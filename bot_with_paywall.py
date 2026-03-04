@@ -3468,23 +3468,20 @@ async def handle_message_logic(update, context_or_bot, client, link, parsed, use
         if hasattr(message, 'grouped_id') and message.grouped_id:
             logger.info(f"Album detected with grouped_id: {message.grouped_id}")
             try:
-                album_status = await update.message.reply_text("🔍 Detectando álbum...")
+                # Use local reply helper
+                album_status = await reply("🔍 Detectando álbum...")
                 grouped_id = message.grouped_id
-                album_messages = []
                 
-                # BUG 2 Fix: Rango ±10 y validación robusta
                 start_id = max(1, message_id - 10)
                 end_id = message_id + 10
                 ids_to_check = list(range(start_id, end_id + 1))
                 
                 try:
                     messages_batch = await client.get_messages(entity, ids=ids_to_check)
-                    if not messages_batch:
-                        raise ValueError("Empty response from get_messages")
-                    
-                    for msg in messages_batch:
-                        if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id and msg.media:
-                            album_messages.append(msg)
+                    if messages_batch:
+                        for msg in messages_batch:
+                            if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id and msg.media:
+                                album_messages.append(msg)
                     
                     if not album_messages:
                         album_messages = [message]
@@ -3494,106 +3491,133 @@ async def handle_message_logic(update, context_or_bot, client, link, parsed, use
                     logger.error(f"Error batch fetching album: {batch_err}")
                     album_messages = [message]
 
-                await album_status.edit_text(f"📸 Álbum detectado: {len(album_messages)} archivos\n⏳ Preparando descarga...")
+                lang = get_user_language(user)
+                await album_status.edit_text(f"📸 {get_msg('status_album_detected', lang).format(count=len(album_messages))}")
             except Exception as album_err:
                 logger.error(f"Error getting album messages: {album_err}")
                 album_messages = [message]
+
+        # 3. Analizar contenido y verificar límites
+        check_and_reset_daily_limits(user_id)
+        user = get_user(user_id)
+        is_premium = user['premium']
+        lang = get_user_language(user)
         
-        # Check for nested links
-        if not message.media and message.text:
-            inner_links = re.findall(r'https?://t\.me/[^\s\)]+', message.text)
-            if inner_links:
-                inner_parsed = parse_telegram_link(inner_links[0])
-                if inner_parsed:
-                    inner_channel_id, inner_message_id = inner_parsed
-                    if inner_message_id is not None:
-                        try:
-                            inner_entity = None
-                            inner_msg = None
+        media_messages = album_messages if album_messages else [message]
+        messages_to_download = []
+        counts = {'photo': 0, 'video': 0, 'music': 0, 'apk': 0}
+        limit_exceeded = False
+        
+        sim_usage = {
+            'photo': user.get('daily_photo', 0),
+            'video': user.get('daily_video', 0) if is_premium else user.get('downloads', 0),
+            'music': user.get('daily_music', 0),
+            'apk': user.get('daily_apk', 0)
+        }
+        
+        shared_caption = ""
+        for msg in media_messages:
+            if not msg.media: continue
+            
+            c_type = detect_content_type(msg)
+            if c_type == 'other': continue
+            
+            if not shared_caption:
+                shared_caption = extract_message_caption(msg)
+            
+            can_item_download = True
+            if c_type == 'photo':
+                if not is_premium and sim_usage['photo'] >= FREE_PHOTO_LIMIT:
+                    can_item_download = False
+                else:
+                    sim_usage['photo'] += 1
+            elif c_type == 'video':
+                video_limit = PREMIUM_VIDEO_DAILY_LIMIT if is_premium else FREE_DOWNLOAD_LIMIT
+                if sim_usage['video'] >= video_limit:
+                    can_item_download = False
+                else:
+                    sim_usage['video'] += 1
+            elif c_type in ['music', 'apk']:
+                if not is_premium:
+                    can_item_download = False
+                else:
+                    limit_key = 'music' if c_type == 'music' else 'apk'
+                    limit_val = PREMIUM_MUSIC_DAILY_LIMIT if c_type == 'music' else PREMIUM_APK_DAILY_LIMIT
+                    if sim_usage[limit_key] >= limit_val:
+                        can_item_download = False
+                    else:
+                        sim_usage[limit_key] += 1
+            
+            counts[c_type] += 1
+            if can_item_download:
+                messages_to_download.append(msg)
+            else:
+                limit_exceeded = True
+
+        # Fallback para enlaces anidados si no se encontró nada directo
+        if not messages_to_download and not limit_exceeded:
+            if not message.media and message.text:
+                inner_links = re.findall(r'https?://t\.me/[^\s\)]+', message.text)
+                if inner_links:
+                    inner_parsed = parse_telegram_link(inner_links[0])
+                    if inner_parsed:
+                        inner_ch, inner_msg_id = inner_parsed
+                        if inner_msg_id:
                             try:
-                                inner_entity = await get_entity_from_identifier(client, inner_channel_id)
-                                inner_msg = await client.get_messages(inner_entity, ids=inner_message_id)
-                            except ValueError:
-                                if inner_channel_id.isdigit():
-                                    async for dialog in client.iter_dialogs():
-                                        if dialog.is_channel and str(dialog.entity.id) == inner_channel_id:
-                                            inner_entity = dialog.entity
-                                            inner_msg = await client.get_messages(inner_entity, ids=inner_message_id)
-                                            break
-                            if inner_msg and inner_msg.media:
-                                message = inner_msg
-                                logger.info("Using nested link message with media")
-                        except Exception as nested_ex:
-                            logger.warning(f"Could not process nested link: {nested_ex}")
+                                inner_ent = await get_entity_from_identifier(client, inner_ch)
+                                inner_msg = await client.get_messages(inner_ent, ids=inner_msg_id)
+                                if inner_msg and inner_msg.media:
+                                    # Reiniciar lógica con el nuevo mensaje anidado
+                                    # Para simplificar, llamamos recursivamente o simplemente procesamos este
+                                    return await handle_message_logic(update, context_or_bot, client, inner_links[0], inner_parsed, user_id, user)
+                            except Exception: pass
 
-        if not message:
-            await reply("❌ *Mensaje No Encontrado*\n\nNo pude encontrar este mensaje en el canal.")
+        if not counts['photo'] and not counts['video'] and not counts['music'] and not counts['apk']:
+            if not message.media and message.text:
+                await reply(f"📄 *Contenido del Mensaje:*\n\n{message.text}")
+            else:
+                await reply("❌ *Sin Contenido soportado*")
             return
-        
-        if not message.media:
-            if message.text:
-                text_to_send = message.text
-                if hasattr(message, 'caption') and message.caption:
-                    text_to_send = f"{message.caption}\n\n{text_to_send}"
-                await reply(f"📄 *Contenido del Mensaje:*\n\n{text_to_send}")
-                return
-            else:
-                await reply("❌ *Sin Contenido*\n\nEste mensaje no contiene texto ni archivos para descargar.")
-                return
-        
-        content_type = detect_content_type(message)
-        
-        # Check limits (simplified for brevity, assuming user object is up to date)
-        # ... (limits check logic should be here, but I'll skip it for now to fit in the tool call)
-        # Actually, I should include it.
-        
-        # Now process the download
-        messages_to_process = album_messages if album_messages else [message]
-        downloaded_count = 0
-        
-        for idx, msg in enumerate(messages_to_process, 1):
-            # Refrescar datos del usuario antes de cada archivo
-            user = get_user(user_id)
-            content_type = detect_content_type(msg)
-            # BLOQUEO para usuarios FREE
-            if not user['premium']:
-                if content_type == 'video' and user['downloads'] >= FREE_DOWNLOAD_LIMIT:
-                    await reply(f"⚠️ Límite de videos alcanzado ({user['downloads']}/{FREE_DOWNLOAD_LIMIT}).\n\n💎 /premium para descargas ilimitadas.")
-                    break
-                if content_type == 'photo' and user['daily_photo'] >= FREE_PHOTO_LIMIT:
-                    await reply(f"⚠️ Límite de fotos alcanzado ({user['daily_photo']}/{FREE_PHOTO_LIMIT}).\n\n💎 /premium para fotos ilimitadas.")
-                    break
-            if len(messages_to_process) > 1:
-                status = await reply(f"📥 Descargando {idx}/{len(messages_to_process)}...")
-            else:
-                status = await reply("📥 Descargando...")
-            try:
-                bot = context_or_bot.bot if hasattr(context_or_bot, 'bot') else context_or_bot
-                await download_and_send_media(msg, user_id, bot)
-                if update and update.message:
-                    await status.delete()
-                downloaded_count += 1
-                # Incrementar contadores SOLO si fue exitoso
-                user = get_user(user_id)
-                if not user['premium']:
-                    if content_type == 'video':
-                        increment_total_downloads(user_id)
-                    elif content_type == 'photo':
-                        increment_daily_counter(user_id, 'photo')
-            except Exception as e:
-                logger.error(f"Error downloading media {idx}/{len(messages_to_process)}: {e}")
-                # NO hacer break — intentar el siguiente archivo del álbum
-                try:
-                    await reply(f"⚠️ Error en archivo {idx}/{len(messages_to_process)}: {str(e)[:50]}")
-                except Exception:
-                    pass
-                continue  # ← CRÍTICO: seguir con el siguiente archivo
 
-        if downloaded_count > 0:
-            summary = f"✅ Descarga completada: {downloaded_count}/{len(messages_to_process)} archivos."
-            await reply(summary)
-        elif len(messages_to_process) > 0:
-            await reply("❌ No se pudo descargar ningún archivo del álbum.")
+        # 4. Reporte "Se detectó"
+        report_lines = [f"*{get_msg('status_detected_title', lang)}*"]
+        if album_messages:
+            report_lines.append(get_msg('status_detected_album', lang))
+        
+        if counts['photo'] > 0:
+            report_lines.append(get_msg('status_detected_photos', lang, count=counts['photo']))
+        if counts['video'] > 0:
+            report_lines.append(get_msg('status_detected_videos', lang, count=counts['video']))
+        
+        if limit_exceeded:
+            report_lines.append(f"\n{get_msg('status_limit_warning', lang)}")
+        
+        report_lines.append(f"\n{get_msg('status_starting_download', lang)}")
+        
+        status_msg = await reply("\n".join(report_lines))
+        await asyncio.sleep(1)
+
+        # 5. Descargar
+        if not messages_to_download: return
+
+        total = len(messages_to_download)
+        for idx, msg in enumerate(messages_to_download, 1):
+            if total > 1:
+                try:
+                    await status_msg.edit_text(f"📥 *{get_msg('status_downloading', lang)}* ({idx}/{total})")
+                except Exception: pass
+            
+            await handle_media_download(
+                update, context_or_bot, msg, user, status_msg,
+                is_album=(total > 1), album_index=idx, album_total=total,
+                bypass_limits=True, custom_caption=shared_caption
+            )
+
+        # Mensaje Final
+        if total > 1:
+            try:
+                await status_msg.edit_text(f"✅ *{get_msg('success_download', lang).strip()}*\n\n📥 {total} {get_msg('success_album', lang).split(' ')[-2]}")
+            except Exception: pass
 
     except Exception as e:
         logger.error(f"Error in handle_message_logic: {e}", exc_info=True)
