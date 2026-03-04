@@ -1248,45 +1248,47 @@
     <div id="onboarding" class="onboarding" style="display: flex;">
         <div class="onboarding-content">
             <div class="onboarding-icon">👋</div>
-            <h2 class="onboarding-title">¡Bienvenido al Bot!</h2>
+            <h2 class="onboarding-title" data-i18n="onboarding_title_1">¡Bienvenido al Bot!</h2>
             <div class="onboarding-description">
-                <p class="onboarding-desc">Soy tu asistente para descargar contenido de Telegram.</p>
+                <p class="onboarding-desc" data-i18n="onboarding_desc_1">Soy tu asistente para descargar contenido de
+                    Telegram.</p>
 
                 <div class="feature-list">
                     <div class="feature-item">
                         <span class="feature-icon">🔗</span>
                         <div class="feature-text">
-                            <strong>Pega cualquier enlace</strong><br>
-                            <small>Copia el enlace t.me/ y pégalo aquí</small>
+                            <strong data-i18n="onboarding_title_2">Pega cualquier enlace</strong><br>
+                            <small data-i18n="onboarding_desc_2">Copia el enlace t.me/ y pégalo aquí</small>
                         </div>
                     </div>
                     <div class="feature-item">
                         <span class="feature-icon">⬇️</span>
                         <div class="feature-text">
-                            <strong>Recibe tu contenido</strong><br>
-                            <small>Videos: 3 gratis, luego Premium. Fotos: siempre gratis</small>
+                            <strong data-i18n="onboarding_title_3">Recibe tu contenido</strong><br>
+                            <small data-i18n="onboarding_desc_3">Videos: 3 gratis, luego Premium. Fotos: siempre
+                                gratis</small>
                         </div>
                     </div>
                     <div class="feature-item">
                         <span class="feature-icon">⭐</span>
                         <div class="feature-text">
-                            <strong>Beneficios Premium</strong><br>
-                            <small>Descargas ilimitadas por solo 179 ⭐</small>
+                            <strong data-i18n="premium_mini_title">Beneficios Premium</strong><br>
+                            <small data-i18n="premium_mini_desc">Descargas ilimitadas por solo 179 ⭐</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="onboarding-footer">
-            <button class="onboarding-btn" id="onboardingBtn">Comenzar</button>
-            <button class="onboarding-skip" id="skipBtn">Omitir</button>
+            <button class="onboarding-btn" id="onboardingBtn" data-i18n="onboarding_start">Comenzar</button>
+            <button class="onboarding-skip" id="skipBtn" data-i18n="onboarding_skip">Omitir</button>
         </div>
     </div>
 
     <!-- Loading -->
     <div id="loading" class="loader-screen">
         <div class="loader-ring"></div>
-        <p class="loader-text">Cargando...</p>
+        <p class="loader-text" data-i18n="loading">Cargando...</p>
     </div>
 
     <!-- App -->
@@ -1297,8 +1299,8 @@
             <div class="app-brand">
                 <div class="app-logo">📥</div>
                 <div>
-                    <div class="app-title" id="appTitleText">Bot de Descargas</div>
-                    <div class="app-subtitle" id="userPlan">Plan Free</div>
+                    <div class="app-title" id="appTitleText" data-i18n="app_title">Bot de Descargas</div>
+                    <div class="app-subtitle" id="userPlan" data-i18n="plan_free">Plan Free</div>
                 </div>
             </div>
             <div class="user-avatar" id="userAvatar" onclick="switchTab('account')">U</div>
@@ -1310,8 +1312,9 @@
             <!-- Welcome -->
             <div class="welcome-banner" id="welcomeBanner">
                 <div class="welcome-emoji">👋</div>
-                <div class="welcome-text" id="welcomeText">¡Hola!</div>
-                <div class="welcome-hint" id="welcomeHint">Pega un enlace de Telegram para descargar</div>
+                <div class="welcome-text" id="welcomeText" data-i18n="welcome_text">¡Hola!</div>
+                <div class="welcome-hint" id="welcomeHint" data-i18n="welcome_hint">Pega un enlace de Telegram para
+                    descargar</div>
             </div>
 
             <!-- Download Box -->
@@ -1319,21 +1322,22 @@
                 <div class="card-body">
                     <div class="download-box">
                         <input type="text" class="download-input" id="linkInput"
-                            placeholder="Pega el enlace t.me/ aquí..." autocomplete="off">
+                            placeholder="Pega el enlace t.me/ aquí..." autocomplete="off"
+                            data-i18n-placeholder="link_placeholder">
                         <button class="download-btn" id="downloadBtn" onclick="startDownload()">
                             ➤
                         </button>
                     </div>
                     <div class="download-status" id="downloadStatus">
                         <span id="statusIcon">⏳</span>
-                        <span id="statusText">Procesando...</span>
+                        <span id="statusText" data-i18n="status_processing">Procesando...</span>
                     </div>
                     <div class="action-btns">
                         <button class="action-btn" onclick="pasteFromClipboard()">
-                            📋 Pegar
+                            <span data-i18n="btn_paste">📋 Pegar</span>
                         </button>
                         <button class="action-btn" onclick="showHelp()">
-                            ❓ Ayuda
+                            <span data-i18n="btn_help">❓ Ayuda</span>
                         </button>
                     </div>
                 </div>
@@ -1342,13 +1346,13 @@
             <!-- Mejora 1: Barra de límites con urgencia visual -->
             <div class="card" id="limitsCard">
                 <div class="card-header">
-                    <span class="card-title">📊 Tus límites de hoy</span>
+                    <span class="card-title" data-i18n="limits_title">📊 Tus límites de hoy</span>
                     <span id="resetTimer" style="font-size:11px; color:var(--text-muted)">Resetea en 24h</span>
                 </div>
                 <div class="card-body" style="display:flex; flex-direction:column; gap:14px;">
                     <div class="limit-row" id="limitRowVideo">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;">🎬 Videos</span>
+                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_videos">🎬 Videos</span>
                             <span id="limitTextVideo" style="font-size:12px; color:var(--text-muted)">0/3</span>
                         </div>
                         <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
@@ -1360,7 +1364,7 @@
                     </div>
                     <div class="limit-row" id="limitRowPhoto">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;">📸 Fotos</span>
+                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_photos">📸 Fotos</span>
                             <span id="limitTextPhoto" style="font-size:12px; color:var(--text-muted)">0/10</span>
                         </div>
                         <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
@@ -1373,7 +1377,7 @@
                     <!-- Nuevas filas para Premium -->
                     <div class="limit-row" id="limitRowMusic" style="display:none;">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;">🎵 Música</span>
+                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_music">🎵 Música</span>
                             <span id="limitTextMusic" style="font-size:12px; color:var(--text-muted)">0/50</span>
                         </div>
                         <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
@@ -1385,7 +1389,7 @@
                     </div>
                     <div class="limit-row" id="limitRowApk" style="display:none;">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;">📱 APKs</span>
+                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_apk">📱 APKs</span>
                             <span id="limitTextApk" style="font-size:12px; color:var(--text-muted)">0/50</span>
                         </div>
                         <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
@@ -1400,12 +1404,14 @@
                         <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:10px; text-align:center; opacity:0.6; cursor:pointer;"
                             onclick="switchTab('premium')">
                             <div style="font-size:18px;">🎵</div>
-                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 Premium</div>
+                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 <span
+                                    data-i18n="nav_premium">Premium</span></div>
                         </div>
                         <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:10px; text-align:center; opacity:0.6; cursor:pointer;"
                             onclick="switchTab('premium')">
                             <div style="font-size:18px;">📱</div>
-                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 Premium</div>
+                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 <span
+                                    data-i18n="nav_premium">Premium</span></div>
                         </div>
                     </div>
                     <!-- Contenedor para el botón de unlock que se mostrará vía JS -->
@@ -1416,9 +1422,10 @@
             <!-- Mejora 3: Historial de descargas recientes -->
             <div class="card" id="historyCard" style="display:none; margin-top: 12px;">
                 <div class="card-header">
-                    <span class="card-title">🕓 Recientes</span>
+                    <span class="card-title">🕓 <span data-i18n="account_history_title">Recientes</span></span>
                     <button onclick="clearHistory()"
-                        style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer;">Limpiar</button>
+                        style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer;"
+                        data-i18n="account_history_clear">Limpiar</button>
                 </div>
                 <div class="card-body" style="padding:0;">
                     <div id="historyList"></div>
@@ -1429,8 +1436,10 @@
             <div class="premium-mini" id="premiumBanner" onclick="switchTab('premium')">
                 <span class="premium-mini-icon">⭐</span>
                 <div class="premium-mini-text">
-                    <div class="premium-banner-title" id="premiumTitleText">¡Hazte Premium!</div>
-                    <div class="premium-banner-desc" id="premiumDescText">Desbloquea todo por solo 179 ⭐</div>
+                    <div class="premium-banner-title" id="premiumTitleText" data-i18n="premium_mini_title">¡Hazte
+                        Premium!</div>
+                    <div class="premium-banner-desc" id="premiumDescText" data-i18n="premium_mini_desc">Desbloquea todo
+                        por solo 179 ⭐</div>
                 </div>
                 <span class="premium-mini-arrow">›</span>
             </div>
@@ -1443,14 +1452,14 @@
             <!-- Si ya es premium -->
             <div id="premiumActive" style="display: none;">
                 <div class="premium-active">
-                    <div class="premium-active-badge">👑 Premium Activo</div>
+                    <div class="premium-active-badge" data-i18n="premium_active_badge">👑 Premium Activo</div>
                     <div class="premium-active-days" id="daysLeft">0</div>
-                    <div class="premium-active-text">días restantes</div>
+                    <div class="premium-active-text" data-i18n="premium_active_days">días restantes</div>
                 </div>
                 <div class="card">
                     <div class="card-body">
                         <button class="buy-button" onclick="buyPremium()">
-                            ⭐ Extender Premium
+                            <span data-i18n="premium_active_extend">⭐ Extender Premium</span>
                         </button>
                     </div>
                 </div>
@@ -1460,21 +1469,22 @@
             <div id="premiumOffer">
                 <div class="premium-hero">
                     <div class="premium-crown">⭐</div>
-                    <h2 class="premium-title">Elige tu Plan Premium</h2>
-                    <p class="premium-desc">4 opciones para ti</p>
+                    <h2 class="premium-title" data-i18n="premium_title">Elige tu Plan Premium</h2>
+                    <p class="premium-desc" data-i18n="premium_desc">4 opciones para ti</p>
                 </div>
 
                 <!-- Mejora 4a: Destacar el plan de prueba como "gancho" -->
                 <div
                     style="background:linear-gradient(135deg, rgba(155,123,234,0.2), rgba(42,171,238,0.1)); border:1px solid rgba(155,123,234,0.4); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center;">
                     <div style="font-size:28px; margin-bottom:8px;">🎁</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:4px;">¿Primera vez? Prueba 3 días por 25⭐
+                    <div style="font-size:15px; font-weight:700; margin-bottom:4px;" data-i18n="premium_trial_hook">
+                        ¿Primera vez? Prueba 3 días por 25⭐
                     </div>
-                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Sin riesgo — si no te
-                        gusta,
-                        simplemente no renuevas</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;"
+                        data-i18n="premium_trial_sub">Sin riesgo — si no te gusta, simplemente no renuevas</div>
                     <button onclick="buyPremium('trial')"
-                        style="background:linear-gradient(135deg, #9B7BEA, #7B5BD4); border:none; border-radius:10px; padding:12px 24px; color:white; font-size:14px; font-weight:700; cursor:pointer; width:100%;">
+                        style="background:linear-gradient(135deg, #9B7BEA, #7B5BD4); border:none; border-radius:10px; padding:12px 24px; color:white; font-size:14px; font-weight:700; cursor:pointer; width:100%;"
+                        data-i18n="premium_trial_btn_now">
                         ⭐ Probar ahora — 25 Stars
                     </button>
                 </div>
@@ -1485,44 +1495,47 @@
                         <table style="width:100%; border-collapse:collapse; font-size:13px;">
                             <thead>
                                 <tr>
-                                    <th
-                                        style="text-align:left; padding:8px 0; color:var(--text-muted); font-weight:600;">
+                                    <th style="text-align:left; padding:8px 0; color:var(--text-muted); font-weight:600;"
+                                        data-i18n="table_header_feature">
                                         Función</th>
-                                    <th
-                                        style="text-align:center; padding:8px; color:var(--text-muted); font-weight:600;">
+                                    <th style="text-align:center; padding:8px; color:var(--text-muted); font-weight:600;"
+                                        data-i18n="table_header_free">
                                         Free</th>
-                                    <th
-                                        style="text-align:center; padding:8px; color:var(--accent-green); font-weight:700;">
+                                    <th style="text-align:center; padding:8px; color:var(--accent-green); font-weight:700;"
+                                        data-i18n="table_header_premium">
                                         Premium</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;">🎬 Videos/día</td>
+                                    <td style="padding:10px 0;" data-i18n="feature_videos_day">🎬 Videos/día</td>
                                     <td style="text-align:center; color:var(--accent-red);">3</td>
                                     <td style="text-align:center; color:var(--accent-green); font-weight:700;">50</td>
                                 </tr>
                                 <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;">📸 Fotos/día</td>
+                                    <td style="padding:10px 0;" data-i18n="feature_photos_day">📸 Fotos/día</td>
                                     <td style="text-align:center; color:var(--accent-orange);">10</td>
-                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">∞</td>
+                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;"
+                                        data-i18n="val_unlimited">∞</td>
                                 </tr>
                                 <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;">🎵 Música</td>
-                                    <td style="text-align:center;">🔒</td>
+                                    <td style="padding:10px 0;" data-i18n="feature_music">🎵 Música</td>
+                                    <td style="text-align:center;" data-i18n="val_locked">🔒</td>
                                     <td style="text-align:center; color:var(--accent-green); font-weight:700;">50/día
                                     </td>
                                 </tr>
                                 <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;">📱 APKs</td>
-                                    <td style="text-align:center;">🔒</td>
+                                    <td style="padding:10px 0;" data-i18n="feature_apks">📱 APKs</td>
+                                    <td style="text-align:center;" data-i18n="val_locked">🔒</td>
                                     <td style="text-align:center; color:var(--accent-green); font-weight:700;">50/día
                                     </td>
                                 </tr>
                                 <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;">📂 Álbumes</td>
-                                    <td style="text-align:center; color:var(--accent-orange);">Limitado</td>
-                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">Completos
+                                    <td style="padding:10px 0;" data-i18n="feature_albums">📂 Álbumes</td>
+                                    <td style="text-align:center; color:var(--accent-orange);" data-i18n="val_limited">
+                                        Limitado</td>
+                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;"
+                                        data-i18n="val_complete">Completos
                                     </td>
                                 </tr>
                             </tbody>
@@ -1533,13 +1546,15 @@
                 <!-- Bonus Referidos -->
                 <div class="referral-bonus-card">
                     <div style="font-size: 40px; margin-bottom: 12px;">🎁</div>
-                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">BONUS REFERIDOS GRATIS</div>
-                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;"
+                        data-i18n="referral_bonus_title">BONUS REFERIDOS GRATIS</div>
+                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;"
+                        data-i18n="referral_bonus_desc">
                         15 referidos confirmados = <span style="color: var(--accent-green); font-weight: 700;">+1 día
                             Premium</span><br>
                         Máximo acumulable: 15 días
                     </div>
-                    <button class="referral-bonus-btn" onclick="switchTab('referrals')">
+                    <button class="referral-bonus-btn" onclick="switchTab('referrals')" data-i18n="referral_bonus_btn">
                         👥 Ver Mis Referidos
                     </button>
                 </div>
@@ -1549,11 +1564,11 @@
                     <div class="card-body">
                         <div class="plan-header">
                             <div class="plan-info">
-                                <div
-                                    style="font-size: 12px; color: var(--accent-purple); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;">
+                                <div style="font-size: 12px; color: var(--accent-purple); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;"
+                                    data-i18n="plan_trial_badge">
                                     ✨ PRUEBA</div>
-                                <h3>🎁 Prueba</h3>
-                                <p class="plan-desc">Perfecto para probar (8.3⭐/día)</p>
+                                <h3 data-i18n="plan_trial_name">🎁 Prueba</h3>
+                                <p class="plan-desc" data-i18n="plan_trial_desc">Perfecto para probar (8.3⭐/día)</p>
                             </div>
                             <div class="plan-price">
                                 <div class="plan-price-main" style="color: var(--accent-blue);">
@@ -1562,7 +1577,7 @@
                                 <div class="plan-price-sub" id="trialPlanPeriod">3 días</div>
                             </div>
                         </div>
-                        <button class="buy-button" onclick="buyPremium('trial')">
+                        <button class="buy-button" onclick="buyPremium('trial')" data-i18n="plan_trial_btn">
                             ⭐ Obtener Prueba
                         </button>
                     </div>
@@ -1570,14 +1585,14 @@
 
                 <!-- Plan 2: Semanal (MÁS POPULAR) -->
                 <div class="plan-card featured" style="border-color: var(--accent-blue); position: relative;">
-                    <div class="plan-badge" style="background: var(--accent-blue);">
+                    <div class="plan-badge" style="background: var(--accent-blue);" data-i18n="plan_weekly_badge">
                         🔥 MÁS POPULAR
                     </div>
                     <div class="card-body" style="padding-top: 24px;">
                         <div class="plan-header">
                             <div class="plan-info">
-                                <h3>🔥 Semanal</h3>
-                                <p class="plan-desc">Mejor precio/día (10.7⭐/día)</p>
+                                <h3 data-i18n="plan_weekly_name">🔥 Semanal</h3>
+                                <p class="plan-desc" data-i18n="plan_weekly_desc">Mejor precio/día (10.7⭐/día)</p>
                             </div>
                             <div class="plan-price">
                                 <div class="plan-price-main" style="color: var(--accent-blue);">
@@ -1588,7 +1603,7 @@
                         </div>
                         <button class="buy-button" id="weeklyPlanBtn"
                             style="background: linear-gradient(135deg, var(--accent-blue), #1E96D1);"
-                            onclick="buyPremium('weekly')">
+                            onclick="buyPremium('weekly')" data-i18n="plan_weekly_btn">
                             🔥 Obtener Semanal
                         </button>
                     </div>
@@ -1596,14 +1611,14 @@
 
                 <!-- Plan 3: Mensual (RECOMENDADO) -->
                 <div class="plan-card featured" style="border-color: var(--accent-green); position: relative;">
-                    <div class="plan-badge" style="background: var(--accent-green);">
+                    <div class="plan-badge" style="background: var(--accent-green);" data-i18n="plan_monthly_badge">
                         ⭐ RECOMENDADO
                     </div>
                     <div class="card-body" style="padding-top: 24px;">
                         <div class="plan-header">
                             <div class="plan-info">
-                                <h3>💎 Mensual</h3>
-                                <p class="plan-desc">El más elegido (5.0⭐/día)</p>
+                                <h3 data-i18n="plan_monthly_name">💎 Mensual</h3>
+                                <p class="plan-desc" data-i18n="plan_monthly_desc">El más elegido (5.0⭐/día)</p>
                             </div>
                             <div class="plan-price">
                                 <div class="plan-price-main" style="color: var(--accent-green);">
@@ -1614,7 +1629,7 @@
                         </div>
                         <button class="buy-button" id="monthlyPlanBtn"
                             style="background: linear-gradient(135deg, var(--accent-green), #5BB05B);"
-                            onclick="buyPremium('monthly')">
+                            onclick="buyPremium('monthly')" data-i18n="plan_monthly_btn">
                             💎 Obtener Mensual
                         </button>
                     </div>
@@ -1622,14 +1637,14 @@
 
                 <!-- Plan 4: Trimestral (MEJOR VALOR) -->
                 <div class="plan-card featured" style="border-color: var(--accent-orange); position: relative;">
-                    <div class="plan-badge" style="background: var(--accent-orange);">
+                    <div class="plan-badge" style="background: var(--accent-orange);" data-i18n="plan_quarterly_badge">
                         💰 MEJOR VALOR
                     </div>
                     <div class="card-body" style="padding-top: 24px;">
                         <div class="plan-header">
                             <div class="plan-info">
-                                <h3>👑 Trimestral</h3>
-                                <p class="plan-desc">Ahorra 11% (4.4⭐/día)</p>
+                                <h3 data-i18n="plan_quarterly_name">👑 Trimestral</h3>
+                                <p class="plan-desc" data-i18n="plan_quarterly_desc">Ahorra 11% (4.4⭐/día)</p>
                             </div>
                             <div class="plan-price">
                                 <div class="plan-price-main" style="color: var(--accent-orange);">
@@ -1639,12 +1654,13 @@
                             </div>
                         </div>
                         <div class="plan-savings">
-                            <span style="font-size: 12px; color: var(--accent-orange); font-weight: 700;">💰 AHORRAS 48⭐
+                            <span style="font-size: 12px; color: var(--accent-orange); font-weight: 700;"
+                                data-i18n="plan_quarterly_savings">💰 AHORRAS 48⭐
                                 vs 3 meses separados</span>
                         </div>
                         <button class="buy-button" id="quarterlyPlanBtn"
                             style="background: linear-gradient(135deg, var(--accent-orange), #D89640);"
-                            onclick="buyPremium('quarterly')">
+                            onclick="buyPremium('quarterly')" data-i18n="plan_quarterly_btn">
                             👑 Obtener Trimestral
                         </button>
                     </div>
@@ -1653,25 +1669,30 @@
                 <!-- Comparativa de beneficios -->
                 <div class="card" style="margin-top: 16px;">
                     <div class="card-header">
-                        <span class="card-title" id="premiumBenefitsTitle">✨ Beneficios Premium</span>
+                        <span class="card-title" id="premiumBenefitsTitle" data-i18n="premium_benefits_title">✨
+                            Beneficios Premium</span>
                     </div>
                     <div class="card-body">
                         <div
                             style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <div style="font-size: 24px;">📸</div>
                             <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;">Fotos Ilimitadas</div>
-                                <div style="font-size: 11px; color: var(--text-muted);">Descarga todas las que quieras
+                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_photos">Fotos
+                                    Ilimitadas</div>
+                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_photos_desc">
+                                    Descarga todas las que quieras
                                 </div>
                             </div>
-                            <div style="color: var(--accent-green); font-weight: 600;">∞</div>
+                            <div style="color: var(--accent-green); font-weight: 600;" data-i18n="val_unlimited">∞</div>
                         </div>
                         <div
                             style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <div style="font-size: 24px;">🎬</div>
                             <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;">50 Videos/día</div>
-                                <div style="font-size: 11px; color: var(--text-muted);">vs 3 en plan gratuito</div>
+                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_videos">50 Videos/día
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_videos_desc">
+                                    vs 3 en plan gratuito</div>
                             </div>
                             <div style="color: var(--accent-green); font-weight: 600;">50</div>
                         </div>
@@ -1679,16 +1700,20 @@
                             style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <div style="font-size: 24px;">🎵</div>
                             <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;">50 Canciones/día</div>
-                                <div style="font-size: 11px; color: var(--text-muted);">Música sin límites</div>
+                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_music">50
+                                    Canciones/día</div>
+                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_music_desc">
+                                    Música sin límites</div>
                             </div>
                             <div style="color: var(--accent-green); font-weight: 600;">50</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0;">
                             <div style="font-size: 24px;">🚫</div>
                             <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;">Sin Anuncios</div>
-                                <div style="font-size: 11px; color: var(--text-muted);">Experiencia premium</div>
+                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_no_ads">Sin Anuncios
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_no_ads_desc">
+                                    Experiencia premium</div>
                             </div>
                             <div style="color: var(--accent-green); font-weight: 600;">✓</div>
                         </div>
@@ -1705,12 +1730,13 @@
                 <div class="account-card">
                     <div class="account-icon" id="connectionIcon">🔗</div>
                     <div class="account-info">
-                        <h3 id="connectionTitle">Estado de conexión</h3>
-                        <p id="connectionText">Verificando...</p>
+                        <h3 id="connectionTitle" data-i18n="connection_status">Estado de conexión</h3>
+                        <p id="connectionText" data-i18n="connection_verifying">Verificando...</p>
                     </div>
                 </div>
                 <div class="card-body" style="padding-top: 0;">
-                    <button class="account-btn primary" id="connectBtn" onclick="configureAccount()">
+                    <button class="account-btn primary" id="connectBtn" onclick="configureAccount()"
+                        data-i18n="btn_configure">
                         ⚙️ Configurar cuenta
                     </button>
                 </div>
@@ -1719,14 +1745,14 @@
             <!-- Limits -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">📊 Límites de hoy</span>
+                    <span class="card-title" data-i18n="limits_title">📊 Límites de hoy</span>
                     <span id="planBadge" style="font-size: 11px; color: var(--accent-blue);">FREE</span>
                 </div>
                 <div class="card-body">
                     <div class="limit-item">
                         <div class="limit-icon">🎬</div>
                         <div class="limit-info">
-                            <div class="limit-name">Videos</div>
+                            <div class="limit-name" data-i18n="limit_videos">Videos</div>
                             <div class="limit-bar">
                                 <div class="limit-fill blue" id="limitVideo" style="width: 0%"></div>
                             </div>
@@ -1736,7 +1762,7 @@
                     <div class="limit-item">
                         <div class="limit-icon">📸</div>
                         <div class="limit-info">
-                            <div class="limit-name">Fotos</div>
+                            <div class="limit-name" data-i18n="limit_photos">Fotos</div>
                             <div class="limit-bar">
                                 <div class="limit-fill green" id="limitPhoto" style="width: 0%"></div>
                             </div>
@@ -1746,7 +1772,7 @@
                     <div class="limit-item">
                         <div class="limit-icon">🎵</div>
                         <div class="limit-info">
-                            <div class="limit-name">Música</div>
+                            <div class="limit-name" data-i18n="limit_music">Música</div>
                             <div class="limit-bar">
                                 <div class="limit-fill orange" id="limitMusic" style="width: 0%"></div>
                             </div>
@@ -1756,7 +1782,7 @@
                     <div class="limit-item">
                         <div class="limit-icon">📱</div>
                         <div class="limit-info">
-                            <div class="limit-name">APKs</div>
+                            <div class="limit-name" data-i18n="limit_apk">APKs</div>
                             <div class="limit-bar">
                                 <div class="limit-fill purple" id="limitApk" style="width: 0%"></div>
                             </div>
@@ -1771,30 +1797,30 @@
                 <div class="menu-item" onclick="switchTab('premium')">
                     <div class="menu-icon">⭐</div>
                     <div class="menu-text">
-                        <div class="menu-title">Premium</div>
-                        <div class="menu-subtitle" id="premiumStatus">Ver planes</div>
+                        <div class="menu-title" data-i18n="nav_premium">Premium</div>
+                        <div class="menu-subtitle" id="premiumStatus" data-i18n="menu_premium_desc">Ver planes</div>
                     </div>
                     <span class="menu-arrow">›</span>
                 </div>
                 <div class="menu-item" onclick="openSupport()">
                     <div class="menu-icon">💬</div>
                     <div class="menu-text">
-                        <div class="menu-title">Soporte</div>
-                        <div class="menu-subtitle">¿Necesitas ayuda?</div>
+                        <div class="menu-title" data-i18n="menu_support">Soporte</div>
+                        <div class="menu-subtitle" data-i18n="menu_support_desc">¿Necesitas ayuda?</div>
                     </div>
                     <span class="menu-arrow">›</span>
                 </div>
                 <div class="menu-item" onclick="showLanguageSelector()">
                     <div class="menu-icon">🌐</div>
                     <div class="menu-text">
-                        <div class="menu-title">Idioma</div>
+                        <div class="menu-title" data-i18n="nav_account">Idioma</div>
                         <div class="menu-subtitle" id="currentLangLabel">Español</div>
                     </div>
                     <span class="menu-arrow">›</span>
                 </div>
             </div>
 
-            <div class="app-footer">
+            <div class="app-footer" data-i18n="footer">
                 Bot de Descargas v3.0<br>
                 Hecho con ❤️
             </div>
@@ -1807,15 +1833,17 @@
             <div class="card">
                 <div class="card-body" style="text-align: center; padding: 24px;">
                     <div style="font-size: 56px; margin-bottom: 12px;">👥</div>
-                    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;">Sistema de Referidos</h2>
-                    <p style="font-size: 13px; color: var(--text-muted);">Invita amigos y gana Premium gratis</p>
+                    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;" data-i18n="referrals_title">
+                        Sistema de Referidos</h2>
+                    <p style="font-size: 13px; color: var(--text-muted);" data-i18n="referrals_desc">Invita amigos y
+                        gana Premium gratis</p>
                 </div>
             </div>
 
             <!-- Progreso -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">📊 Tu Progreso</span>
+                    <span class="card-title" data-i18n="referrals_progress_title">📊 Tu Progreso</span>
                 </div>
                 <div class="card-body">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
@@ -1823,13 +1851,15 @@
                             style="background: rgba(42, 171, 238, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
                             <div style="font-size: 28px; font-weight: 700; color: var(--accent-blue);"
                                 id="confirmedReferrals">0</div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Confirmados</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"
+                                data-i18n="referrals_confirmed">Confirmados</div>
                         </div>
                         <div
                             style="background: rgba(229, 165, 88, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
                             <div style="font-size: 28px; font-weight: 700; color: var(--accent-orange);"
                                 id="pendingReferrals">0</div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Pendientes</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"
+                                data-i18n="referrals_pending">Pendientes</div>
                         </div>
                     </div>
 
@@ -1837,7 +1867,7 @@
                     <div style="margin-bottom: 8px;">
                         <div
                             style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
-                            <span>Progreso hacia recompensa</span>
+                            <span data-i18n="referrals_progress">Progreso hacia recompensa</span>
                             <span id="progressText">0/15</span>
                         </div>
                         <div style="background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden;">
@@ -1850,7 +1880,8 @@
                     <!-- Días ganados -->
                     <div
                         style="background: rgba(109, 194, 109, 0.1); padding: 14px; border-radius: 10px; margin-top: 12px; text-align: center;">
-                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">🎁 Días Premium
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;"
+                            data-i18n="referrals_days_earned">🎁 Días Premium
                             Ganados</div>
                         <div style="font-size: 24px; font-weight: 700; color: var(--accent-green);" id="daysEarned">0
                         </div>
@@ -1861,7 +1892,7 @@
             <!-- Cómo funciona -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">🎯 Cómo Funciona</span>
+                    <span class="card-title" data-i18n="referrals_how_title">🎯 Cómo Funciona</span>
                 </div>
                 <div class="card-body">
                     <div style="display: flex; gap: 12px; margin-bottom: 12px;">
@@ -1869,8 +1900,10 @@
                             style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
                             1️⃣</div>
                         <div style="font-size: 13px; line-height: 1.5;">
-                            <div style="font-weight: 600; margin-bottom: 2px;">Comparte tu enlace</div>
-                            <div style="color: var(--text-muted);">Invita a tus amigos a usar el bot</div>
+                            <div style="font-weight: 600; margin-bottom: 2px;" data-i18n="referrals_step1">Comparte tu
+                                enlace</div>
+                            <div style="color: var(--text-muted);" data-i18n="referrals_step1_desc">Invita a tus amigos
+                                a usar el bot</div>
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px; margin-bottom: 12px;">
@@ -1878,8 +1911,10 @@
                             style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
                             2️⃣</div>
                         <div style="font-size: 13px; line-height: 1.5;">
-                            <div style="font-weight: 600; margin-bottom: 2px;">Ellos usan el bot</div>
-                            <div style="color: var(--text-muted);">Deben conectar su cuenta y hacer 1 descarga</div>
+                            <div style="font-weight: 600; margin-bottom: 2px;" data-i18n="referrals_step2">Ellos usan el
+                                bot</div>
+                            <div style="color: var(--text-muted);" data-i18n="referrals_step2_desc">Deben conectar su
+                                cuenta y hacer 1 descarga</div>
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px;">
@@ -1887,8 +1922,10 @@
                             style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
                             3️⃣</div>
                         <div style="font-size: 13px; line-height: 1.5;">
-                            <div style="font-weight: 600; margin-bottom: 2px;">Ganas recompensas</div>
-                            <div style="color: var(--text-muted);">Cada 15 referidos = 1 día Premium (máx. 15 días)
+                            <div style="font-weight: 600; margin-bottom: 2px;" data-i18n="referrals_step3">Ganas
+                                recompensas</div>
+                            <div style="color: var(--text-muted);" data-i18n="referrals_step3_desc">Cada 15 referidos =
+                                1 día Premium (máx. 15 días)
                             </div>
                         </div>
                     </div>
@@ -1898,19 +1935,19 @@
             <!-- Tu enlace -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">🔗 Tu Enlace Personal</span>
+                    <span class="card-title" data-i18n="referrals_link_title">🔗 Tu Enlace Personal</span>
                 </div>
                 <div class="card-body">
                     <div style="background: var(--bg-input); padding: 14px; border-radius: 10px; margin-bottom: 12px; word-break: break-all; font-size: 12px; font-family: 'Courier New', monospace; color: var(--accent-blue);"
-                        id="referralLink">
+                        id="referralLink" data-i18n="referrals_loading">
                         Cargando...
                     </div>
-                    <button class="account-btn primary" onclick="copyReferralLink()">
+                    <button class="account-btn primary" onclick="copyReferralLink()" data-i18n="referrals_copy_btn">
                         📋 Copiar Enlace
                     </button>
                     <button class="account-btn"
                         style="background: rgba(42, 171, 238, 0.1); color: var(--accent-blue); margin-top: 8px;"
-                        onclick="shareReferralLink()">
+                        onclick="shareReferralLink()" data-i18n="referrals_share_btn">
                         📤 Compartir
                     </button>
                 </div>
@@ -1924,7 +1961,8 @@
         style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:500; align-items:flex-end; justify-content:center;">
         <div
             style="background:var(--bg-primary); border-radius:20px 20px 0 0; padding:24px; width:100%; max-width:500px;">
-            <div style="text-align:center; font-size:16px; font-weight:700; margin-bottom:20px;">🌐 Seleccionar idioma
+            <div style="text-align:center; font-size:16px; font-weight:700; margin-bottom:20px;"
+                data-i18n="lang_selector_title">🌐 Seleccionar idioma
             </div>
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button onclick="selectLanguage('es')" id="langBtn_es"
@@ -1945,7 +1983,8 @@
                 </button>
             </div>
             <button onclick="closeLangModal()"
-                style="width:100%; margin-top:16px; padding:14px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-muted); font-size:14px; cursor:pointer;">
+                style="width:100%; margin-top:16px; padding:14px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-muted); font-size:14px; cursor:pointer;"
+                data-i18n="btn_cancel">
                 Cancelar
             </button>
         </div>
@@ -1955,19 +1994,19 @@
     <div class="bottom-nav" id="bottomNav" style="display: none;">
         <button class="nav-item active" onclick="switchTab('home')">
             <span class="nav-icon">🏠</span>
-            <span>Inicio</span>
+            <span data-i18n="nav_home">Inicio</span>
         </button>
         <button class="nav-item" onclick="switchTab('premium')">
             <span class="nav-icon">⭐</span>
-            <span>Premium</span>
+            <span data-i18n="nav_premium">Premium</span>
         </button>
         <button class="nav-item" onclick="switchTab('referrals')">
             <span class="nav-icon">👥</span>
-            <span>Referir</span>
+            <span data-i18n="nav_referrals">Referir</span>
         </button>
         <button class="nav-item" onclick="switchTab('account')">
             <span class="nav-icon">👤</span>
-            <span>Cuenta</span>
+            <span data-i18n="nav_account">Cuenta</span>
         </button>
     </div>
 
@@ -2048,75 +2087,28 @@
             if (['es', 'en', 'pt', 'it'].includes(lang)) {
                 currentLanguage = lang;
                 console.log(`🌐 Idioma cambiado a: ${currentLanguage}`);
+
+                // Persist language choice
+                localStorage.setItem('user_lang', lang);
+
+                // Update text content across the app
                 updateUI();
-                updateOnboardingTexts();
-            }
-        }
 
-        function updateOnboardingTexts() {
-            // Update onboarding content if visible
-            const onboardingElement = document.getElementById('onboarding');
-            if (onboardingElement && onboardingElement.style.display !== 'none') {
-                console.log('📊 Actualizando texto del onboarding');
-
-                try {
-                    // Update main title and description
-                    const title = onboardingElement.querySelector('.onboarding-title');
-                    const desc = onboardingElement.querySelector('.onboarding-desc');
-
-                    if (title && desc) {
-                        title.textContent = t('onboarding_title_1');
-                        desc.textContent = t('onboarding_desc_1');
-                        console.log('✅ Título y descripción actualizados');
-                    }
-
-                    // Update feature items
-                    const featureItems = onboardingElement.querySelectorAll('.feature-item');
-                    if (featureItems.length >= 3) {
-                        // Feature 1: Paste link
-                        const feature1Text = featureItems[0].querySelector('.feature-text');
-                        if (feature1Text) {
-                            feature1Text.querySelector('strong').textContent = t('onboarding_title_2');
-                            feature1Text.querySelector('small').textContent = t('onboarding_desc_2');
-                        }
-
-                        // Feature 2: Get content  
-                        const feature2Text = featureItems[1].querySelector('.feature-text');
-                        if (feature2Text) {
-                            feature2Text.querySelector('strong').textContent = t('onboarding_title_3');
-                            feature2Text.querySelector('small').textContent = t('onboarding_desc_3');
-                        }
-
-                        // Feature 3: Premium (using existing translation)
-                        const feature3Text = featureItems[2].querySelector('.feature-text');
-                        if (feature3Text) {
-                            feature3Text.querySelector('strong').textContent = 'Beneficios Premium';
-                            feature3Text.querySelector('small').textContent = 'Descargas ilimitadas por solo 179 ⭐';
-                        }
-
-                        console.log('✅ Características actualizadas');
-                    }
-
-                    // Update buttons
-                    const btn = document.getElementById('onboardingBtn');
-                    const skipBtn = document.getElementById('skipBtn');
-                    if (btn) btn.textContent = t('onboarding_start');
-                    if (skipBtn) skipBtn.textContent = t('onboarding_skip');
-
-                } catch (error) {
-                    console.error('❌ Error al actualizar onboarding:', error);
+                // Update language-specific UI elements (flags, labels)
+                const langLabel = document.getElementById('currentLangLabel');
+                if (langLabel) {
+                    const names = { 'es': 'Español', 'en': 'English', 'pt': 'Português', 'it': 'Italiano' };
+                    langLabel.textContent = names[lang] || lang;
                 }
             }
         }
 
+
+
         // ========== ONBOARDING MANAGEMENT ==========
         function startOnboarding() {
-            console.log('🎓 Iniciando onboarding simplificado');
-
-            // Esperar un poco para asegurar que el DOM esté listo antes de traducir
-            setTimeout(() => {
-                updateOnboardingTexts(); // Apply translations
-            }, 100);
+            console.log('🎓 Iniciando onboarding');
+            updateUI(); // This will handle onboarding translations via data-i18n
         }
 
         function finishOnboarding() {
@@ -2320,7 +2312,7 @@
             const input = document.getElementById('linkInput');
             if (input) {
                 input.value = link;
-                showToast('Enlace cargado');
+                showToast(t('toast_link_loaded'));
                 if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
             }
         }
@@ -2451,126 +2443,103 @@
 
         // ========== UPDATE UI ==========
         function updateUI() {
-            console.log('updateUI called');
+            console.log(`🌐 updateUI: Actualizando interfaz (${currentLanguage})`);
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             document.getElementById('bottomNav').style.display = 'flex';
 
-            console.log('bottomNav visibility:', document.getElementById('bottomNav').style.display);
+            // 1. Traducción Automática (data-i18n)
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const translation = t(key);
 
-            // User info
-            const name = userData.first_name || 'Usuario';
-            document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('welcomeText').textContent = `${t('welcome_text')}, ${name}!`;
-
-            // Cargar stats de referidos automáticamente (con delay para asegurar que userData esté listo)
-            setTimeout(() => {
-                console.log('Intentando cargar referral stats...');
-                console.log('userData:', userData);
-                loadReferralStats();
-            }, 500);
-
-            // Plan
-            if (userData.premium) {
-                document.getElementById('userPlan').textContent = t('panel_plan_premium');
-                document.getElementById('planBadge').textContent = 'PREMIUM';
-                document.getElementById('planBadge').style.color = '#E5A958';
-                document.getElementById('premiumStatus').textContent = t('account_premium_active');
-                document.getElementById('premiumBanner').style.display = 'none';
-
-                document.getElementById('premiumActive').style.display = 'block';
-                document.getElementById('premiumOffer').style.display = 'none';
-
-                if (userData.premium_until) {
-                    const days = Math.ceil((new Date(userData.premium_until) - new Date()) / (1000 * 60 * 60 * 24));
-                    document.getElementById('daysLeft').textContent = Math.max(0, days);
+                // If the element has kids (like icons), we try to only update the text part
+                // if it's a simple structure, or just replace innerHTML if it's safe.
+                // For our elements, innerHTML is fine as we've prepared the keys with emojis.
+                if (el.children.length === 0) {
+                    el.textContent = translation;
+                } else {
+                    el.innerHTML = translation;
                 }
-            } else {
-                document.getElementById('userPlan').textContent = t('panel_plan_free');
-                document.getElementById('planBadge').textContent = 'FREE';
-                document.getElementById('premiumStatus').textContent = t('account_premium_buy');
-                document.getElementById('premiumBanner').style.display = 'flex';
-                document.getElementById('premiumActive').style.display = 'none';
-                document.getElementById('premiumOffer').style.display = 'block';
+            });
+
+            // 2. Traducción de Placeholders (data-i18n-placeholder)
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                el.placeholder = t(key);
+            });
+
+            // 3. Datos Dinámicos del Usuario
+            if (userData) {
+                const name = userData.first_name || 'Usuario';
+                const userNameEl = document.getElementById('userName');
+                const userAvatarEl = document.getElementById('userAvatar');
+
+                if (userAvatarEl) userAvatarEl.textContent = name.charAt(0).toUpperCase();
+                if (userNameEl) userNameEl.textContent = name;
+
+                // Update Welcome text specifically to include name
+                const welcomeTextEl = document.getElementById('welcomeText');
+                if (welcomeTextEl) welcomeTextEl.textContent = `${t('welcome_text')}, ${name}!`;
+
+                // Actualizar plan y banners
+                const userPlanEl = document.getElementById('userPlan');
+                const planBadgeEl = document.getElementById('planBadge');
+                const premiumStatusEl = document.getElementById('premiumStatus');
+                const premiumBannerEl = document.getElementById('premiumBanner');
+                const premiumActiveEl = document.getElementById('premiumActive');
+                const premiumOfferEl = document.getElementById('premiumOffer');
+
+                if (userData.premium) {
+                    if (userPlanEl) userPlanEl.textContent = t('panel_plan_premium');
+                    if (planBadgeEl) {
+                        planBadgeEl.textContent = 'PREMIUM';
+                        planBadgeEl.style.color = '#E5A958';
+                    }
+                    if (premiumStatusEl) premiumStatusEl.textContent = t('account_premium_active');
+                    if (premiumBannerEl) premiumBannerEl.style.display = 'none';
+                    if (premiumActiveEl) premiumActiveEl.style.display = 'block';
+                    if (premiumOfferEl) premiumOfferEl.style.display = 'none';
+
+                    if (userData.premium_until) {
+                        const days = Math.ceil((new Date(userData.premium_until) - new Date()) / (1000 * 60 * 60 * 24));
+                        const daysLeftEl = document.getElementById('daysLeft');
+                        if (daysLeftEl) daysLeftEl.textContent = Math.max(0, days);
+                    }
+                } else {
+                    if (userPlanEl) userPlanEl.textContent = t('panel_plan_free');
+                    if (planBadgeEl) {
+                        planBadgeEl.textContent = 'FREE';
+                        planBadgeEl.style.color = 'var(--accent-blue)';
+                    }
+                    if (premiumStatusEl) premiumStatusEl.textContent = t('account_premium_buy');
+                    if (premiumBannerEl) premiumBannerEl.style.display = 'flex';
+                    if (premiumActiveEl) premiumActiveEl.style.display = 'none';
+                    if (premiumOfferEl) premiumOfferEl.style.display = 'block';
+                }
             }
-
-            // Translation of UI elements
-            document.getElementById('appTitleText').textContent = t('app_title');
-            document.getElementById('welcomeHint').textContent = t('home_hint');
-            document.getElementById('linkInput').placeholder = t('home_input_placeholder');
-            document.getElementById('premiumTitleText').textContent = t('premium_mini_title');
-            document.getElementById('premiumDescText').textContent = t('premium_mini_desc');
-            document.getElementById('premiumBenefitsTitle').textContent = t('premium_benefits_title');
-
-            // Plan names and descriptions
-            // Trial
-            const trialName = document.querySelector('#tab-premium .plan-card:nth-of-type(1) h3');
-            if (trialName) trialName.textContent = t('plan_trial_name');
-            const trialDesc = document.querySelector('#tab-premium .plan-card:nth-of-type(1) .plan-desc');
-            if (trialDesc) trialDesc.textContent = t('plan_trial_desc');
-            const trialBtn = document.querySelector('#tab-premium .plan-card:nth-of-type(1) .buy-button');
-            if (trialBtn) trialBtn.textContent = t('plan_trial_btn');
-            document.getElementById('trialPlanPeriod').textContent = t('plan_trial_period');
-
-            // Weekly
-            const weeklyName = document.querySelector('#tab-premium .featured:nth-of-type(3) h3');
-            if (weeklyName) weeklyName.textContent = t('plan_weekly_name');
-            const weeklyDesc = document.querySelector('#tab-premium .featured:nth-of-type(3) .plan-desc');
-            if (weeklyDesc) weeklyDesc.textContent = t('plan_weekly_desc');
-            document.getElementById('weeklyPlanBtn').textContent = t('plan_weekly_btn');
-            document.getElementById('weeklyPlanPeriod').textContent = t('plan_weekly_period');
-
-            // Monthly
-            const monthlyName = document.querySelector('#tab-premium .featured:nth-of-type(4) h3');
-            if (monthlyName) monthlyName.textContent = t('plan_monthly_name');
-            const monthlyDesc = document.querySelector('#tab-premium .featured:nth-of-type(4) .plan-desc');
-            if (monthlyDesc) monthlyDesc.textContent = t('plan_monthly_desc');
-            document.getElementById('monthlyPlanBtn').textContent = t('plan_monthly_btn');
-            document.getElementById('monthlyPlanPeriod').textContent = t('plan_monthly_period');
-
-            // Quarterly
-            const quarterlyName = document.querySelector('#tab-premium .featured:nth-of-type(5) h3');
-            if (quarterlyName) quarterlyName.textContent = t('plan_quarterly_name');
-            const quarterlyDesc = document.querySelector('#tab-premium .featured:nth-of-type(5) .plan-desc');
-            if (quarterlyDesc) quarterlyDesc.textContent = t('plan_quarterly_desc');
-            document.getElementById('quarterlyPlanBtn').textContent = t('plan_quarterly_btn');
-            document.getElementById('quarterlyPlanPeriod').textContent = t('plan_quarterly_period');
-
-            // Translate bottom nav
-            const navItems = document.querySelectorAll('.nav-item span:last-child');
-            if (navItems.length >= 4) {
-                navItems[0].textContent = t('nav_home');
-                navItems[1].textContent = t('nav_premium');
-                navItems[2].textContent = t('nav_referrals');
-                navItems[3].textContent = t('nav_account');
-            }
-
-            // Connection status title
-            document.getElementById('connectionTitle').textContent = t('account_connection_status');
 
             // Connection status
-            isConnected = userData.has_session || false;
+            isConnected = userData ? (userData.has_session || false) : false;
             updateConnectionStatus();
 
-            // Mejora 1, 2 y 3: Componentes Visuales Nuevos
+            // Additional features
             updateLimitBars();
             updatePremiumBanner();
             renderHistory();
 
-            // Actualizar label de idioma en menú de cuenta
+            // Language update
             const langLabel = document.getElementById('currentLangLabel');
-            if (langLabel) langLabel.textContent = LANG_LABELS[currentLanguage] || currentLanguage;
+            if (langLabel) {
+                const names = { 'es': 'Español', 'en': 'English', 'pt': 'Português', 'it': 'Italiano' };
+                langLabel.textContent = names[currentLanguage] || currentLanguage;
+            }
 
-            // Restaurar idioma guardado en localStorage si no vino por URL
-            try {
-                const savedLang = localStorage.getItem('user_lang');
-                if (savedLang && !new URLSearchParams(window.location.search).get('lang')) {
-                    if (savedLang !== currentLanguage) {
-                        updateLanguage(savedLang);
-                    }
-                }
-            } catch (e) { }
+            // Load referral stats
+            setTimeout(() => loadReferralStats(), 300);
         }
+
+
 
         function updateLimit(type, data) {
             const countEl = document.getElementById('count' + type);
@@ -2597,17 +2566,17 @@
             if (isConnected) {
                 icon.className = 'account-icon connected';
                 icon.textContent = '✅';
-                title.textContent = 'Cuenta conectada';
-                text.textContent = 'Puedes descargar contenido';
-                btn.textContent = '🔌 Desconectar cuenta';
+                title.textContent = t('connection_status_connected');
+                text.textContent = t('connection_desc_connected');
+                btn.textContent = `🔌 ${t('btn_disconnect')}`;
                 btn.className = 'account-btn danger';
                 btn.onclick = disconnectAccount;
             } else {
                 icon.className = 'account-icon disconnected';
                 icon.textContent = '⚠️';
-                title.textContent = 'Cuenta no conectada';
-                text.textContent = 'Configura tu cuenta para descargar';
-                btn.textContent = '⚙️ Configurar cuenta';
+                title.textContent = t('connection_status_disconnected');
+                text.textContent = t('connection_desc_disconnected');
+                btn.textContent = `⚙️ ${t('btn_configure')}`;
                 btn.className = 'account-btn primary';
                 btn.onclick = configureAccount;
             }
@@ -2621,12 +2590,12 @@
             const link = input.value.trim();
 
             if (!link) {
-                showToast('Pega un enlace de Telegram');
+                showToast(t('error_no_link'));
                 return;
             }
 
             if (!link.includes('t.me/')) {
-                showToast('Enlace no válido');
+                showToast(t('error_invalid_link'));
                 return;
             }
 
@@ -2685,9 +2654,9 @@
             try {
                 const text = await navigator.clipboard.readText();
                 document.getElementById('linkInput').value = text;
-                showToast('Enlace pegado');
+                showToast(t('toast_link_pasted'));
             } catch (e) {
-                showToast('No se pudo acceder al portapapeles');
+                showToast(t('toast_clipboard_error'));
             }
         }
 
@@ -2703,7 +2672,7 @@
 
         // ========== ACCOUNT ==========
         async function configureAccount() {
-            showToast('Enviando instrucciones...');
+            showToast(t('configuring_text'));
 
             try {
                 const response = await fetch(`${API_BASE}/api/miniapp/configure`, {
@@ -2717,20 +2686,20 @@
                 const result = await response.json();
 
                 if (result.ok) {
-                    tg.showAlert('📱 Revisa el chat del bot para configurar tu cuenta');
+                    tg.showAlert(t('configure_success'));
                     setTimeout(() => tg.close(), 1500);
                 } else {
-                    showToast('Error al enviar');
+                    showToast(t('configure_error'));
                 }
             } catch (e) {
-                showToast('Error de conexión');
+                showToast(t('toast_connection_error'));
             }
         }
 
         async function disconnectAccount() {
-            tg.showConfirm('¿Desconectar tu cuenta?', async (confirmed) => {
+            tg.showConfirm(t('disconnect_confirm'), async (confirmed) => {
                 if (confirmed) {
-                    showToast('Desconectando...');
+                    showToast(t('disconnecting_text'));
 
                     try {
                         const response = await fetch(`${API_BASE}/api/miniapp/disconnect`, {
@@ -2744,7 +2713,7 @@
                         const result = await response.json();
 
                         if (result.ok) {
-                            tg.showAlert('✅ Cuenta desconectada. La MiniApp se actualizará.');
+                            tg.showAlert(t('disconnect_success'));
                             isConnected = false;
                             updateConnectionStatus();
                             // Forzar recarga de datos
@@ -2753,7 +2722,7 @@
                             showToast(result.message || 'Error');
                         }
                     } catch (e) {
-                        showToast('Error de conexión');
+                        showToast(t('toast_connection_error'));
                     }
                 }
             });
@@ -2765,7 +2734,7 @@
 
         // ========== PREMIUM ==========
         async function buyPremium(planKey = 'monthly') {
-            showToast('Preparando pago...');
+            showToast(t('toast_payment_preparing'));
 
             // Plan details
             const plans = {
@@ -2792,16 +2761,16 @@
                 if (result.ok && result.invoice_link) {
                     tg.openInvoice(result.invoice_link, (status) => {
                         if (status === 'paid') {
-                            tg.showAlert(`¡Gracias! Tu Premium ${plan.name} se activará en segundos ✨`);
+                            tg.showAlert(`${t('toast_payment_success')}`);
                             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                             setTimeout(() => {
                                 loadUserData();
                                 tg.close();
                             }, 2000);
                         } else if (status === 'cancelled') {
-                            showToast('Pago cancelado');
+                            showToast(t('toast_payment_cancelled'));
                         } else if (status === 'failed') {
-                            showToast('Error en el pago');
+                            showToast(t('toast_payment_error'));
                         }
                         if (btn) btn.disabled = false;
                     });
@@ -2810,7 +2779,7 @@
                 }
             } catch (e) {
                 console.error(e);
-                showToast('Error al procesar el pago');
+                showToast(t('toast_payment_error_text'));
                 if (btn) btn.disabled = false;
             }
         }
@@ -2829,7 +2798,7 @@
                     // Mostrar mensaje en el UI
                     const linkEl = document.getElementById('referralLink');
                     if (linkEl) {
-                        linkEl.textContent = 'Error: Usuario no identificado';
+                        linkEl.textContent = t('error_user_not_found');
                         linkEl.style.color = 'var(--accent-red)';
                     }
                     return false;
@@ -2854,7 +2823,7 @@
                         console.error('API returned error:', result);
                         const linkEl = document.getElementById('referralLink');
                         if (linkEl) {
-                            linkEl.textContent = 'Error: ' + (result.error || 'Desconocido');
+                            linkEl.textContent = `${t('error_unknown')}: ` + (result.error || '');
                             linkEl.style.color = 'var(--accent-red)';
                         }
                         return false;
@@ -2865,9 +2834,9 @@
                     const linkEl = document.getElementById('referralLink');
                     if (linkEl) {
                         if (response.status === 404) {
-                            linkEl.textContent = 'Error 404: Endpoint no encontrado';
+                            linkEl.textContent = t('error_404');
                         } else {
-                            linkEl.textContent = `Error HTTP ${response.status}`;
+                            linkEl.textContent = `${t('error_http')} ${response.status}`;
                         }
                         linkEl.style.color = 'var(--accent-red)';
                     }
@@ -2877,7 +2846,7 @@
                 console.error('Exception loading referral stats:', e);
                 const linkEl = document.getElementById('referralLink');
                 if (linkEl) {
-                    linkEl.textContent = 'Error de conexión';
+                    linkEl.textContent = t('toast_connection_error');
                     linkEl.style.color = 'var(--accent-red)';
                 }
                 return false;
@@ -2914,10 +2883,10 @@
 
         async function copyReferralLink() {
             if (!referralData || !referralData.referral_link) {
-                showToast('Cargando enlace...');
+                showToast(t('referrals_loading'));
                 const success = await loadReferralStats();
                 if (!success || !referralData || !referralData.referral_link) {
-                    showToast('❌ Error al generar enlace');
+                    showToast(t('referrals_generate_error'));
                     console.error('Failed to load referral data');
                     return;
                 }
@@ -2925,29 +2894,29 @@
 
             try {
                 await navigator.clipboard.writeText(referralData.referral_link);
-                showToast('✅ Enlace copiado');
+                showToast(t('referrals_copy_success'));
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } catch (e) {
                 console.error('Clipboard error:', e);
-                showToast('❌ Error al copiar');
+                showToast(t('referrals_copy_error'));
             }
         }
 
         async function shareReferralLink() {
             if (!referralData || !referralData.referral_link) {
-                showToast('Cargando enlace...');
+                showToast(t('referrals_loading'));
                 const success = await loadReferralStats();
                 if (!success || !referralData || !referralData.referral_link) {
-                    showToast('❌ Error al generar enlace');
+                    showToast(t('referrals_generate_error'));
                     console.error('Failed to load referral data');
                     return;
                 }
             }
 
-            const text = `¡Descarga contenido de Telegram con este bot! 🚀\n\n${referralData.referral_link}`;
+            const text = `${t('referrals_share_text')}\n\n${referralData.referral_link}`;
 
             if (tg.openTelegramLink) {
-                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralData.referral_link)}&text=${encodeURIComponent('¡Descarga contenido de Telegram con este bot! 🚀')}`);
+                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralData.referral_link)}&text=${encodeURIComponent(t('referrals_share_text'))}`);
             } else {
                 await copyReferralLink();
             }
