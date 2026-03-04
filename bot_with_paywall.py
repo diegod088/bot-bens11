@@ -2569,7 +2569,7 @@ async def handle_media_download(update: Update, context_or_bot,
                                 album_index: int = 1, album_total: int = 1,
                                 bypass_limits: bool = False, custom_caption: str = None):
     """Maneja la descarga según el tipo de medio con validaciones optimizadas"""
-    user_id = user['id']
+    user_id = user.get('user_id', user.get('id'))
     bot = context_or_bot.bot if hasattr(context_or_bot, 'bot') else context_or_bot
     
     # Determinar tipo de contenido usando la función unificada
