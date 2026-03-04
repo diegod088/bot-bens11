@@ -1508,7 +1508,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = query.from_user.id
         user = get_user(user_id)
         lang = get_user_language(user)
-        await show_premium_plans(query, context, lang)
+        base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+        if base_url:
+            miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}#premium"
+            keyboard = [[InlineKeyboardButton("⭐ Ver Planes" if lang == 'es' else "⭐ View Plans", web_app=WebAppInfo(url=miniapp_url))]]
+            await query.edit_message_text(
+                "💎 Elige tu plan en la app:" if lang == 'es' else "💎 Choose your plan in the app:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
         return
     
     if query.data == "show_guide":
@@ -1535,196 +1542,63 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if query.data == "back_to_menu":
-        # Return to main menu - usar el mismo mensaje de /start
         await query.answer()
         user_id = update.effective_user.id
+        first_name = update.effective_user.first_name
         user = get_user(user_id)
         lang = get_user_language(user)
-        
-        # Check and reset daily limits
         check_and_reset_daily_limits(user_id)
-        user = get_user(user_id)
-        
-        # Build welcome message using multi-language system
-        welcome_message = get_msg("start_welcome", lang)
-        welcome_message += get_msg("start_description", lang)
-        welcome_message += get_msg("start_divider", lang)
-        welcome_message += get_msg("start_how_to", lang)
-        welcome_message += get_msg("start_example", lang)
-        welcome_message += get_msg("start_divider", lang)
-        
-        # Add plan status
-        if user['premium']:
-            if user.get('premium_until'):
-                expiry = datetime.fromisoformat(user['premium_until'])
-                days_left = (expiry - datetime.now()).days
-                welcome_message += get_msg("start_premium_plan", lang, 
-                                         expiry=expiry.strftime('%d/%m/%Y'),
-                                         days_left=days_left)
-                welcome_message += get_msg("start_premium_usage", lang,
-                                         daily_video=user['daily_video'],
-                                         video_limit=PREMIUM_VIDEO_DAILY_LIMIT,
-                                         daily_music=user['daily_music'],
-                                         music_limit=PREMIUM_MUSIC_DAILY_LIMIT,
-                                         daily_apk=user['daily_apk'],
-                                         apk_limit=PREMIUM_APK_DAILY_LIMIT)
-            else:
-                welcome_message += get_msg("start_premium_active", lang)
+
+        if lang == 'es':
+            welcome_message = f"👋 ¡Hola {first_name}!\n\n👇 *Abre la app para continuar:*"
         else:
-            welcome_message += get_msg("start_free_plan", lang,
-                                     daily_photo=user['daily_photo'],
-                                     photo_limit=FREE_PHOTO_LIMIT,
-                                     downloads=user['downloads'],
-                                     download_limit=FREE_DOWNLOAD_LIMIT)
-        
-        welcome_message += get_msg("start_cta", lang)
-        
-        # Build buttons with language support
-        keyboard = [
-            [InlineKeyboardButton(get_msg("btn_download_now", lang), callback_data="start_download")],
-            [
-                InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
-                InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-            ]
-        ]
-        
-        # PROBLEMA 2: Agregar botón de MiniApp al menú principal
-        miniapp_url_env = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
-        if miniapp_url_env:
-            full_url = f"{miniapp_url_env}/miniapp?v=2&user_id={user_id}&lang={lang}"
+            welcome_message = f"👋 Hello {first_name}!\n\n👇 *Open the app to continue:*"
+
+        keyboard = []
+        base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+        if base_url:
+            miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}"
             keyboard.append([
-                InlineKeyboardButton("📱 Abrir App", web_app=WebAppInfo(url=full_url))
+                InlineKeyboardButton(
+                    "📱 Abrir App" if lang == 'es' else "📱 Open App",
+                    web_app=WebAppInfo(url=miniapp_url)
+                )
             ])
-            
-        keyboard.extend([
-            [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-            [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
-            [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
+
+        has_session = has_active_session(user_id)
+        if not has_session:
+            keyboard.append([
+                InlineKeyboardButton(
+                    "⚙️ Configurar cuenta" if lang == 'es' else "⚙️ Configure account",
+                    callback_data="connect_account"
+                )
+            ])
+
+        keyboard.append([
+            InlineKeyboardButton(
+                "💬 Soporte" if lang == 'es' else "💬 Support",
+                url="https://t.me/observer_bots/11"
+            )
         ])
+
         reply_markup = InlineKeyboardMarkup(keyboard)
-        
         await query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
         return
     
     # Manejar callback de ver/refrescar estadísticas PERSONALES
-    if query.data == "view_stats" or query.data == "refresh_stats":
-        await query.answer("🔄 Actualizando...")
-        user_id = query.from_user.id
-        user_name = query.from_user.first_name or "Usuario"
-        
-        check_and_reset_daily_limits(user_id)
-        user_stats = get_user_usage_stats(user_id, FREE_DOWNLOAD_LIMIT, FREE_PHOTO_LIMIT)
+    if query.data in ["view_stats", "refresh_stats"]:
+        await query.answer()
+        user_id = update.effective_user.id
         user = get_user(user_id)
-        
-        if not user_stats:
-            await query.edit_message_text("❌ Error al obtener estadísticas")
-            return
-        
-        # Función helper para barra de progreso
-        def get_progress_bar(used, total, width=10):
-            if total == 0:
-                return "▱" * width
-            filled = int((used / total) * width)
-            return "▰" * filled + "▱" * (width - filled)
-        
-        # Header PERSONAL
-        message = "```\n"
-        message += "╔═══════════════════════════════╗\n"
-        message += "║   👤 MIS ESTADÍSTICAS         ║\n"
-        message += "╚═══════════════════════════════╝\n"
-        message += "```\n\n"
-        
-        # Información del usuario
-        message += "```\n"
-        message += "┌─────────────────────────────┐\n"
-        message += f"│  📋 {user_name[:20]:<20} │\n"
-        message += "└─────────────────────────────┘\n"
-        message += "```\n"
-        
-        if user['premium']:
-            if user.get('premium_until'):
-                expiry = datetime.fromisoformat(user['premium_until'])
-                days_left = (expiry - datetime.now()).days
-                message += f"💎 *Plan:* Premium Activo\n"
-                message += f"📅 *Expira:* {expiry.strftime('%d/%m/%Y')}\n"
-                message += f"⏳ *Quedan:* {days_left} días\n\n"
-            else:
-                message += "💎 *Plan:* Premium Vitalicio ♾️\n\n"
-            
-            # Uso de hoy con barras de progreso
-            videos = user_stats['videos']
-            video_bar = get_progress_bar(videos['used'], 50)
-            message += f"🎬 *Videos Hoy:* {videos['used']}/50\n"
-            message += f"   {video_bar} {50 - videos['used']} restantes\n\n"
-            
-            photos = user_stats['photos']
-            message += f"📸 *Fotos Hoy:* {photos['used']} (Ilimitadas) ♾️\n\n"
-            
-            music = user_stats['music']
-            music_bar = get_progress_bar(music['used'], 50)
-            message += f"🎵 *Música Hoy:* {music['used']}/50\n"
-            message += f"   {music_bar} {music['remaining']} restantes\n\n"
-            
-            apk = user_stats['apk']
-            apk_bar = get_progress_bar(apk['used'], 50)
-            message += f"📦 *APK Hoy:* {apk['used']}/50\n"
-            message += f"   {apk_bar} {apk['remaining']} restantes\n"
-        else:
-            message += "🆓 *Plan:* Gratuito\n\n"
-            
-            # Videos (límite total, no diario)
-            videos = user_stats['videos']
-            if videos['remaining'] > 0:
-                dots = "🟢" * videos['remaining'] + "⚫" * (videos['limit'] - videos['remaining'])
-                message += f"🎬 *Videos Totales:* {videos['used']}/{videos['limit']}\n"
-                message += f"   {dots}\n"
-                message += f"   Quedan *{videos['remaining']}* {'videos' if videos['remaining'] > 1 else 'video'}\n"
-                if videos['remaining'] == 1:
-                    message += "   ⚠️ ¡Solo queda 1!\n"
-            else:
-                message += f"🎬 *Videos:* {videos['used']}/{videos['limit']} ❌\n"
-                message += "   🔒 Límite alcanzado\n"
-            message += "\n"
-            
-            # Fotos (límite diario)
-            photos = user_stats['photos']
-            if photos['remaining'] > 0:
-                dots = "🟩" * photos['remaining'] + "⬜" * (photos['limit'] - photos['remaining'])
-                message += f"📸 *Fotos:* {photos['used']}/{photos['limit']}\n"
-                message += f"   {dots}\n"
-                message += f"   Quedan *{photos['remaining']}* {'fotos' if photos['remaining'] > 1 else 'foto'}\n"
-                if photos['remaining'] <= 2:
-                    message += "   ⚠️ Pocas restantes\n"
-            else:
-                message += f"📸 *Fotos:* {photos['used']}/{photos['limit']} ❌\n"
-                message += "   🔒 Límite alcanzado\n"
-            message += "\n"
-            
-            # Contenido premium bloqueado
-            message += "🔒 *Requiere Premium:*\n"
-            message += "   🎵 Música\n"
-            message += "   📦 APK\n"
-        
-        # Footer con call to action
-        if not user['premium']:
-            message += f"\n```\n┌─────────────────────────────┐\n"
-            message += f"│  💎 PREMIUM: {PREMIUM_PRICE_STARS} ⭐  │\n"
-            message += "└─────────────────────────────┘\n```"
-        
-        keyboard = []
-        if not user['premium']:
-            keyboard.append([InlineKeyboardButton("💎 Obtener Premium", callback_data="show_premium")])
-        keyboard.append([InlineKeyboardButton("🔄 Actualizar Stats", callback_data="refresh_stats")])
-        keyboard.append([InlineKeyboardButton("◀️ Volver al menú", callback_data="back_to_menu")])
-        
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        try:
-            await query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
-        except Exception as e:
-            logger.error(f"Error actualizando stats: {e}")
-            await query.answer("Error al actualizar", show_alert=True)
-        
+        lang = get_user_language(user)
+        base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+        if base_url:
+            miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}"
+            keyboard = [[InlineKeyboardButton("📱 Ver Stats" if lang == 'es' else "📱 View Stats", web_app=WebAppInfo(url=miniapp_url))]]
+            await query.edit_message_text(
+                "📊 Tus stats completos están en la app:" if lang == 'es' else "📊 Your full stats are in the app:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
         return
     
     # Manejar callback de refrescar estadísticas de ADMIN
@@ -1829,7 +1703,17 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Manejar callback para mostrar info de Premium
     if query.data == "show_premium":
         await query.answer()
-        await show_premium_plans(query, context)
+        user_id = update.effective_user.id
+        user = get_user(user_id)
+        lang = get_user_language(user)
+        base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+        if base_url:
+            miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}#premium"
+            keyboard = [[InlineKeyboardButton("⭐ Ver Planes" if lang == 'es' else "⭐ View Plans", web_app=WebAppInfo(url=miniapp_url))]]
+            await query.edit_message_text(
+                "💎 Elige tu plan en la app:" if lang == 'es' else "💎 Choose your plan in the app:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
         return
     
     await query.answer("📄 Procesando...", show_alert=False)
@@ -2342,6 +2226,26 @@ async def successful_payment_callback(update: Update, context: ContextTypes.DEFA
             "📊 Use /panel to check your status",
             parse_mode='Markdown'
         )
+    
+    # FIX 2: Agregar botón para abrir la MiniApp con el nuevo estado premium
+    miniapp_base = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+    if miniapp_base:
+        full_miniapp_url = f"{miniapp_base}/miniapp?v=2&user_id={user_id}&lang={lang}"
+        try:
+            keyboard = [[
+                InlineKeyboardButton(
+                    "📱 Ver mi Premium" if lang == 'es' else "📱 View my Premium",
+                    web_app=WebAppInfo(url=full_miniapp_url)
+                )
+            ]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await update.message.reply_text(
+                "👇 *Abre la app para ver tu plan activo*" if lang == 'es' else "👇 *Open the app to see your active plan*",
+                parse_mode='Markdown',
+                reply_markup=reply_markup
+            )
+        except Exception as e:
+            logger.error(f"Error sending miniapp button after payment: {e}")
 
 
 # ==================== FLUJO GUIADO ====================
@@ -2939,296 +2843,111 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Ensure admins have premium
     ensure_admin_premium(user_id)
     
-    # Show language selection menu
-    welcome_message = (
-        f"👋 ¡Hola {first_name}! / Hello {first_name}!\n\n"
-        "🌐 *Selecciona tu idioma / Select your language:*\n"
-    )
-    
-    keyboard = [
-        [
-            InlineKeyboardButton("🇪🇸 Español", callback_data="set_lang_es"),
-            InlineKeyboardButton("🇬🇧 English", callback_data="set_lang_en")
-        ],
-        [
-            InlineKeyboardButton("🇧🇷 Português", callback_data="set_lang_pt"),
-            InlineKeyboardButton("🇮🇹 Italiano", callback_data="set_lang_it")
-        ]
-    ]
-    
-    # PROBLEMA 2: Agregar botón de MiniApp con user_id y lang
-    miniapp_url_env = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
-    if miniapp_url_env:
-        # Usar la variable local lang si está definida (en el else de is_new_user)
-        # o user_language (que es el detectado por Telegram)
-        try:
-            current_lang = lang if 'lang' in locals() else user_language
-        except NameError:
-            current_lang = user_language
-            
-        full_url = f"{miniapp_url_env}/miniapp?v=2&user_id={user_id}&lang={current_lang}"
-        keyboard.append([
-            InlineKeyboardButton("📱 Abrir App", web_app=WebAppInfo(url=full_url))
-        ])
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    if update.callback_query:
-        try:
-            await update.callback_query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
-        except Exception as e:
-            logger.warning(f"Could not edit message, sending new one: {e}")
-            await update.callback_query.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
-    else:
-        await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
-    return
-    
-    # Check and reset daily limits
-    check_and_reset_daily_limits(user_id)
+    # Obtener idioma del usuario
     user = get_user(user_id)
-    
-    # Get user language
-    lang = get_user_language(user)
-    
-    # Build welcome message using multi-language system
-    welcome_message = get_msg("start_welcome", lang)
-    welcome_message += get_msg("start_description", lang)
-    welcome_message += get_msg("start_divider", lang)
-    welcome_message += get_msg("start_how_to", lang)
-    welcome_message += get_msg("start_example", lang)
-    welcome_message += get_msg("start_divider", lang)
-    
-    if user['premium']:
-        if user.get('premium_until'):
-            expiry = datetime.fromisoformat(user['premium_until'])
-            days_left = (expiry - datetime.now()).days
-            welcome_message += get_msg("start_premium_plan", lang, 
-                                         expiry=expiry.strftime('%d/%m/%Y'),
-                                         days_left=days_left)
+    lang = user.get('language') if user and user.get('language') else user_language
+
+    # Mensaje de bienvenida corto
+    if lang == 'es':
+        if is_new_user:
+            welcome_message = (
+                f"👋 ¡Hola {first_name}! Bienvenido al bot de descargas.\n\n"
+                "📥 Descarga fotos, videos, música y APKs de canales privados de Telegram.\n\n"
+                "👇 *Abre la app para empezar:*"
+            )
         else:
-            welcome_message += get_msg("start_premium_active", lang)
+            welcome_message = (
+                f"👋 ¡Hola de nuevo, {first_name}!\n\n"
+                "👇 *Abre la app para continuar:*"
+            )
     else:
-        welcome_message += get_msg("start_free_plan", lang)
-        welcome_message += get_msg("start_upgrade", lang)
-    
-    # Add buttons with language support
-    keyboard = [
-        [InlineKeyboardButton(get_msg("btn_panel", lang), callback_data="panel_menu")],
-        [
-            InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
-            InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-        ],
-        [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
-        [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")]
-    ]
+        if is_new_user:
+            welcome_message = (
+                f"👋 Hello {first_name}! Welcome to the downloads bot.\n\n"
+                "📥 Download photos, videos, music and APKs from private Telegram channels.\n\n"
+                "👇 *Open the app to get started:*"
+            )
+        else:
+            welcome_message = (
+                f"👋 Welcome back, {first_name}!\n\n"
+                "👇 *Open the app to continue:*"
+            )
+
+    # Construir teclado minimalista
+    keyboard = []
+
+    # Botón principal: MiniApp
+    base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+    if base_url:
+        new_flag = "true" if is_new_user else "false"
+        miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&new={new_flag}&lang={lang}"
+        keyboard.append([
+            InlineKeyboardButton(
+                "📱 Abrir App" if lang == 'es' else "📱 Open App",
+                web_app=WebAppInfo(url=miniapp_url)
+            )
+        ])
+
+    # Solo si NO tiene cuenta configurada, mostrar botón de configurar
+    has_session = has_active_session(user_id)
+    if not has_session:
+        keyboard.append([
+            InlineKeyboardButton(
+                "⚙️ Configurar cuenta" if lang == 'es' else "⚙️ Configure account",
+                callback_data="connect_account"
+            )
+        ])
+
+    # Soporte siempre disponible
+    keyboard.append([
+        InlineKeyboardButton(
+            "💬 Soporte" if lang == 'es' else "💬 Support",
+            url="https://t.me/observer_bots/11"
+        )
+    ])
+
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
+
     if update.callback_query:
-        await update.callback_query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
-    else:
-        await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+        try:
+            await update.callback_query.edit_message_text(
+                welcome_message, parse_mode='Markdown', reply_markup=reply_markup
+            )
+        except Exception:
+            await update.callback_query.message.reply_text(
+                welcome_message, parse_mode='Markdown', reply_markup=reply_markup
+            )
+    elif update.message:
+        await update.message.reply_text(
+            welcome_message, parse_mode='Markdown', reply_markup=reply_markup
+        )
+    return
 
 
 async def premium_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /premium command - Show ALL subscription plans with referral bonus"""
-    from datetime import datetime
+    """Handle /premium command - Redirect to MiniApp premium tab"""
     user_id = update.effective_user.id
     user = get_user(user_id)
     lang = get_user_language(user)
-    
-    # Check current premium status
-    if user and user['premium'] and user.get('premium_until'):
-        expiry = datetime.fromisoformat(user['premium_until'])
-        days_left = (expiry - datetime.now()).days
-        
-        if lang == 'es':
-            status_msg = (
-                "✨ *Ya eres Premium* ✨\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                f"📅 Expira: {expiry.strftime('%d/%m/%Y')}\n"
-                f"⏳ *Quedan:* {days_left} días\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                "💎 *Renovar o Extender Premium*\n\n"
-            )
-        else:
-            status_msg = (
-                "✨ *You're already Premium* ✨\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                f"📅 Expires: {expiry.strftime('%m/%d/%Y')}\n"
-                f"⏳ *{days_left} days remaining*\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                "💎 *Renew or Extend Premium*\n\n"
-            )
-    else:
-        status_msg = ""
-    
-    # Build pricing tiers message
-    if lang == 'es':
-        message = status_msg + (
-            "🌟 *PLANES PREMIUM DISPONIBLES* 🌟\n\n"
-            "Elige el plan que mejor se adapte a ti:\n\n"
+
+    base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+
+    if not base_url:
+        msg = "⚠️ MiniApp no disponible. Usa /start." if lang == 'es' else "⚠️ MiniApp not available. Use /start."
+        await update.message.reply_text(msg)
+        return
+
+    # Abrir directo en tab premium
+    miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}#premium"
+
+    msg = "💎 Elige tu plan Premium en la app:" if lang == 'es' else "💎 Choose your Premium plan in the app:"
+    keyboard = [[
+        InlineKeyboardButton(
+            "⭐ Ver Planes Premium" if lang == 'es' else "⭐ View Premium Plans",
+            web_app=WebAppInfo(url=miniapp_url)
         )
-        
-        # Trial Plan
-        trial = PREMIUM_PLANS['trial']
-        message += (
-            f"{trial['badge']}\n"
-            f"*{trial['name']}* - {trial['stars']} ⭐ Stars\n"
-            f"⏰ Duración: {trial['days']} días\n"
-            f"💡 {trial['description']}\n"
-            f"💵 ~${trial['stars']/100:.2f} USD\n\n"
-        )
-        
-        # Weekly Plan
-        weekly = PREMIUM_PLANS['weekly']
-        price_per_day_w = weekly['stars'] / weekly['days']
-        message += (
-            f"{weekly['badge']}\n"
-            f"*{weekly['name']}* - {weekly['stars']} ⭐ Stars\n"
-            f"⏰ Duración: {weekly['days']} días\n"
-            f"💡 {weekly['description']} ({price_per_day_w:.1f}⭐/día)\n"
-            f"💵 ~${weekly['stars']/100:.2f} USD\n\n"
-        )
-        
-        # Monthly Plan
-        monthly = PREMIUM_PLANS['monthly']
-        price_per_day_m = monthly['stars'] / monthly['days']
-        message += (
-            f"{monthly['badge']}\n"
-            f"*{monthly['name']}* - {monthly['stars']} ⭐ Stars\n"
-            f"⏰ Duración: {monthly['days']} días (1 mes)\n"
-            f"💡 {monthly['description']} ({price_per_day_m:.1f}⭐/día)\n"
-            f"💵 ~${monthly['stars']/100:.2f} USD\n\n"
-        )
-        
-        # Quarterly Plan
-        quarterly = PREMIUM_PLANS['quarterly']
-        price_per_day_q = quarterly['stars'] / quarterly['days']
-        savings = int((1 - (quarterly['stars'] / (monthly['stars'] * 3))) * 100)
-        message += (
-            f"{quarterly['badge']}\n"
-            f"*{quarterly['name']}* - {quarterly['stars']} ⭐ Stars\n"
-            f"⏰ Duración: {quarterly['days']} días (3 meses)\n"
-            f"💡 {quarterly['description']} ({price_per_day_q:.1f}⭐/día)\n"
-            f"💵 ~${quarterly['stars']/100:.2f} USD\n"
-            f"📊 Ahorras {savings}% vs 3 meses individuales\n\n"
-        )
-        
-        message += (
-            "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "🎁 *BONUS REFERIDOS GRATIS* 🎁\n\n"
-            "Por cada *15 referidos confirmados* recibes:\n"
-            "➕ *1 día Premium GRATIS*\n"
-            "📊 Máximo acumulable: 15 días\n\n"
-            "Usa /referidos para ver tu progreso\n\n"
-            "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "✨ *Beneficios Premium:*\n"
-            "• Descargas ilimitadas de fotos\n"
-            "• 50 videos/día\n"
-            "• 50 canciones/día\n"
-            "• Sin anuncios\n"
-            "• Prioridad en soporte\n\n"
-            "Selecciona tu plan abajo 👇"
-        )
-    else:
-        message = status_msg + (
-            "🌟 *PREMIUM PLANS AVAILABLE* 🌟\n\n"
-            "Choose the plan that fits you best:\n\n"
-        )
-        
-        # Trial Plan (English)
-        trial = PREMIUM_PLANS['trial']
-        message += (
-            f"{trial['badge']}\n"
-            f"*{trial['name']}* - {trial['stars']} ⭐ Stars\n"
-            f"⏰ Duration: {trial['days']} days\n"
-            f"💡 Perfect for testing\n"
-            f"💵 ~${trial['stars']/100:.2f} USD\n\n"
-        )
-        
-        # Weekly Plan
-        weekly = PREMIUM_PLANS['weekly']
-        price_per_day_w = weekly['stars'] / weekly['days']
-        message += (
-            f"{weekly['badge']}\n"
-            f"*{weekly['name']}* - {weekly['stars']} ⭐ Stars\n"
-            f"⏰ Duration: {weekly['days']} days\n"
-            f"💡 Best price per day ({price_per_day_w:.1f}⭐/day)\n"
-            f"💵 ~${weekly['stars']/100:.2f} USD\n\n"
-        )
-        
-        # Monthly Plan
-        monthly = PREMIUM_PLANS['monthly']
-        price_per_day_m = monthly['stars'] / monthly['days']
-        message += (
-            f"{monthly['badge']}\n"
-            f"*{monthly['name']}* - {monthly['stars']} ⭐ Stars\n"
-            f"⏰ Duration: {monthly['days']} days (1 month)\n"
-            f"💡 Most popular ({price_per_day_m:.1f}⭐/day)\n"
-            f"💵 ~${monthly['stars']/100:.2f} USD\n\n"
-        )
-        
-        # Quarterly Plan
-        quarterly = PREMIUM_PLANS['quarterly']
-        price_per_day_q = quarterly['stars'] / quarterly['days']
-        savings = int((1 - (quarterly['stars'] / (monthly['stars'] * 3))) * 100)
-        message += (
-            f"{quarterly['badge']}\n"
-            f"*{quarterly['name']}* - {quarterly['stars']} ⭐ Stars\n"
-            f"⏰ Duration: {quarterly['days']} days (3 months)\n"
-            f"💡 Save up to {savings}% ({price_per_day_q:.1f}⭐/day)\n"
-            f"💵 ~${quarterly['stars']/100:.2f} USD\n"
-            f"📊 Save {savings}% vs 3 individual months\n\n"
-        )
-        
-        message += (
-            "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "🎁 *FREE REFERRAL BONUS* 🎁\n\n"
-            "For every *15 confirmed referrals* you get:\n"
-            "➕ *1 day Premium FREE*\n"
-            "📊 Max accumulation: 15 days\n\n"
-            "Use /referidos to check your progress\n\n"
-            "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "✨ *Premium Benefits:*\n"
-            "• Unlimited photo downloads\n"
-            "• 50 videos/day\n"
-            "• 50 songs/day\n"
-            "• No ads\n"
-            "• Priority support\n\n"
-            "Select your plan below 👇"
-        )
-    
-    # Create keyboard with all plan options
-    keyboard = [
-        [
-            InlineKeyboardButton(
-                f"{PREMIUM_PLANS['trial']['badge']} {PREMIUM_PLANS['trial']['stars']}⭐ ({PREMIUM_PLANS['trial']['days']}d)",
-                callback_data="pay_premium_trial"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                f"{PREMIUM_PLANS['weekly']['badge']} {PREMIUM_PLANS['weekly']['stars']}⭐ ({PREMIUM_PLANS['weekly']['days']}d)",
-                callback_data="pay_premium_weekly"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                f"{PREMIUM_PLANS['monthly']['badge']} {PREMIUM_PLANS['monthly']['stars']}⭐ ({PREMIUM_PLANS['monthly']['days']}d)",
-                callback_data="pay_premium_monthly"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                f"{PREMIUM_PLANS['quarterly']['badge']} {PREMIUM_PLANS['quarterly']['stars']}⭐ ({PREMIUM_PLANS['quarterly']['days']}d)",
-                callback_data="pay_premium_quarterly"
-            )
-        ],
-        [InlineKeyboardButton(get_msg("btn_join_channel", lang), url="https://t.me/observer_bots")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+    ]]
+    await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def testpay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3325,7 +3044,7 @@ async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Add /miniapp path to the URL
     if not miniapp_url.endswith('/'):
         miniapp_url += '/'
-    miniapp_url += f'miniapp?v=2&lang={lang}'
+    miniapp_url += f'miniapp?v=2&user_id={user_id}&lang={lang}'
     
     keyboard = [
         [InlineKeyboardButton(
@@ -3425,107 +3144,28 @@ async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /panel command - Show user control panel with detailed stats"""
+    """Handle /panel command - Redirect to MiniApp"""
     user_id = update.effective_user.id
     user = get_user(user_id)
     lang = get_user_language(user)
-    
-    # Get usage stats
-    stats = get_user_usage_stats(user_id)
-    if not stats:
-        # Fallback if user not found (shouldn't happen usually)
-        if update.callback_query:
-            await update.callback_query.message.reply_text("Error loading profile.")
-        else:
-            await update.message.reply_text("Error loading profile.")
+
+    base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+
+    if not base_url:
+        msg = "⚠️ MiniApp no disponible. Usa /start." if lang == 'es' else "⚠️ MiniApp not available. Use /start."
+        await update.message.reply_text(msg)
         return
 
-    # 1. Header & Plan Info
-    message = get_msg("panel_title", lang, user_name=update.effective_user.first_name)
-    
-    if stats['is_premium']:
-        message += get_msg("panel_plan_premium", lang)
-        # Calculate days left
-        if user.get('premium_until'):
-            try:
-                expiry_dt = datetime.fromisoformat(user['premium_until'])
-                days_left = (expiry_dt - datetime.now()).days
-                expiry_str = expiry_dt.strftime("%d/%m/%Y")
-                message += get_msg("panel_expires", lang, expiry=expiry_str, days_left=days_left)
-            except:
-                pass
-    else:
-        message += get_msg("panel_plan_free", lang)
+    miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}"
 
-    # 2. Usage Statistics
-    message += "\n" + get_msg("panel_stats_row", lang)
-    
-    # Photos
-    p_used = stats['photos']['used']
-    p_limit = "∞" if stats['photos']['unlimited'] else stats['photos']['limit']
-    message += get_msg("panel_photos", lang, count=p_used, limit=p_limit)
-    
-    # Videos
-    v_used = stats['videos']['used']
-    v_limit = "∞" if stats['videos']['unlimited'] else stats['videos']['limit']
-    message += get_msg("panel_videos", lang, count=v_used, limit=v_limit)
-    
-    # Music
-    m_used = stats['music']['used']
-    m_limit = stats['music']['limit']
-    message += get_msg("panel_music", lang, count=m_used, limit=m_limit)
-    
-    # APK
-    a_used = stats['apk']['used']
-    a_limit = stats['apk']['limit']
-    message += get_msg("panel_apk", lang, count=a_used, limit=a_limit)
-
-    # 3. Connection Status
-    message += get_msg("panel_connection_title", lang)
-    session_string = get_user_session(user_id)
-    is_connected = bool(session_string)
-    
-    if is_connected:
-        message += get_msg("panel_connection_ok", lang)
-    else:
-        message += get_msg("panel_connection_fail", lang)
-        
-    # Footer
-    if not stats['is_premium']:
-        message += get_msg("panel_footer", lang)
-    
-    # Buttons
-    keyboard = []
-    
-    # Row 1: Refresh & Plans
-    keyboard.append([
-        InlineKeyboardButton(get_msg("btn_refresh_stats", lang), callback_data="panel_refresh"),
-        InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-    ])
-    
-    # Row 2: Connect/Disconnect
-    if is_connected:
-        keyboard.append([InlineKeyboardButton(get_msg("btn_disconnect", lang), callback_data="disconnect_account")])
-    else:
-        keyboard.append([InlineKeyboardButton(get_msg("btn_connect", lang), callback_data="connect_account")])
-        
-    # Row 3: Support & Back
-    keyboard.append([
-        InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11"),
-        InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")
-    ])
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    if update.callback_query:
-        # If called from callback (e.g. refresh button)
-        try:
-            await update.callback_query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
-        except Exception:
-            # If message content is same, ignore error
-            pass
-    else:
-        await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+    msg = "📊 Tu panel completo está en la app:" if lang == 'es' else "📊 Your full panel is in the app:"
+    keyboard = [[
+        InlineKeyboardButton(
+            "📱 Abrir App" if lang == 'es' else "📱 Open App",
+            web_app=WebAppInfo(url=miniapp_url)
+        )
+    ]]
+    await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3630,230 +3270,53 @@ async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def referidos_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """🔥 COMANDO /REFERIDOS - Sistema de referidos con validación anti-abuso"""
+    """Handle /referidos command - Redirect to MiniApp referrals tab"""
     user_id = update.effective_user.id
     user = get_user(user_id)
-    
-    if not user:
-        await update.message.reply_text("⚠️ Usuario no encontrado. Usa /start primero.")
+    lang = get_user_language(user) if user else 'es'
+
+    base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+
+    if not base_url:
+        msg = "⚠️ MiniApp no disponible. Usa /start." if lang == 'es' else "⚠️ MiniApp not available. Use /start."
+        await update.message.reply_text(msg)
         return
-    
-    # Obtener estadísticas de referidos
-    stats = get_referral_stats(user_id)
-    
-    # Generar enlace de referido
-    bot_username = context.bot.username
-    referral_link = f"https://t.me/{bot_username}?start=ref_{user_id}"
-    
-    # Construir mensaje
-    message = (
-        "👥 *Sistema de Referidos*\n\n"
-        "🎯 *Cómo Funciona:*\n"
-        "1️⃣ Comparte tu enlace personal\n"
-        "2️⃣ Tus amigos se unen y usan el bot\n"
-        "3️⃣ Cada 15 referidos válidos = 1 día Premium\n\n"
-        "⚠️ *Requisitos para ser válido:*\n"
-        "• Usuario nuevo\n"
-        "• Conecta su cuenta\n"
-        "• Realiza al menos 1 descarga\n\n"
-        "📊 *Tu Progreso:*\n"
-        f"✅ Referidos confirmados: *{stats['confirmed']}*\n"
-        f"⏳ Pendientes: *{stats['pending']}*\n"
-        f"🎁 Días Premium ganados: *{stats['days_earned']}*\n"
-        f"📈 Progreso: *{stats['progress']}/{stats['next_reward_at']}*\n\n"
-    )
-    
-    # Añadir información sobre el límite
-    if stats['days_earned'] >= 15:
-        message += "🏆 *¡Has alcanzado el límite de 15 días!*\n\n"
-    else:
-        remaining = 15 - stats['days_earned']
-        message += f"🎯 Puedes ganar hasta *{remaining} días más* de Premium.\n\n"
-    
-    message += (
-        "🔗 *Tu Enlace Personal:*\n"
-        f"`{referral_link}`\n\n"
-        "👇 Comparte tu enlace usando el botón de abajo."
-    )
-    
-    # Botón para compartir
-    keyboard = [
-        [InlineKeyboardButton(
-            "📤 Compartir Enlace",
-            url=f"https://t.me/share/url?url={referral_link}&text="
-                f"¡Descarga contenido de Telegram con este bot! 🚀"
-        )]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await update.message.reply_text(
-        message,
-        parse_mode='Markdown',
-        reply_markup=reply_markup
-    )
+
+    miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}"
+
+    msg = "👥 Tu sistema de referidos está en la app:" if lang == 'es' else "👥 Your referral system is in the app:"
+    keyboard = [[
+        InlineKeyboardButton(
+            "👥 Ver Mis Referidos" if lang == 'es' else "👥 View My Referrals",
+            web_app=WebAppInfo(url=miniapp_url)
+        )
+    ]]
+    await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /stats command - Muestra solo estadísticas PERSONALES del usuario"""
+    """Handle /stats command - Redirect to MiniApp account tab"""
     user_id = update.effective_user.id
-    user_name = update.effective_user.first_name or "Usuario"
-    
-    # Reset daily limits if needed
-    check_and_reset_daily_limits(user_id)
-    
-    # Obtener estadísticas personales
-    user_stats = get_user_usage_stats(user_id, FREE_DOWNLOAD_LIMIT, FREE_PHOTO_LIMIT)
     user = get_user(user_id)
-    lang = get_user_language(user) if user else 'es'
-    
-    # Initialize keyboard early
-    keyboard = []
-    
-    if not user_stats:
-        error_text = "❌ Error getting statistics" if lang == 'en' else "❌ Error al obtener estadísticas"
-        keyboard.append([InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")])
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        if update.callback_query:
-            await update.callback_query.edit_message_text(error_text, reply_markup=reply_markup)
-        else:
-            await update.message.reply_text(error_text, reply_markup=reply_markup)
+    lang = get_user_language(user)
+
+    base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+
+    if not base_url:
+        msg = "⚠️ MiniApp no disponible. Usa /start." if lang == 'es' else "⚠️ MiniApp not available. Use /start."
+        await update.message.reply_text(msg)
         return
-    
-    # Header
-    header = "MY STATISTICS" if lang == 'en' else "MIS ESTADÍSTICAS"
-    message = "```\n"
-    message += "╔═══════════════════════════════╗\n"
-    message += f"║   👤 {header:<20} ║\n"
-    message += "╚═══════════════════════════════╝\n"
-    message += "```\n\n"
-    message += "┌─────────────────────────────┐\n"
-    message += f"│  📋 {user_name[:20]:<20} │\n"
-    message += "└─────────────────────────────┘\n"
-    message += "```\n"
-    
-    # Información del plan
-    if user['premium']:
-        message += "💎 *Plan:* `PREMIUM` ✨\n"
-        
-        if user.get('premium_until'):
-            expiry = datetime.fromisoformat(user['premium_until'])
-            days_left = (expiry - datetime.now()).days
-            expires_label = "Expires" if lang == 'en' else "Expira"
-            days_label = "days left" if lang == 'en' else "días"
-            message += f"📅 *{expires_label}:* `{expiry.strftime('%d/%m/%Y')}`\n"
-            message += f"⏰ *{days_label.title()}:* `{days_left} {days_label}`\n\n"
-        else:
-            lifetime = "Lifetime Premium" if lang == 'en' else "Premium Vitalicio"
-            message += f"♾️ *{lifetime}*\n\n"
-        
-        # Barra de progreso para cada tipo
-        videos = user_stats['videos']
-        photos = user_stats['photos']
-        music = user_stats['music']
-        apk = user_stats['apk']
-        
-        def get_progress_bar(used, total, width=10):
-            if total == 0:
-                return "▰" * width
-            filled = int((used / total) * width)
-            return "▰" * filled + "▱" * (width - filled)
-        
-        remaining_label = "remaining" if lang == 'en' else "restantes"
-        unlimited_label = "unlimited" if lang == 'en' else "ilimitadas"
-        
-        message += f"🎬 *Videos:* `{videos['used']}/50`\n"
-        message += f"   {get_progress_bar(videos['used'], 50)} `{50-videos['used']} {remaining_label}`\n\n"
-        
-        message += f"📸 *Fotos:* `{photos['used']}` ♾️\n"
-        message += f"   ∞∞∞∞∞∞∞∞∞∞ `{unlimited_label}`\n\n"
-        
-        message += f"🎵 *Música:* `{music['used']}/50`\n"
-        message += f"   {get_progress_bar(music['used'], 50)} `{music['remaining']} {remaining_label}`\n\n"
-        
-        message += f"📦 *APK:* `{apk['used']}/50`\n"
-        message += f"   {get_progress_bar(apk['used'], 50)} `{apk['remaining']} {remaining_label}`\n\n"
-        
-        # Footer for premium
-        message += "```\n"
-        message += "╔═══════════════════════════════╗\n"
-        message += "║    Estadísticas personales    ║\n"
-        message += "╚═══════════════════════════════╝\n"
-        message += "```"
-    else:
-        free_plan = "FREE" if lang == 'en' else "GRATUITO"
-        message += f"🆓 *Plan:* `{free_plan}`\n\n"
-        
-        videos = user_stats['videos']
-        photos = user_stats['photos']
-        
-        # Labels traducidos
-        total_label = "total" if lang == 'en' else "totales"
-        today_label = "today" if lang == 'en' else "hoy"
-        remaining_label = "remaining" if lang == 'en' else "restante"
-        only_one = "Only 1 left!" if lang == 'en' else "¡Solo queda 1!"
-        limit_reached = "Limit reached" if lang == 'en' else "Límite alcanzado"
-        daily_limit = "Daily limit reached" if lang == 'en' else "Límite diario alcanzado"
-        resets_in = "Resets in 24h" if lang == 'en' else "Se reinicia en 24h"
-        few_left = "Few remaining" if lang == 'en' else "Pocas restantes"
-        required = "Premium required" if lang == 'en' else "Premium requerido"
-        
-        # Videos (totales)
-        message += f"🎬 *Videos:* `{videos['used']}/{videos['limit']}` {total_label}\n"
-        if videos['remaining'] > 0:
-            bar = "🟢" * videos['remaining'] + "⚫" * (videos['limit'] - videos['remaining'])
-            message += f"   {bar}\n"
-            plural = 's' if videos['remaining'] > 1 else ''
-            message += f"   💡 `{videos['remaining']} {remaining_label}{plural}`\n"
-            if videos['remaining'] == 1:
-                message += f"   ⚠️ *{only_one}*\n"
-        else:
-            message += f"   🔴🔴🔴 `{limit_reached}`\n"
-        message += "\n"
-        
-        # Fotos (permanentes para FREE)
-        message += f"📸 *Fotos:* `{photos['used']}/{photos['limit']}`\n"
-        if photos['remaining'] > 0:
-            filled = min(photos['used'], photos['limit'])
-            bar = "🟩" * filled + "⬜" * (photos['limit'] - filled)
-            message += f"   {bar}\n"
-            plural = 's' if photos['remaining'] > 1 else ''
-            message += f"   💡 `{photos['remaining']} {remaining_label}{plural}`\n"
-            if photos['remaining'] <= 2:
-                message += f"   ⚠️ *{few_left}*\n"
-        else:
-            message += f"   🔴 `{limit_reached}`\n"
-        message += "\n"
-        
-        # Contenido premium bloqueado
-        message += "🔒 *Requiere Premium:*\n"
-        message += "   🎵 Música\n"
-        message += "   📦 APK\n"
-        
-        # Footer
-        message += "```\n"
-        message += "╔═══════════════════════════════╗\n"
-        message += "║    Estadísticas personales    ║\n"
-        message += "╚═══════════════════════════════╝\n"
-        message += "```"
-    
-    # Build keyboard buttons
-    if not user['premium']:
-        btn_premium = "💎 Get Premium" if lang == 'en' else "💎 Obtener Premium"
-        keyboard.append([InlineKeyboardButton(btn_premium, callback_data="show_premium")])
-    btn_refresh = "🔄 Refresh Stats" if lang == 'en' else "🔄 Actualizar Stats"
-    keyboard.append([InlineKeyboardButton(btn_refresh, callback_data="refresh_stats")])
-    keyboard.append([InlineKeyboardButton(get_msg("btn_back_start", lang), callback_data="back_to_menu")])
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    # Send or edit message based on context
-    if update.callback_query:
-        try:
-            await update.callback_query.edit_message_text(message, parse_mode='Markdown', reply_markup=reply_markup)
-        except Exception:
-            await update.callback_query.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
-    else:
-        await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
+
+    miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}"
+
+    msg = "📈 Tus estadísticas completas están en la app:" if lang == 'es' else "📈 Your full stats are in the app:"
+    keyboard = [[
+        InlineKeyboardButton(
+            "📱 Ver Mis Stats" if lang == 'es' else "📱 View My Stats",
+            web_app=WebAppInfo(url=miniapp_url)
+        )
+    ]]
+    await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def handle_message_logic(update, context_or_bot, client, link, parsed, user_id, user):
@@ -5091,13 +4554,9 @@ async def post_init(application: Application):
     # Set bot commands menu
     from telegram import BotCommand, MenuButtonWebApp, WebAppInfo
     commands = [
-        BotCommand("start", "🏠 Inicio - Menú principal"),
-        BotCommand("panel", "📊 Panel de usuario"),
-        BotCommand("premium", "💎 Hacerse Premium"),
-        BotCommand("configurar", "⚙️ Configurar cuenta"),
-        BotCommand("stats", "📈 Mis estadísticas"),
-        BotCommand("referidos", "👥 Sistema de referidos"),
-        BotCommand("miniapp", "📱 Abrir MiniApp")
+        BotCommand("start", "🏠 Inicio"),
+        BotCommand("configurar", "⚙️ Configurar cuenta de Telegram"),
+        BotCommand("miniapp", "📱 Abrir App")
     ]
     try:
         await application.bot.set_my_commands(commands)
