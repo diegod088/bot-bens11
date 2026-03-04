@@ -1356,6 +1356,7 @@
                                 style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
                             </div>
                         </div>
+                        <div id="unlockBtnVideo"></div>
                     </div>
                     <div class="limit-row" id="limitRowPhoto">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
@@ -1367,6 +1368,32 @@
                                 style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
                             </div>
                         </div>
+                        <div id="unlockBtnPhoto"></div>
+                    </div>
+                    <!-- Nuevas filas para Premium -->
+                    <div class="limit-row" id="limitRowMusic" style="display:none;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span style="font-size:13px; font-weight:600;">🎵 Música</span>
+                            <span id="limitTextMusic" style="font-size:12px; color:var(--text-muted)">0/50</span>
+                        </div>
+                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
+                            <div id="limitBarMusic"
+                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
+                            </div>
+                        </div>
+                        <div id="unlockBtnMusic"></div>
+                    </div>
+                    <div class="limit-row" id="limitRowApk" style="display:none;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span style="font-size:13px; font-weight:600;">📱 APKs</span>
+                            <span id="limitTextApk" style="font-size:12px; color:var(--text-muted)">0/50</span>
+                        </div>
+                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
+                            <div id="limitBarApk"
+                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
+                            </div>
+                        </div>
+                        <div id="unlockBtnApk"></div>
                     </div>
                     <!-- Para música y APK mostrar como bloqueados si no es premium -->
                     <div id="lockedRow" style="display:flex; gap:10px;">
@@ -1382,7 +1409,7 @@
                         </div>
                     </div>
                     <!-- Contenedor para el botón de unlock que se mostrará vía JS -->
-                    <div id="premiumUnlockBtnContainer"></div>
+                    <div id="premiumUnlockBtnContainer" style="display:none;"></div>
                 </div>
             </div>
 
@@ -2263,20 +2290,23 @@
             renderHistory();
         }
 
-        // Mejora 1: JS para las barras de límites
+        // Mejora 1: JS para las barras de límites (Refinado)
         function updateLimitBars() {
             const limits = userData.limits || {};
+            const isPremium = userData.premium || false;
 
-            function renderBar(barId, textId, used, max, type) {
+            function renderBar(barId, textId, unlockId, used, max, type) {
                 const bar = document.getElementById(barId);
                 const text = document.getElementById(textId);
+                const unlock = document.getElementById(unlockId);
                 if (!bar || !text) return;
 
                 if (max === 0) {
                     text.textContent = '🔒 Solo Premium';
                     bar.style.width = '100%';
                     bar.style.background = 'var(--bg-card)';
-                    return;
+                    if (unlock) unlock.innerHTML = '';
+                    return 0;
                 }
 
                 const pct = Math.min((used / max) * 100, 100);
@@ -2288,38 +2318,50 @@
                     bar.style.background = 'var(--accent-red)'; // Rojo = límite alcanzado
                     text.style.color = 'var(--accent-red)';
                     text.style.fontWeight = '700';
+
+                    // Mostrar botón de unlock si no es premium y es Video o Photo
+                    if (!isPremium && unlock) {
+                        unlock.innerHTML = `
+                            <button onclick="switchTab('premium')" style="width:100%; margin-top:8px; padding:8px; border:none; border-radius:8px; background:linear-gradient(135deg, #E5A958, #D89640); color:white; font-size:12px; font-weight:700; cursor:pointer;">
+                              ⭐ Desbloquear con Premium
+                            </button>
+                        `;
+                    } else if (unlock) {
+                        unlock.innerHTML = '';
+                    }
                 } else if (pct >= 70) {
                     bar.style.background = 'var(--accent-orange)'; // Naranja = casi lleno
                     text.style.color = 'var(--text-muted)';
+                    if (unlock) unlock.innerHTML = '';
                 } else {
                     bar.style.background = 'var(--accent-green)'; // Verde = ok
                     text.style.color = 'var(--text-muted)';
+                    if (unlock) unlock.innerHTML = '';
                 }
 
                 return pct;
             }
 
-            const videoPct = renderBar('limitBarVideo', 'limitTextVideo', limits.video?.used || 0, limits.video?.max || 3, 'video');
-            const photoPct = renderBar('limitBarPhoto', 'limitTextPhoto', limits.photo?.used || 0, limits.photo?.max || 10, 'photo');
+            // Videos y Fotos (siempre visibles)
+            renderBar('limitBarVideo', 'limitTextVideo', 'unlockBtnVideo', limits.video?.used || 0, limits.video?.max || 3, 'video');
+            renderBar('limitBarPhoto', 'limitTextPhoto', 'unlockBtnPhoto', limits.photo?.used || 0, limits.photo?.max || 10, 'photo');
 
-            // Mostrar cupón o botón de premium si algo está lleno
-            const unlockContainer = document.getElementById('premiumUnlockBtnContainer');
-            if (unlockContainer) {
-                if (videoPct >= 100 || photoPct >= 100) {
-                    unlockContainer.innerHTML = `
-                        <button onclick="switchTab('premium')" style="width:100%; margin-top:8px; padding:10px; border:none; border-radius:10px; background:linear-gradient(135deg, #E5A958, #D89640); color:white; font-size:13px; font-weight:700; cursor:pointer; animation: pulse 2s infinite;">
-                            ⭐ Desbloquear descargas ilimitadas
-                        </button>
-                    `;
-                } else {
-                    unlockContainer.innerHTML = '';
-                }
-            }
-
-            // Ocultar filas bloqueadas si es premium
+            // Música y APKs (visibles solo si es premium)
+            const rowMusic = document.getElementById('limitRowMusic');
+            const rowApk = document.getElementById('limitRowApk');
             const lockedRow = document.getElementById('lockedRow');
-            if (lockedRow) {
-                lockedRow.style.display = userData.premium ? 'none' : 'flex';
+
+            if (isPremium) {
+                if (rowMusic) rowMusic.style.display = 'block';
+                if (rowApk) rowApk.style.display = 'block';
+                if (lockedRow) lockedRow.style.display = 'none';
+
+                renderBar('limitBarMusic', 'limitTextMusic', 'unlockBtnMusic', limits.music?.used || 0, limits.music?.max || 50, 'music');
+                renderBar('limitBarApk', 'limitTextApk', 'unlockBtnApk', limits.apk?.used || 0, limits.apk?.max || 50, 'apk');
+            } else {
+                if (rowMusic) rowMusic.style.display = 'none';
+                if (rowApk) rowApk.style.display = 'none';
+                if (lockedRow) lockedRow.style.display = 'flex';
             }
         }
 
