@@ -2564,12 +2564,13 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 
 
-async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
+async def handle_media_download(update: Update, context_or_bot,
                                 message, user: dict, status_msg, is_album: bool = False, 
                                 album_index: int = 1, album_total: int = 1,
                                 bypass_limits: bool = False, custom_caption: str = None):
     """Maneja la descarga según el tipo de medio con validaciones optimizadas"""
-    user_id = update.effective_user.id
+    user_id = user['id']
+    bot = context_or_bot.bot if hasattr(context_or_bot, 'bot') else context_or_bot
     
     # Determinar tipo de contenido usando la función unificada
     content_type = detect_content_type(message)
@@ -2638,7 +2639,7 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
         
         # Usar la función optimizada para descargar y enviar
         logger.info(f"Iniciando envío de {content_type} para usuario {user_id}")
-        success = await download_and_send_media(message, user_id, context.bot, caption=final_caption)
+        success = await download_and_send_media(message, user_id, bot, caption=final_caption)
         logger.info(f"Resultado del envío: {success} para usuario {user_id}")
         
         if success:
