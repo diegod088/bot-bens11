@@ -915,34 +915,6 @@ class UsageNotification:
         
         return summary
     
-    @staticmethod
-    async def send_upgrade_suggestion(message_obj, content_type: str):
-        """
-        Sugiere actualización a Premium después de uso exitoso
-        
-        Args:
-            message_obj: Objeto de mensaje
-            content_type: Tipo de contenido descargado
-        """
-        suggestions = {
-            'video': (
-                "💡 *¿Te gustó este video?*\n\n"
-                f"Con Premium puedes descargar *50 videos diarios* + música y APK\n"
-                f"⭐ Solo {PREMIUM_PRICE_STARS} estrellas\n"
-                "💎 Comando: /premium"
-            ),
-            'photo': (
-                "💡 *¿Necesitas más fotos?*\n\n"
-                f"Con Premium tienes *fotos ilimitadas* + videos, música y APK\n"
-                f"⭐ Solo {PREMIUM_PRICE_STARS} estrellas\n"
-                "💎 Comando: /premium"
-            )
-        }
-        
-        suggestion = suggestions.get(content_type)
-        if suggestion:
-            await message_obj.reply_text(suggestion, parse_mode='Markdown')
-
 
 def parse_telegram_link(url: str) -> tuple[str, int | None] | None:
     """Extrae identificador del canal y message_id (puede ser None)"""
@@ -1345,31 +1317,46 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if query.data.startswith("setlang_"):
         await query.answer()
-        lang = query.data.split("_")[1]
         user_id = query.from_user.id
+        lang = query.data.split("_")[1]
         set_user_language(user_id, lang)
-        logger.info(f"User {user_id} selected language: {lang}")
-        
-        # Proceed to the actual welcome message which was deferred from /start
-        user = get_user(user_id)
-        
-        # Send Miniapp button with language included
         first_name = update.effective_user.first_name
+        logger.info(f"User {user_id} selected language: {lang}")
+
         base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
-        miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&new=false&lang={lang}"
-        
-        welcome_message = (
-            f"👋 ¡Hola {first_name}! / Hello {first_name}!\n\n"
-            "🚀 Abriendo MiniApp...\n"
-        )
-        
-        keyboard = [
-            [InlineKeyboardButton("📱 Abrir MiniApp", web_app=WebAppInfo(url=miniapp_url))],
-            [InlineKeyboardButton("⚙️ Configuración", callback_data="settings")],
-            [InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans")]
-        ]
+
+        if lang == 'es':
+            welcome_message = f"👋 ¡Hola de nuevo, {first_name}!\n\n👇 *Abre la app para continuar:*"
+        else:
+            welcome_message = f"👋 Welcome back, {first_name}!\n\n👇 *Open the app to continue:*"
+
+        keyboard = []
+        if base_url:
+            miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}"
+            keyboard.append([
+                InlineKeyboardButton(
+                    "📱 Abrir App" if lang == 'es' else "📱 Open App",
+                    web_app=WebAppInfo(url=miniapp_url)
+                )
+            ])
+
+        has_session = has_active_session(user_id)
+        if not has_session:
+            keyboard.append([
+                InlineKeyboardButton(
+                    "⚙️ Configurar cuenta" if lang == 'es' else "⚙️ Configure account",
+                    callback_data="connect_account"
+                )
+            ])
+
+        keyboard.append([
+            InlineKeyboardButton(
+                "💬 Soporte" if lang == 'es' else "💬 Support",
+                url="https://t.me/observer_bots/11"
+            )
+        ])
+
         reply_markup = InlineKeyboardMarkup(keyboard)
-        
         try:
             await query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
         except Exception:
@@ -1406,10 +1393,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await stats_command(update, context)
         return
         
-    if query.data == "back_to_menu":
-        await query.answer()
-        await start_command(update, context)
-        return
     
     if query.data == "start_download":
         logger.info(f"start_download callback triggered by user {query.from_user.id}")
@@ -2035,7 +2018,20 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
         user = get_user(user_id)
         lang = get_user_language(user) if user else 'es'
-        await show_premium_plans(query, context, lang)
+        base_url = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+        if base_url:
+            miniapp_url = f"{base_url}/miniapp?v=2&user_id={user_id}&lang={lang}#premium"
+            keyboard = [[
+                InlineKeyboardButton(
+                    "⭐ Ver Planes Premium" if lang == 'es' else "⭐ View Premium Plans",
+                    web_app=WebAppInfo(url=miniapp_url)
+                )
+            ]]
+            msg = "💎 Elige tu plan en la app:" if lang == 'es' else "💎 Choose your plan in the app:"
+            try:
+                await query.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
+            except Exception:
+                await query.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
         return
     
     # Handle language changes (change_lang_XX)
@@ -3012,7 +3008,46 @@ async def diagnostic_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
         return
 
-    await update.message.reply_text("🔍 *Ejecutando diagnóstico...*", parse_mode='Markdown')
+    status_msg = await update.message.reply_text("🔍 *Ejecutando diagnóstico...*", parse_mode='Markdown')
+    
+    results = []
+    
+    # 1. Database Check
+    try:
+        conn = get_db_connection()
+        conn.execute("SELECT 1")
+        conn.close()
+        results.append("✅ *Base de datos:* Conectada")
+    except Exception as e:
+        results.append(f"❌ *Base de datos:* Error - `{str(e)}`")
+        
+    # 2. API Config
+    if TELEGRAM_API_ID and TELEGRAM_API_HASH and TELEGRAM_TOKEN:
+        results.append("✅ *Configuración API:* Presente")
+    else:
+        results.append("❌ *Configuración API:* Faltan variables (.env)")
+
+    # 3. Telethon Bot Client
+    if bot_client and bot_client.is_connected():
+        results.append("✅ *Cliente Telethon (Bot):* Conectado")
+    else:
+        results.append("⚠️ *Cliente Telethon (Bot):* Desconectado o no iniciado")
+        
+    # 4. OS / Runtime
+    import platform
+    results.append(f"ℹ️ *Sistema:* `{platform.system()} {platform.release()}`")
+    
+    # 5. MiniApp URL
+    miniapp_url = os.getenv('MINIAPP_URL', os.getenv('DASHBOARD_URL', ''))
+    if miniapp_url:
+        results.append(f"🔗 *MiniApp URL:* `{miniapp_url}`")
+    else:
+        results.append("⚠️ *MiniApp URL:* No definida")
+
+    diagnostic_text = "📊 *Resultado del Diagnóstico:*\n\n" + "\n".join(results)
+    diagnostic_text += "\n\n━━━━━━━━━━━━━━━\n📢 @observer_bots"
+    
+    await status_msg.edit_text(diagnostic_text, parse_mode='Markdown')
 
 
 async def miniapp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3693,790 +3728,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_message_logic(update, context, client, link, parsed, user_id, user)
 
 
-async def handle_message_old(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle incoming messages with Telegram links"""
-    user_id = update.effective_user.id
-    text = update.message.text
-    
-    if not text:
-        return
-    
-    # Extract Telegram links
-    links = re.findall(r'https?://t\.me/[^\s]+', text)
-    if not links:
-        return
-    
-    # Ensure user exists
-    if not get_user(user_id):
-        create_user(user_id, first_name=update.effective_user.first_name, username=update.effective_user.username)
-    
-    # Ensure admins have premium
-    ensure_admin_premium(user_id)
-    
-    if not has_active_session(user_id):
-        await update.message.reply_text(
-            "⚠️ *Configuración Requerida*\n\n"
-            "Para descargar contenido, necesitas configurar tu cuenta de Telegram.\n"
-            "Esto es necesario para evitar baneos y descargar de canales privados.\n\n"
-            "👉 Usa /configurar para empezar.",
-            parse_mode='Markdown'
-        )
-        return
-    
-    user = get_user(user_id)
-    
-    # Parse link
-    link = links[0]
-    parsed = parse_telegram_link(link)
-    
-    if not parsed:
-        await update.message.reply_text(
-            "❌ *Enlace Inválido*\n\n"
-            "El enlace que enviaste no es válido.\n\n"
-            "📌 *Formatos aceptados:*\n"
-            "• Canales públicos: t.me/canal/123\n"
-            "• Canales privados: t.me/+HASH/123\n"
-            "• Enlaces numéricos: t.me/c/123456/789\n\n"
-            "💡 Copia el enlace completo desde Telegram y envíamelo otra vez.",
-            parse_mode='Markdown'
-        )
-        return
-    
-    channel_id, message_id = parsed
-    joined_automatically = False  # Track if we joined a channel
-    
-    # If no message_id, this is just an invitation link to join
-    if message_id is None:
-        if channel_id.startswith('+'):
-            try:
-                invite_hash = channel_id[1:]
-                result = await telethon_client(ImportChatInviteRequest(invite_hash))
-                await asyncio.sleep(1)
-                
-                # Get channel name from result
-                channel_name = getattr(result.chats[0], 'title', 'canal') if result.chats else 'canal'
-                
-                await update.message.reply_text(
-                    f"✅ *Unido Exitosamente*\n\n"
-                    f"Me uní al canal: *{channel_name}*\n\n"
-                    f"Ahora puedes enviarme enlaces de mensajes específicos del canal para descargar contenido.\n\n"
-                    f"📝 Ejemplo: t.me/+HASH/123",
-                    parse_mode='Markdown'
-                )
-                return
-            except UserAlreadyParticipantError:
-                await update.message.reply_text(
-                    "ℹ️ *Ya Estoy en el Canal*\n\n"
-                    "Ya soy miembro de este canal.\n\n"
-                    "Puedes enviarme enlaces de mensajes específicos para descargar contenido.\n\n"
-                    "📝 Ejemplo: t.me/+HASH/123",
-                    parse_mode='Markdown'
-                )
-                return
-            except InviteHashExpiredError:
-                await update.message.reply_text(
-                    "La invitación ha expirado\n\n"
-                    "Pide al administrador del canal un enlace nuevo (debe empezar con t.me/+) y envíamelo otra vez."
-                )
-                return
-            except InviteHashInvalidError:
-                await update.message.reply_text(
-                    "Enlace de invitación inválido o ya usado\n\n"
-                    "Asegúrate de copiar el enlace completo que empieza con t.me/+"
-                )
-                return
-            except FloodWaitError as e:
-                await update.message.reply_text(
-                    f"⏳ *Límite de Velocidad*\n\n"
-                    f"Demasiadas solicitudes. Espera {e.seconds} segundos e inténtalo nuevamente.",
-                    parse_mode='Markdown'
-                )
-                return
-            except Exception as join_e:
-                logger.error(f"Error joining channel: {join_e}")
-                await update.message.reply_text(
-                    "❌ *Error al Unirse al Canal*\n\n"
-                    "No pude unirme al canal automáticamente.\n\n"
-                    "🔍 *Qué puedes hacer:*\n"
-                    "1️⃣ Verifica que el enlace sea correcto\n"
-                    "2️⃣ Pide un nuevo enlace de invitación al admin\n"
-                    "3️⃣ Intenta agregar el bot manualmente al canal\n\n"
-                    "💡 Si el problema persiste, contacta al administrador del canal.",
-                    parse_mode='Markdown'
-                )
-                return
-        else:
-            await update.message.reply_text(
-                "❌ *Enlace Incompleto*\n\n"
-                "Este enlace no tiene el número de mensaje.\n\n"
-                "📝 *Necesito el enlace completo:*\n"
-                "• Para canales públicos: t.me/canal/123\n"
-                "• Para canales privados: t.me/c/123456/789\n\n"
-                "💡 Toca el mensaje específico → Copiar enlace",
-                parse_mode='Markdown'
-            )
-            return
-    
-    try:
-        # Get the message
-        message = None
-        entity = None
-        
-        logger.info(f"Attempting to get message {message_id} from channel {channel_id}")
-        
-        try:
-            entity = await get_entity_from_identifier(channel_id)
-            logger.info(f"Entity resolved: {entity}")
-            message = await telethon_client.get_messages(entity, ids=message_id)
-            logger.info(f"Message retrieved: {message is not None}")
-        except ValueError as ve:
-            logger.warning(f"ValueError getting entity: {ve}")
-            # Entity not found in cache
-            # For numeric channel IDs, we need to get all dialogs to find it
-            if channel_id.isdigit():
-                try:
-                    logger.info(f"Numeric channel ID, searching in dialogs...")
-                    # Get the channel from dialogs
-                    async for dialog in telethon_client.iter_dialogs():
-                        if dialog.is_channel and str(dialog.entity.id) == channel_id:
-                            entity = dialog.entity
-                            logger.info(f"Found channel in dialogs: {dialog.entity.title}")
-                            message = await telethon_client.get_messages(entity, ids=message_id)
-                            logger.info(f"Message retrieved from dialog channel: {message is not None}")
-                            break
-                    
-                    if not message:
-                        # Channel not found in dialogs, need invitation
-                        raise ChannelPrivateError(None)
-                except Exception as ex:
-                    logger.error(f"Failed to get entity from dialogs: {ex}")
-                    raise ChannelPrivateError(None)
-            elif channel_id.startswith('+'):
-                # For invite links, try to get entity directly or join
-                try:
-                    logger.info(f"Trying to get entity directly for invite link")
-                    entity = await telethon_client.get_entity(channel_id)
-                    message = await telethon_client.get_messages(entity, ids=message_id)
-                    logger.info(f"Message retrieved after direct entity fetch: {message is not None}")
-                except Exception as ex:
-                    logger.error(f"Failed to get entity directly: {ex}")
-                    # If still fails, treat as private channel
-                    raise ChannelPrivateError(None)
-            else:
-                raise ChannelPrivateError(None)
-        except (ChannelPrivateError, ChatForbiddenError):
-            # If channel is private and we have an invite hash, try to join
-            if channel_id.startswith('+'):
-                try:
-                    # Extract hash from identifier (remove '+' prefix)
-                    invite_hash = channel_id[1:]
-                    await telethon_client(ImportChatInviteRequest(invite_hash))
-                    
-                    # Wait a moment for the join to complete
-                    await asyncio.sleep(1)
-                    
-                    # Try to get the message again
-                    entity = await get_entity_from_identifier(channel_id)
-                    message = await telethon_client.get_messages(entity, ids=message_id)
-                    
-                    await update.message.reply_text("Unido al canal automáticamente. Descargando...")
-                    joined_automatically = True
-                    
-                except InviteHashExpiredError:
-                    await update.message.reply_text(
-                        "La invitación ha expirado\n\n"
-                        "Pide al administrador del canal un enlace nuevo (debe empezar con t.me/+) y envíamelo otra vez."
-                    )
-                    return
-                except InviteHashInvalidError:
-                    await update.message.reply_text(
-                        "Enlace de invitación inválido o ya usado\n\n"
-                        "Asegúrate de copiar el enlace completo que empieza con t.me/+"
-                    )
-                    return
-                except FloodWaitError as flood_e:
-                    await update.message.reply_text(
-                        f"⏳ *Límite de Velocidad*\n\n"
-                        f"Demasiadas solicitudes. Espera {flood_e.seconds} segundos e inténtalo nuevamente.",
-                        parse_mode='Markdown'
-                    )
-                    return
-                except Exception as join_e:
-                    logger.error(f"Error joining channel: {join_e}")
-                    await update.message.reply_text(
-                        "❌ *Error al Unirse al Canal*\n\n"
-                        "No pude unirme al canal automáticamente.\n\n"
-                        "🔍 *Qué puedes hacer:*\n"
-                        "1️⃣ Verifica que el enlace sea correcto\n"
-                        "2️⃣ Pide un nuevo enlace de invitación al admin\n"
-                        "3️⃣ Intenta agregar el bot manualmente al canal\n\n"
-                        "💡 Si el problema persiste, contacta al administrador del canal.",
-                        parse_mode='Markdown'
-                    )
-                    return
-            else:
-                # Private channel without invite hash
-                me = await telethon_client.get_me()
-                username = f"@{me.username}" if me.username else "el bot"
-                await update.message.reply_text(
-                    f"Este es un canal privado y no tengo acceso\n\n"
-                    f"Para que pueda descargar:\n\n"
-                    f"Opción 1 → Envíame un enlace de invitación (empieza con t.me/+) \n"
-                    f"Opción 2 → Agrégame manualmente al canal con mi cuenta {username}"
-                )
-                return
-        
-        if not message:
-            await update.message.reply_text(
-                "❌ *Mensaje No Encontrado*\n\n"
-                "No pude encontrar este mensaje en el canal.\n\n"
-                "🔍 *Posibles razones:*\n"
-                "• El mensaje fue eliminado\n"
-                "• El enlace está incorrecto\n"
-                "• El canal no existe\n\n"
-                "💡 Verifica el enlace y envíamelo otra vez.",
-                parse_mode='Markdown'
-            )
-            return
-        
-        # === DETECCIÓN DE PAYWALL/PROTECCIÓN STARS ===
-        # Si el mensaje existe pero no tiene media y no es solo texto, probablemente está protegido
-        is_paywall = False
-        paywall_reason = None
-        # Telethon: algunos mensajes protegidos tienen media=None y restriction_reason o restricted
-        if message and not message.media:
-            # Si tiene restriction_reason o restricted, o el texto menciona Stars
-            restriction = getattr(message, 'restriction_reason', None)
-            restricted = getattr(message, 'restricted', None)
-            text = getattr(message, 'text', '') or ''
-            if restriction or restricted:
-                is_paywall = True
-                paywall_reason = str(restriction) if restriction else 'Contenido restringido.'
-            # Heurística: si el texto menciona Stars/paywall
-            if 'Stars' in text or '⭐' in text or 'paywall' in text.lower():
-                is_paywall = True
-                paywall_reason = 'Contenido protegido por Telegram Stars.'
-        # Si detectamos paywall, mostrar mensaje claro
-        if is_paywall:
-            user_id = update.effective_user.id
-            if user_id in ADMIN_USER_IDS:
-                # Intento de bypass experimental para admins
-                try:
-                    await update.message.reply_text(
-                        "🔓 *Contenido protegido por Stars detectado.*\n\n"
-                        "Intentando bypass experimental solo para admins...",
-                        parse_mode='Markdown'
-                    )
-                    # Intentar reenviar el mensaje (puede fallar)
-                    try:
-                        await context.bot.forward_message(
-                            chat_id=user_id,
-                            from_chat_id=message.chat_id,
-                            message_id=message.id
-                        )
-                        await update.message.reply_text(
-                            "✅ *Bypass experimental exitoso.*\n\nSi ves el archivo, el método funcionó.",
-                            parse_mode='Markdown'
-                        )
-                        return
-                    except Exception as e:
-                        await update.message.reply_text(
-                            f"❌ *Bypass experimental fallido.*\n\nNo se pudo reenviar el mensaje.\n\nError: {e}",
-                            parse_mode='Markdown'
-                        )
-                except Exception as e:
-                    await update.message.reply_text(
-                        f"❌ *Error inesperado en bypass experimental.*\n\n{e}",
-                        parse_mode='Markdown'
-                    )
-            # Mensaje para usuarios normales
-            else:
-                await update.message.reply_text(
-                    "🔒 *Contenido protegido por Stars*\n\n"
-                    "Este archivo está protegido por un paywall de Telegram Stars y no puede ser descargado automáticamente.\n\n"
-                    "💡 Si eres el dueño del canal, puedes quitar el paywall o compartir el archivo directamente.\n\n"
-                    "⭐ Si quieres más información sobre Stars: https://core.telegram.org/stars",
-                    parse_mode='Markdown'
-                )
-            return
-
-        # Check if message is part of an album (grouped media)
-        album_messages = []
-        if hasattr(message, 'grouped_id') and message.grouped_id:
-            logger.info(f"Album detected with grouped_id: {message.grouped_id}")
-            
-            # Search forward and backward for other messages in the group
-            try:
-                # Show initial status
-                album_status = await update.message.reply_text("🔍 Detectando álbum...")
-                
-                # Collect all messages with same grouped_id
-                grouped_id = message.grouped_id
-                album_messages = []
-                
-                # BUG 2 Fix: Rango ±10 y validación robusta
-                start_id = max(1, message_id - 10)
-                end_id = message_id + 10
-                ids_to_check = list(range(start_id, end_id + 1))
-                logger.info(f"Checking message IDs from {start_id} to {end_id} for grouped_id {grouped_id}")
-                
-                try:
-                    messages_batch = await telethon_client.get_messages(entity, ids=ids_to_check)
-                    if not messages_batch:
-                        raise ValueError("Empty response from get_messages")
-                    
-                    for msg in messages_batch:
-                        if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id and msg.media:
-                            album_messages.append(msg)
-                    
-                    if not album_messages:
-                        album_messages = [message]
-                    
-                    album_messages.sort(key=lambda m: m.id)
-                except Exception as batch_err:
-                    logger.error(f"Error in batch album fetch (Telethon): {batch_err}")
-                    album_messages = [message]
-                
-                logger.info(f"Found {len(album_messages)} messages in album")
-                
-                # Update status message to show album
-                await album_status.edit_text(f"📸 Álbum detectado: {len(album_messages)} archivos\n⏳ Preparando descarga...")
-            except Exception as album_err:
-                logger.error(f"Error getting album messages (Telethon): {album_err}")
-                logger.exception(album_err)
-                # Continue with single message if album fetch fails
-                album_messages = [message]
-        
-        # Check for nested links
-        if not message.media and message.text:
-            inner_links = re.findall(r'https?://t\.me/[^\s\)]+', message.text)
-            if inner_links:
-                inner_parsed = parse_telegram_link(inner_links[0])
-                if inner_parsed:
-                    inner_channel_id, inner_message_id = inner_parsed
-                    if inner_message_id is None:
-                        logger.info(f"Skipping nested link without message_id: {inner_links[0]}")
-                    else:
-                        try:
-                            inner_entity = None
-                            inner_msg = None
-                            try:
-                                inner_entity = await get_entity_from_identifier(inner_channel_id)
-                                inner_msg = await telethon_client.get_messages(inner_entity, ids=inner_message_id)
-                            except ValueError as ve_inner:
-                                if inner_channel_id.isdigit():
-                                    async for dialog in telethon_client.iter_dialogs():
-                                        if dialog.is_channel and str(dialog.entity.id) == inner_channel_id:
-                                            inner_entity = dialog.entity
-                                            inner_msg = await telethon_client.get_messages(inner_entity, ids=inner_message_id)
-                                            break
-                            if inner_msg and inner_msg.media:
-                                message = inner_msg
-                                logger.info("Using nested link message with media")
-                        except Exception as nested_ex:
-                            logger.warning(f"Could not process nested link: {nested_ex}")
-                            # Continue with original message if nested fails
-        
-        # Check if message has media or text content
-        if not message:
-            await update.message.reply_text(
-                "❌ *Mensaje No Encontrado*\n\n"
-                "No pude encontrar este mensaje en el canal.",
-                parse_mode='Markdown'
-            )
-            return
-        
-        # If message has only text (no media), send the text
-        if not message.media:
-            if message.text:
-                # Send the text content
-                text_to_send = message.text
-                
-                # Add caption if available
-                if hasattr(message, 'caption') and message.caption:
-                    text_to_send = f"{message.caption}\n\n{text_to_send}"
-                
-                await update.message.reply_text(
-                    f"📄 *Contenido del Mensaje:*\n\n{text_to_send}",
-                    parse_mode='Markdown'
-                )
-                return
-            else:
-                await update.message.reply_text(
-                    "❌ *Sin Contenido*\n\n"
-                    "Este mensaje no contiene texto ni archivos para descargar.\n\n"
-                    "📥 *Puedo descargar:*\n"
-                    "• Texto\n"
-                    "• Videos y GIFs\n"
-                    "• Fotos e imágenes\n"
-                    "• Música y audio\n"
-                    "• Archivos APK\n\n"
-                    "💡 Envíame un enlace a un mensaje que contenga alguno de estos.",
-                    parse_mode='Markdown'
-                )
-                return
-        
-        # Detect content type
-        content_type = detect_content_type(message)
-        
-        # Check photo limits
-        if content_type == 'photo':
-            if not user['premium']:
-                # FREE users: límite PERMANENTE de fotos
-                user = get_user(user_id)
-                
-                if user['daily_photo'] >= FREE_PHOTO_LIMIT:
-                    await update.message.reply_text(
-                        "⚠️ *Límite de Fotos Alcanzado*\n\n"
-                        f"Has usado tus {FREE_PHOTO_LIMIT} fotos gratuitas.\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "💎 *Con Premium obtienes:*\n"
-                        "✅ Fotos: Ilimitadas\n"
-                        "✅ Videos: 50 diarios\n"
-                        "✅ Música: 50 diarias\n"
-                        "✅ APK: 50 diarios\n"
-                        "♻️ Videos, música y APK se renuevan diario\n\n"
-                        f"💰 Solo {PREMIUM_PRICE_STARS} ⭐ por 30 días\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "⭐ Usa /premium para suscribirte",
-                        parse_mode='Markdown'
-                    )
-                    return
-            # Premium users have unlimited photos, continue
-        # Music and APK blocked for FREE users
-        elif content_type in ['music', 'apk'] and not user['premium']:
-            content_name = 'Música' if content_type == 'music' else 'APK'
-            await update.message.reply_text(
-                "🔒 *Contenido Bloqueado*\n\n"
-                f"✖️ {content_name} solo para usuarios Premium\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                "💎 *Con Premium desbloqueas:*\n"
-                f"✅ {content_name}: 50 diarias\n"
-                "✅ Videos: 50 diarios\n"
-                "✅ Todo se resetea cada día\n\n"
-                f"💰 Solo {PREMIUM_PRICE_STARS} ⭐ por 30 días\n\n"
-                "━━━━━━━━━━━━━━━━━━━━\n\n"
-                "⭐ Usa /premium para suscribirte",
-                parse_mode='Markdown'
-            )
-            return
-        # Check video limits
-        elif content_type == 'video':
-            if user['premium']:
-                # Check premium daily video limit
-                check_and_reset_daily_limits(user_id)
-                user = get_user(user_id)  # Refresh after potential reset
-                
-                if user['daily_video'] >= PREMIUM_VIDEO_DAILY_LIMIT:
-                    await update.message.reply_text(
-                        "⚠️ *Límite Diario Alcanzado*\n\n"
-                        f"Has descargado {user['daily_video']}/{PREMIUM_VIDEO_DAILY_LIMIT} videos hoy.\n\n"
-                        "♻️ Tu límite se renueva en 24 horas.\n\n"
-                        "💡 Mientras esperas puedes descargar:\n"
-                        "✨ Fotos: Ilimitadas\n"
-                        f"🎵 Música: {user['daily_music']}/{PREMIUM_MUSIC_DAILY_LIMIT}\n"
-                        f"📦 APK: {user['daily_apk']}/{PREMIUM_APK_DAILY_LIMIT}",
-                        parse_mode='Markdown'
-                    )
-                    return
-            else:
-                # Check FREE total video limit
-                if user['downloads'] >= FREE_DOWNLOAD_LIMIT:
-                    await update.message.reply_text(
-                        "⚠️ *Límite Alcanzado*\n\n"
-                        "Has usado tus 3 videos gratuitos.\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "💎 *Mejora a Premium y obtén:*\n"
-                        "✅ 50 videos cada día\n"
-                        "✅ 50 canciones cada día\n"
-                        "✅ 50 APK cada día\n"
-                        "♻️ Límites se renuevan diario\n\n"
-                        f"💰 Solo {PREMIUM_PRICE_STARS} ⭐ por 30 días\n\n"
-                        "━━━━━━━━━━━━━━━━━━━━\n\n"
-                        "⭐ Usa /premium para suscribirte",
-                        parse_mode='Markdown'
-                    )
-                    return
-        # Check music limits for premium
-        elif content_type == 'music' and user['premium']:
-            check_and_reset_daily_limits(user_id)
-            user = get_user(user_id)  # Refresh
-            
-            if user['daily_music'] >= PREMIUM_MUSIC_DAILY_LIMIT:
-                await update.message.reply_text(
-                    "⚠️ *Límite Diario Alcanzado*\n\n"
-                    f"Has descargado {user['daily_music']}/{PREMIUM_MUSIC_DAILY_LIMIT} canciones hoy.\n\n"
-                    "♻️ Tu límite se renueva en 24 horas.\n\n"
-                    "💡 Mientras esperas puedes descargar:\n"
-                    "✨ Fotos: Ilimitadas\n"
-                    f"🎬 Videos: {user['daily_video']}/{PREMIUM_VIDEO_DAILY_LIMIT}\n"
-                    f"📦 APK: {user['daily_apk']}/{PREMIUM_APK_DAILY_LIMIT}",
-                    parse_mode='Markdown'
-                )
-                return
-        # Check APK limits for premium
-        elif content_type == 'apk' and user['premium']:
-            check_and_reset_daily_limits(user_id)
-            user = get_user(user_id)  # Refresh
-            
-            if user['daily_apk'] >= PREMIUM_APK_DAILY_LIMIT:
-                await update.message.reply_text(
-                    "⚠️ *Límite Diario Alcanzado*\n\n"
-                    f"Has descargado {user['daily_apk']}/{PREMIUM_APK_DAILY_LIMIT} APK hoy.\n\n"
-                    "♻️ Tu límite se renueva en 24 horas.\n\n"
-                    "💡 Mientras esperas puedes descargar:\n"
-                    "✨ Fotos: Ilimitadas\n"
-                    f"🎬 Videos: {user['daily_video']}/{PREMIUM_VIDEO_DAILY_LIMIT}\n"
-                    f"🎵 Música: {user['daily_music']}/{PREMIUM_MUSIC_DAILY_LIMIT}",
-                    parse_mode='Markdown'
-                )
-                return
-        
-        # Now process the download
-        # If album was detected, process all messages
-        messages_to_process = album_messages if album_messages else [message]
-        
-        for idx, msg in enumerate(messages_to_process, 1):
-            # Detección de paywall para cada mensaje del álbum
-            is_paywall = False
-            paywall_reason = None
-            restriction = getattr(msg, 'restriction_reason', None)
-            restricted = getattr(msg, 'restricted', None)
-            text = getattr(msg, 'text', '') or ''
-            if msg and not msg.media:
-                if restriction or restricted:
-                    is_paywall = True
-                    paywall_reason = str(restriction) if restriction else 'Contenido restringido.'
-                if 'Stars' in text or '⭐' in text or 'paywall' in text.lower():
-                    is_paywall = True
-                    paywall_reason = 'Contenido protegido por Telegram Stars.'
-            if is_paywall:
-                if user_id in ADMIN_USER_IDS:
-                    try:
-                        await update.message.reply_text(
-                            f"🔓 *Contenido protegido por Stars detectado en archivo {idx}.*\n\nIntentando bypass experimental solo para admins...",
-                            parse_mode='Markdown'
-                        )
-                        try:
-                            await context.bot.forward_message(
-                                chat_id=user_id,
-                                from_chat_id=msg.chat_id,
-                                message_id=msg.id
-                            )
-                            await update.message.reply_text(
-                                f"✅ *Bypass experimental exitoso en archivo {idx}.*\n\nSi ves el archivo, el método funcionó.",
-                                parse_mode='Markdown'
-                            )
-                        except Exception as e:
-                            await update.message.reply_text(
-                                f"❌ *Bypass experimental fallido en archivo {idx}.*\n\nNo se pudo reenviar el mensaje.\n\nError: {e}",
-                                parse_mode='Markdown'
-                            )
-                    except Exception as e:
-                        await update.message.reply_text(
-                            f"❌ *Error inesperado en bypass experimental (archivo {idx}).*\n\n{e}",
-                            parse_mode='Markdown'
-                        )
-                else:
-                    await update.message.reply_text(
-                        f"🔒 *Contenido protegido por Stars (archivo {idx})*\n\nEste archivo está protegido por un paywall de Telegram Stars y no puede ser descargado automáticamente.\n\n💡 Si eres el dueño del canal, puedes quitar el paywall o compartir el archivo directamente.\n\n⭐ Más info: https://core.telegram.org/stars",
-                        parse_mode='Markdown'
-                    )
-                continue
-            # Si no está protegido, proceder normalmente
-            
-            # Check limits inside the loop to prevent album bypass
-            user = get_user(user_id) # Refresh user data
-            msg_content_type = detect_content_type(msg)
-            
-            if msg_content_type == 'video':
-                if user['premium']:
-                    if user['daily_video'] >= PREMIUM_VIDEO_DAILY_LIMIT:
-                        await update.message.reply_text(f"⚠️ Límite de videos premium alcanzado ({user['daily_video']}/{PREMIUM_VIDEO_DAILY_LIMIT}). Deteniendo descarga del álbum.")
-                        break
-                else:
-                    if user['downloads'] >= FREE_DOWNLOAD_LIMIT:
-                        await update.message.reply_text(f"⚠️ Límite de videos alcanzado ({user['downloads']}/{FREE_DOWNLOAD_LIMIT}).\n\n💎 /premium para descargas ilimitadas.")
-                        break
-            elif msg_content_type == 'photo':
-                if not user['premium']:
-                    if user['daily_photo'] >= FREE_PHOTO_LIMIT:
-                        await update.message.reply_text(f"⚠️ Límite de fotos alcanzado ({user['daily_photo']}/{FREE_PHOTO_LIMIT}).\n\n💎 /premium para fotos ilimitadas.")
-                        break
-            elif msg_content_type == 'music':
-                if user['premium']:
-                    if user['daily_music'] >= PREMIUM_MUSIC_DAILY_LIMIT:
-                        await update.message.reply_text(f"⚠️ Límite de música diario alcanzado. Deteniendo descarga.")
-                        break
-            elif msg_content_type == 'apk':
-                if user['premium']:
-                    if user['daily_apk'] >= PREMIUM_APK_DAILY_LIMIT:
-                        await update.message.reply_text(f"⚠️ Límite de APK diario alcanzado. Deteniendo descarga.")
-                        break
-
-            if len(messages_to_process) > 1:
-                status = await update.message.reply_text(f"📥 Descargando {idx}/{len(messages_to_process)}...")
-            else:
-                status = await update.message.reply_text("📥 Descargando...")
-            
-            try:
-                # Always use download_and_send_media to avoid 'Forwarded from' tag and ensure it looks like it comes from the bot
-                await download_and_send_media(msg, user_id, context.bot)
-                await status.delete()
-                
-                # Increment counters
-                if msg_content_type == 'photo':
-                    if not user['premium']:
-                        increment_daily_counter(user_id, 'photo')
-                elif msg_content_type == 'video':
-                    if user['premium']:
-                        increment_daily_counter(user_id, 'video')
-                    else:
-                        increment_total_downloads(user_id)
-                elif msg_content_type == 'music':
-                    if user['premium']:
-                        increment_daily_counter(user_id, 'music')
-                elif msg_content_type == 'apk':
-                    if user['premium']:
-                        increment_daily_counter(user_id, 'apk')
-            except Exception as e:
-                await status.edit_text(f"❌ Error al descargar archivo {idx}: {str(e)}")
-        
-        # Show final success message after all messages processed
-        user = get_user(user_id)  # Refresh user data
-        
-        # Show success message
-        album_text = f"📸 Álbum de {len(messages_to_process)} archivos descargado\n\n" if len(messages_to_process) > 1 else ""
-        
-        if content_type == 'photo':
-            if user['premium']:
-                success_msg = f"✅ *Descarga Completada*\n\n{album_text}📸 Fotos ilimitadas con Premium ✨"
-                if joined_automatically:
-                    success_msg += "\n\n🔗 Canal unido automáticamente"
-                await update.message.reply_text(success_msg, parse_mode='Markdown')
-            else:
-                user = get_user(user_id)
-                remaining_photos = FREE_PHOTO_LIMIT - user['daily_photo']
-                success_msg = (
-                    f"✅ *Descarga Completada*\n\n"
-                    f"{album_text}"
-                    f"📸 Fotos usadas: {user['daily_photo']}/{FREE_PHOTO_LIMIT}\n"
-                    f"🎁 Te quedan: *{remaining_photos}* fotos\n\n"
-                    f"💎 /premium para fotos ilimitadas"
-                )
-                if joined_automatically:
-                    success_msg += "\n\n🔗 Canal unido automáticamente"
-                await update.message.reply_text(success_msg, parse_mode='Markdown')
-        elif content_type == 'video':
-            # Counters already incremented in loop
-            user = get_user(user_id)
-            if user['premium']:
-                success_msg = (
-                    f"✅ *Descarga Completada*\n\n"
-                    f"{album_text}"
-                    f"📊 Videos hoy: {user['daily_video']}/{PREMIUM_VIDEO_DAILY_LIMIT}\n"
-                    f"♻️ Se resetea en 24 horas"
-                )
-                if joined_automatically:
-                    success_msg += "\n\n🔗 Canal unido automáticamente"
-                await update.message.reply_text(success_msg, parse_mode='Markdown')
-            else:
-                remaining = FREE_DOWNLOAD_LIMIT - user['downloads']
-                success_msg = (
-                    f"✅ *Descarga Completada*\n\n"
-                    f"{album_text}"
-                    f"📊 Videos usados: {user['downloads']}/{FREE_DOWNLOAD_LIMIT}\n"
-                    f"🎁 Te quedan: *{remaining}* descargas\n\n"
-                    f"💎 /premium para 50 videos diarios"
-                )
-                if joined_automatically:
-                    success_msg += "\n\n🔗 Canal unido automáticamente"
-                await update.message.reply_text(success_msg, parse_mode='Markdown')
-        elif content_type == 'music':
-            # Counters already incremented in loop
-            user = get_user(user_id)
-            success_msg = (
-                f"✅ *Descarga Completada*\n\n"
-                f"{album_text}"
-                f"🎵 Música hoy: {user['daily_music']}/{PREMIUM_MUSIC_DAILY_LIMIT}\n"
-                f"♻️ Se resetea en 24 horas"
-            )
-            if joined_automatically:
-                success_msg += "\n\n🔗 Canal unido automáticamente"
-            await update.message.reply_text(success_msg, parse_mode='Markdown')
-        elif content_type == 'apk':
-            # Counters already incremented in loop
-            user = get_user(user_id)
-            success_msg = (
-                f"✅ *Descarga Completada*\n\n"
-                f"{album_text}"
-                f"📦 APK hoy: {user['daily_apk']}/{PREMIUM_APK_DAILY_LIMIT}\n"
-                f"♻️ Se resetea en 24 horas"
-            )
-            if joined_automatically:
-                success_msg += "\n\n🔗 Canal unido automáticamente"
-            await update.message.reply_text(success_msg, parse_mode='Markdown')
-        else:
-            success_msg = f"✅ *Descarga Completada*\n\n{album_text}" if album_text else "✅ *Descarga Completada*"
-            if joined_automatically:
-                success_msg += "\n\n🔗 Canal unido automáticamente"
-            await update.message.reply_text(success_msg, parse_mode='Markdown')
-    
-    except FloodWaitError as e:
-        await update.message.reply_text(
-            f"⏳ *Límite de Velocidad*\n\n"
-            f"Espera {e.seconds} segundos e inténtalo nuevamente.",
-            parse_mode='Markdown'
-        )
-    except Exception as e:
-        import traceback
-        from telegram.error import TimedOut, NetworkError, RetryAfter
-        
-        error_type = type(e).__name__
-        
-        # Manejo específico de errores de red
-        if isinstance(e, (TimedOut, NetworkError)):
-            logger.warning(f"Network error: {error_type} - {e}")
-            try:
-                await update.message.reply_text(
-                    "⚠️ *Problema de Conexión*\n\n"
-                    "Hubo un problema temporal de red.\n\n"
-                    "🔄 Intenta de nuevo en unos segundos.",
-                    parse_mode='Markdown'
-                )
-            except:
-                pass  # Si falla el mensaje de error, no hacer nada
-        elif isinstance(e, RetryAfter):
-            logger.warning(f"Rate limited: wait {e.retry_after} seconds")
-            try:
-                await update.message.reply_text(
-                    f"⏳ *Límite de Solicitudes*\n\n"
-                    f"Espera {e.retry_after} segundos e inténtalo nuevamente.",
-                    parse_mode='Markdown'
-                )
-            except:
-                pass
-        else:
-            # Error desconocido - mostrar mensaje genérico
-            logger.error(f"Error processing message: {error_type} - {e}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
-            try:
-                await update.message.reply_text(
-                    "❌ *Error Inesperado*\n\n"
-                    "Ocurrió un problema al procesar tu enlace.\n\n"
-                    "🔄 *Qué hacer:*\n"
-                    "1️⃣ Verifica que el enlace sea correcto\n"
-                    "2️⃣ Intenta con otro enlace\n"
-                    "3️⃣ Si el problema continúa, contacta al soporte\n\n"
-                    "💡 Puedes usar /help para ver la guía de uso.",
-                    parse_mode='Markdown'
-                )
-            except:
-                pass  # Si falla el mensaje de error, registrar y continuar
-                logger.error("Failed to send error message to user")
-
-
-
 async def miniapp_queue_observer(application: Application):
     """
     Background task that polls the database for pending downloads from the MiniApp
@@ -4600,14 +3851,16 @@ async def post_shutdown(application: Application):
     for user_id, data in login_clients.items():
         try:
             await data['client'].disconnect()
-        except:
+        except Exception as e:
+            logger.debug(f"Error disconnecting login client {user_id}: {e}")
             pass
             
     # Close bot client
     if bot_client:
         try:
             await bot_client.disconnect()
-        except:
+        except Exception as e:
+            logger.debug(f"Error disconnecting bot client: {e}")
             pass
 
 

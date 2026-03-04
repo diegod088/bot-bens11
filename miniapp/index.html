@@ -1784,6 +1784,14 @@
                     </div>
                     <span class="menu-arrow">›</span>
                 </div>
+                <div class="menu-item" onclick="showLanguageSelector()">
+                    <div class="menu-icon">🌐</div>
+                    <div class="menu-text">
+                        <div class="menu-title">Idioma</div>
+                        <div class="menu-subtitle" id="currentLangLabel">Español</div>
+                    </div>
+                    <span class="menu-arrow">›</span>
+                </div>
             </div>
 
             <div class="app-footer">
@@ -1908,6 +1916,38 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Modal de idioma -->
+    <div id="langModal"
+        style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:500; align-items:flex-end; justify-content:center;">
+        <div
+            style="background:var(--bg-primary); border-radius:20px 20px 0 0; padding:24px; width:100%; max-width:500px;">
+            <div style="text-align:center; font-size:16px; font-weight:700; margin-bottom:20px;">🌐 Seleccionar idioma
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button onclick="selectLanguage('es')" id="langBtn_es"
+                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
+                    <span style="font-size:22px;">🇪🇸</span> <span>Español</span>
+                </button>
+                <button onclick="selectLanguage('en')" id="langBtn_en"
+                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
+                    <span style="font-size:22px;">🇬🇧</span> <span>English</span>
+                </button>
+                <button onclick="selectLanguage('pt')" id="langBtn_pt"
+                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
+                    <span style="font-size:22px;">🇧🇷</span> <span>Português</span>
+                </button>
+                <button onclick="selectLanguage('it')" id="langBtn_it"
+                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
+                    <span style="font-size:22px;">🇮🇹</span> <span>Italiano</span>
+                </button>
+            </div>
+            <button onclick="closeLangModal()"
+                style="width:100%; margin-top:16px; padding:14px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-muted); font-size:14px; cursor:pointer;">
+                Cancelar
+            </button>
         </div>
     </div>
 
@@ -2516,6 +2556,20 @@
             updateLimitBars();
             updatePremiumBanner();
             renderHistory();
+
+            // Actualizar label de idioma en menú de cuenta
+            const langLabel = document.getElementById('currentLangLabel');
+            if (langLabel) langLabel.textContent = LANG_LABELS[currentLanguage] || currentLanguage;
+
+            // Restaurar idioma guardado en localStorage si no vino por URL
+            try {
+                const savedLang = localStorage.getItem('user_lang');
+                if (savedLang && !new URLSearchParams(window.location.search).get('lang')) {
+                    if (savedLang !== currentLanguage) {
+                        updateLanguage(savedLang);
+                    }
+                }
+            } catch (e) { }
         }
 
         function updateLimit(type, data) {
@@ -2897,6 +2951,60 @@
             } else {
                 await copyReferralLink();
             }
+        }
+
+        // ========== LANGUAGE SELECTOR ==========
+        const LANG_LABELS = { es: 'Español', en: 'English', pt: 'Português', it: 'Italiano' };
+
+        function showLanguageSelector() {
+            const modal = document.getElementById('langModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+
+            // Highlight current language button
+            ['es', 'en', 'pt', 'it'].forEach(l => {
+                const btn = document.getElementById('langBtn_' + l);
+                if (btn) {
+                    btn.style.background = l === currentLanguage
+                        ? 'rgba(42,171,238,0.2)'
+                        : 'var(--bg-card)';
+                    btn.style.color = l === currentLanguage
+                        ? 'var(--accent-blue)'
+                        : 'var(--text-primary)';
+                }
+            });
+        }
+
+        function closeLangModal() {
+            const modal = document.getElementById('langModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function selectLanguage(lang) {
+            updateLanguage(lang); // already defined — updates UI and translations
+            closeLangModal();
+
+            // Update subtitle in account menu
+            const label = document.getElementById('currentLangLabel');
+            if (label) label.textContent = LANG_LABELS[lang] || lang;
+
+            // Save to localStorage for persistence
+            try { localStorage.setItem('user_lang', lang); } catch (e) { }
+
+            // Notify the bot via API (best effort)
+            try {
+                const userId = userData?.user_id || tg.initDataUnsafe?.user?.id;
+                if (userId) {
+                    fetch(`${API_BASE}/api/miniapp/set_language`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, language: lang })
+                    }).catch(() => { });
+                }
+            } catch (e) { }
+
+            showToast(lang === 'es' ? '✅ Idioma actualizado' : '✅ Language updated');
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
 
         // ========== INIT ==========

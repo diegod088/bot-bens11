@@ -1282,7 +1282,7 @@ def miniapp_get_user():
         # Calculate limits based on premium status
         limits = {
             'video': {
-                'used': user['daily_video'] or 0,
+                'used': (user['downloads'] or 0) if not is_premium else (user['daily_video'] or 0),
                 'max': 50 if is_premium else 3
             },
             'photo': {
@@ -1717,6 +1717,32 @@ def get_downloads_chart():
         })
     except Exception as e:
         logger.error(f"Error fetching downloads chart: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/miniapp/set_language', methods=['POST'])
+def miniapp_set_language():
+    """Guardar idioma del usuario desde la MiniApp"""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+        language = data.get('language', 'es')
+
+        if not user_id:
+            return jsonify({'error': 'user_id required'}), 400
+
+        if language not in ['es', 'en', 'pt', 'it']:
+            return jsonify({'error': 'invalid language'}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET language = ? WHERE user_id = ?", (language, user_id))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'ok': True, 'language': language})
+    except Exception as e:
+        logger.error(f"Error setting language: {e}")
         return jsonify({'error': str(e)}), 500
 
 
