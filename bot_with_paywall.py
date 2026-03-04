@@ -2510,13 +2510,30 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
                 )
                 
                 # Obtener todos los mensajes del álbum (ventana de +/- 10 alrededor del mensaje original)
+                # FIX: usar get_messages con rango de IDs explícito, buscando en ambas direcciones
                 album_messages = []
-                async for msg in client.iter_messages(channel, limit=20, offset_id=message_id + 11):
-                    if hasattr(msg, 'grouped_id') and msg.grouped_id == message.grouped_id:
-                        album_messages.append(msg)
-                
-                # Ordenar por ID para consistencia
-                album_messages.sort(key=lambda m: m.id)
+                grouped_id = message.grouped_id
+
+                # Los álbumes en Telegram son siempre <= 10 archivos y sus IDs son consecutivos
+                # Buscar en una ventana de ±10 alrededor del mensaje conocido
+                start_id = max(1, message_id - 10)
+                end_id = message_id + 10
+                ids_to_check = list(range(start_id, end_id + 1))
+
+                try:
+                    messages_batch = await client.get_messages(channel, ids=ids_to_check)
+                    if messages_batch:
+                        for msg in messages_batch:
+                            if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id:
+                                album_messages.append(msg)
+                    
+                    if not album_messages:
+                        album_messages = [message]
+                    
+                    album_messages.sort(key=lambda m: m.id)
+                except Exception as album_err:
+                    logger.error(f"Error getting album messages in process_download: {album_err}")
+                    album_messages = [message]
                 
                 # Filtrar solo los mensajes que tienen medios y extraer caption
                 media_messages = []
@@ -3959,14 +3976,29 @@ async def handle_message_logic(update, context_or_bot, client, link, parsed, use
                 album_status = await update.message.reply_text("🔍 Detectando álbum...")
                 grouped_id = message.grouped_id
                 album_messages = []
-                start_id = max(1, message_id - 20)
-                end_id = message_id + 20
+                
+                # BUG 2 Fix: Rango ±10 y validación robusta
+                start_id = max(1, message_id - 10)
+                end_id = message_id + 10
                 ids_to_check = list(range(start_id, end_id + 1))
-                messages_batch = await client.get_messages(entity, ids=ids_to_check)
-                for msg in messages_batch:
-                    if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id:
-                        album_messages.append(msg)
-                album_messages.sort(key=lambda m: m.id)
+                
+                try:
+                    messages_batch = await client.get_messages(entity, ids=ids_to_check)
+                    if not messages_batch:
+                        raise ValueError("Empty response from get_messages")
+                    
+                    for msg in messages_batch:
+                        if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id and msg.media:
+                            album_messages.append(msg)
+                    
+                    if not album_messages:
+                        album_messages = [message]
+                    
+                    album_messages.sort(key=lambda m: m.id)
+                except Exception as batch_err:
+                    logger.error(f"Error batch fetching album: {batch_err}")
+                    album_messages = [message]
+
                 await album_status.edit_text(f"📸 Álbum detectado: {len(album_messages)} archivos\n⏳ Preparando descarga...")
             except Exception as album_err:
                 logger.error(f"Error getting album messages: {album_err}")
@@ -4054,15 +4086,19 @@ async def handle_message_logic(update, context_or_bot, client, link, parsed, use
                     elif content_type == 'photo':
                         increment_daily_counter(user_id, 'photo')
             except Exception as e:
-                logger.error(f"Error downloading media: {e}")
-                err_text = f"❌ Error al descargar: {str(e)[:50]}"
-                if update and update.message:
-                    await status.edit_text(err_text)
-                else:
-                    await reply(err_text)
+                logger.error(f"Error downloading media {idx}/{len(messages_to_process)}: {e}")
+                # NO hacer break — intentar el siguiente archivo del álbum
+                try:
+                    await reply(f"⚠️ Error en archivo {idx}/{len(messages_to_process)}: {str(e)[:50]}")
+                except Exception:
+                    pass
+                continue  # ← CRÍTICO: seguir con el siguiente archivo
 
         if downloaded_count > 0:
-            await reply("✅ *Descarga Completada*")
+            summary = f"✅ Descarga completada: {downloaded_count}/{len(messages_to_process)} archivos."
+            await reply(summary)
+        elif len(messages_to_process) > 0:
+            await reply("❌ No se pudo descargar ningún archivo del álbum.")
 
     except Exception as e:
         logger.error(f"Error in handle_message_logic: {e}", exc_info=True)
@@ -4515,31 +4551,35 @@ async def handle_message_old(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 grouped_id = message.grouped_id
                 album_messages = []
                 
-                # Get a range of message IDs around the current message
-                # Albums are always consecutive, so check 20 messages before and after
-                start_id = max(1, message_id - 20)
-                end_id = message_id + 20
-                
-                # Get all messages in the range
+                # BUG 2 Fix: Rango ±10 y validación robusta
+                start_id = max(1, message_id - 10)
+                end_id = message_id + 10
                 ids_to_check = list(range(start_id, end_id + 1))
                 logger.info(f"Checking message IDs from {start_id} to {end_id} for grouped_id {grouped_id}")
                 
-                messages_batch = await telethon_client.get_messages(entity, ids=ids_to_check)
-                
-                # Filter messages with the same grouped_id
-                for msg in messages_batch:
-                    if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id:
-                        album_messages.append(msg)
-                
-                # Sort by ID to maintain order
-                album_messages.sort(key=lambda m: m.id)
+                try:
+                    messages_batch = await telethon_client.get_messages(entity, ids=ids_to_check)
+                    if not messages_batch:
+                        raise ValueError("Empty response from get_messages")
+                    
+                    for msg in messages_batch:
+                        if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id and msg.media:
+                            album_messages.append(msg)
+                    
+                    if not album_messages:
+                        album_messages = [message]
+                    
+                    album_messages.sort(key=lambda m: m.id)
+                except Exception as batch_err:
+                    logger.error(f"Error in batch album fetch (Telethon): {batch_err}")
+                    album_messages = [message]
                 
                 logger.info(f"Found {len(album_messages)} messages in album")
                 
                 # Update status message to show album
                 await album_status.edit_text(f"📸 Álbum detectado: {len(album_messages)} archivos\n⏳ Preparando descarga...")
             except Exception as album_err:
-                logger.error(f"Error getting album messages: {album_err}")
+                logger.error(f"Error getting album messages (Telethon): {album_err}")
                 logger.exception(album_err)
                 # Continue with single message if album fetch fails
                 album_messages = [message]
