@@ -1228,6 +1228,18 @@
             color: var(--text-muted);
             font-size: 11px;
         }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-120px) scale(0.5);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
@@ -1327,34 +1339,62 @@
                 </div>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="card">
+            <!-- Mejora 1: Barra de límites con urgencia visual -->
+            <div class="card" id="limitsCard">
                 <div class="card-header">
-                    <span class="card-title">📊 Hoy</span>
+                    <span class="card-title">📊 Tus límites de hoy</span>
+                    <span id="resetTimer" style="font-size:11px; color:var(--text-muted)">Resetea en 24h</span>
                 </div>
-                <div class="card-body">
-                    <div class="quick-stats">
-                        <div class="quick-stat">
-                            <div class="quick-stat-icon">🎬</div>
-                            <div class="quick-stat-value" id="todayVideos">0</div>
-                            <div class="quick-stat-label">Videos</div>
+                <div class="card-body" style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="limit-row" id="limitRowVideo">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span style="font-size:13px; font-weight:600;">🎬 Videos</span>
+                            <span id="limitTextVideo" style="font-size:12px; color:var(--text-muted)">0/3</span>
                         </div>
-                        <div class="quick-stat">
-                            <div class="quick-stat-icon">📸</div>
-                            <div class="quick-stat-value" id="todayPhotos">0</div>
-                            <div class="quick-stat-label">Fotos</div>
-                        </div>
-                        <div class="quick-stat">
-                            <div class="quick-stat-icon">🎵</div>
-                            <div class="quick-stat-value" id="todayMusic">0</div>
-                            <div class="quick-stat-label">Música</div>
-                        </div>
-                        <div class="quick-stat">
-                            <div class="quick-stat-icon">📱</div>
-                            <div class="quick-stat-value" id="todayApk">0</div>
-                            <div class="quick-stat-label">APKs</div>
+                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
+                            <div id="limitBarVideo"
+                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
+                            </div>
                         </div>
                     </div>
+                    <div class="limit-row" id="limitRowPhoto">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span style="font-size:13px; font-weight:600;">📸 Fotos</span>
+                            <span id="limitTextPhoto" style="font-size:12px; color:var(--text-muted)">0/10</span>
+                        </div>
+                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
+                            <div id="limitBarPhoto"
+                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Para música y APK mostrar como bloqueados si no es premium -->
+                    <div id="lockedRow" style="display:flex; gap:10px;">
+                        <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:10px; text-align:center; opacity:0.6; cursor:pointer;"
+                            onclick="switchTab('premium')">
+                            <div style="font-size:18px;">🎵</div>
+                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 Premium</div>
+                        </div>
+                        <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:10px; text-align:center; opacity:0.6; cursor:pointer;"
+                            onclick="switchTab('premium')">
+                            <div style="font-size:18px;">📱</div>
+                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 Premium</div>
+                        </div>
+                    </div>
+                    <!-- Contenedor para el botón de unlock que se mostrará vía JS -->
+                    <div id="premiumUnlockBtnContainer"></div>
+                </div>
+            </div>
+
+            <!-- Mejora 3: Historial de descargas recientes -->
+            <div class="card" id="historyCard" style="display:none; margin-top: 12px;">
+                <div class="card-header">
+                    <span class="card-title">🕓 Recientes</span>
+                    <button onclick="clearHistory()"
+                        style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer;">Limpiar</button>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <div id="historyList"></div>
                 </div>
             </div>
 
@@ -1395,6 +1435,72 @@
                     <div class="premium-crown">⭐</div>
                     <h2 class="premium-title">Elige tu Plan Premium</h2>
                     <p class="premium-desc">4 opciones para ti</p>
+                </div>
+
+                <!-- Mejora 4a: Destacar el plan de prueba como "gancho" -->
+                <div
+                    style="background:linear-gradient(135deg, rgba(155,123,234,0.2), rgba(42,171,238,0.1)); border:1px solid rgba(155,123,234,0.4); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center;">
+                    <div style="font-size:28px; margin-bottom:8px;">🎁</div>
+                    <div style="font-size:15px; font-weight:700; margin-bottom:4px;">¿Primera vez? Prueba 3 días por 25⭐
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Sin riesgo — si no te
+                        gusta,
+                        simplemente no renuevas</div>
+                    <button onclick="buyPremium('trial')"
+                        style="background:linear-gradient(135deg, #9B7BEA, #7B5BD4); border:none; border-radius:10px; padding:12px 24px; color:white; font-size:14px; font-weight:700; cursor:pointer; width:100%;">
+                        ⭐ Probar ahora — 25 Stars
+                    </button>
+                </div>
+
+                <!-- Mejora 4b: Comparativa Free vs Premium -->
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-body" style="padding:16px;">
+                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                            <thead>
+                                <tr>
+                                    <th
+                                        style="text-align:left; padding:8px 0; color:var(--text-muted); font-weight:600;">
+                                        Función</th>
+                                    <th
+                                        style="text-align:center; padding:8px; color:var(--text-muted); font-weight:600;">
+                                        Free</th>
+                                    <th
+                                        style="text-align:center; padding:8px; color:var(--accent-green); font-weight:700;">
+                                        Premium</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-top:1px solid var(--bg-card);">
+                                    <td style="padding:10px 0;">🎬 Videos/día</td>
+                                    <td style="text-align:center; color:var(--accent-red);">3</td>
+                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">50</td>
+                                </tr>
+                                <tr style="border-top:1px solid var(--bg-card);">
+                                    <td style="padding:10px 0;">📸 Fotos/día</td>
+                                    <td style="text-align:center; color:var(--accent-orange);">10</td>
+                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">∞</td>
+                                </tr>
+                                <tr style="border-top:1px solid var(--bg-card);">
+                                    <td style="padding:10px 0;">🎵 Música</td>
+                                    <td style="text-align:center;">🔒</td>
+                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">50/día
+                                    </td>
+                                </tr>
+                                <tr style="border-top:1px solid var(--bg-card);">
+                                    <td style="padding:10px 0;">📱 APKs</td>
+                                    <td style="text-align:center;">🔒</td>
+                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">50/día
+                                    </td>
+                                </tr>
+                                <tr style="border-top:1px solid var(--bg-card);">
+                                    <td style="padding:10px 0;">📂 Álbumes</td>
+                                    <td style="text-align:center; color:var(--accent-orange);">Limitado</td>
+                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">Completos
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Bonus Referidos -->
@@ -2063,6 +2169,204 @@
             updateUI();
         }
 
+        // ========== UI ENHANCEMENTS ==========
+
+        // Mejora 5: Micro-animación de éxito al descargar
+        function showSuccessEffect() {
+            const emojis = ['⭐', '✅', '🎉', '📥', '💫'];
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    el.style.cssText = `
+                        position: fixed;
+                        font-size: ${16 + Math.random() * 16}px;
+                        left: ${10 + Math.random() * 80}%;
+                        top: 60%;
+                        z-index: 9999;
+                        pointer-events: none;
+                        animation: floatUp 1.2s ease-out forwards;
+                    `;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 1200);
+                }, i * 80);
+            }
+        }
+
+        // Mejora 3: Lógica de Historial de descargas
+        function addToHistory(link) {
+            try {
+                const history = JSON.parse(localStorage.getItem('download_history') || '[]');
+                const entry = {
+                    link: link,
+                    time: new Date().toLocaleTimeString('es', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
+                    date: new Date().toLocaleDateString('es', {
+                        day: '2-digit',
+                        month: 'short'
+                    })
+                };
+                // Evitar duplicados consecutivos
+                if (history.length > 0 && history[0].link === link) return;
+
+                history.unshift(entry); // Agregar al inicio
+                if (history.length > 10) history.pop(); // Máximo 10
+                localStorage.setItem('download_history', JSON.stringify(history));
+                renderHistory();
+            } catch (e) {
+                console.error('Error adding to history:', e);
+            }
+        }
+
+        function renderHistory() {
+            try {
+                const history = JSON.parse(localStorage.getItem('download_history') || '[]');
+                const card = document.getElementById('historyCard');
+                const list = document.getElementById('historyList');
+
+                if (!card || !list) return;
+
+                if (!history.length) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                card.style.display = 'block';
+                list.innerHTML = history.map((entry, i) => `
+                    <div style="display:flex; align-items:center; gap:12px; padding:12px 20px; ${i < history.length - 1 ? 'border-bottom:1px solid var(--bg-card);' : ''}">
+                        <div style="font-size:20px; flex-shrink:0;">📥</div>
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-size:12px; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${entry.link}</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${entry.date} · ${entry.time}</div>
+                        </div>
+                        <button onclick="reuseLink('${entry.link}')" style="background:var(--bg-card); border:none; border-radius:8px; padding:6px 10px; color:var(--accent-blue); font-size:11px; cursor:pointer; flex-shrink:0;">↩ Usar</button>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Error rendering history:', e);
+            }
+        }
+
+        function reuseLink(link) {
+            const input = document.getElementById('linkInput');
+            if (input) {
+                input.value = link;
+                showToast('Enlace cargado');
+                if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            }
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('download_history');
+            renderHistory();
+        }
+
+        // Mejora 1: JS para las barras de límites
+        function updateLimitBars() {
+            const limits = userData.limits || {};
+
+            function renderBar(barId, textId, used, max, type) {
+                const bar = document.getElementById(barId);
+                const text = document.getElementById(textId);
+                if (!bar || !text) return;
+
+                if (max === 0) {
+                    text.textContent = '🔒 Solo Premium';
+                    bar.style.width = '100%';
+                    bar.style.background = 'var(--bg-card)';
+                    return;
+                }
+
+                const pct = Math.min((used / max) * 100, 100);
+                bar.style.width = pct + '%';
+                text.textContent = `${used}/${max >= 900 ? '∞' : max}`;
+
+                // Color que cambia con urgencia
+                if (pct >= 100) {
+                    bar.style.background = 'var(--accent-red)'; // Rojo = límite alcanzado
+                    text.style.color = 'var(--accent-red)';
+                    text.style.fontWeight = '700';
+                } else if (pct >= 70) {
+                    bar.style.background = 'var(--accent-orange)'; // Naranja = casi lleno
+                    text.style.color = 'var(--text-muted)';
+                } else {
+                    bar.style.background = 'var(--accent-green)'; // Verde = ok
+                    text.style.color = 'var(--text-muted)';
+                }
+
+                return pct;
+            }
+
+            const videoPct = renderBar('limitBarVideo', 'limitTextVideo', limits.video?.used || 0, limits.video?.max || 3, 'video');
+            const photoPct = renderBar('limitBarPhoto', 'limitTextPhoto', limits.photo?.used || 0, limits.photo?.max || 10, 'photo');
+
+            // Mostrar cupón o botón de premium si algo está lleno
+            const unlockContainer = document.getElementById('premiumUnlockBtnContainer');
+            if (unlockContainer) {
+                if (videoPct >= 100 || photoPct >= 100) {
+                    unlockContainer.innerHTML = `
+                        <button onclick="switchTab('premium')" style="width:100%; margin-top:8px; padding:10px; border:none; border-radius:10px; background:linear-gradient(135deg, #E5A958, #D89640); color:white; font-size:13px; font-weight:700; cursor:pointer; animation: pulse 2s infinite;">
+                            ⭐ Desbloquear descargas ilimitadas
+                        </button>
+                    `;
+                } else {
+                    unlockContainer.innerHTML = '';
+                }
+            }
+
+            // Ocultar filas bloqueadas si es premium
+            const lockedRow = document.getElementById('lockedRow');
+            if (lockedRow) {
+                lockedRow.style.display = userData.premium ? 'none' : 'flex';
+            }
+        }
+
+        // Mejora 2: Banner de urgencia inteligente
+        function updatePremiumBanner() {
+            const banner = document.getElementById('premiumBanner');
+            const titleEl = document.getElementById('premiumTitleText');
+            const descEl = document.getElementById('premiumDescText');
+
+            if (!banner || userData.premium) {
+                if (banner) banner.style.display = 'none';
+                return;
+            }
+
+            const limits = userData.limits || {};
+            const videoUsed = limits.video?.used || 0;
+            const videoMax = limits.video?.max || 3;
+            const photoUsed = limits.photo?.used || 0;
+            const photoMax = limits.photo?.max || 10;
+
+            // Mensajes de urgencia según situación
+            if (videoUsed >= videoMax) {
+                // Límite de videos alcanzado — urgencia máxima
+                banner.style.background = 'linear-gradient(135deg, rgba(229,89,89,0.15), rgba(229,89,89,0.05))';
+                banner.style.borderColor = 'rgba(229,89,89,0.3)';
+                titleEl.textContent = '⛔ Sin videos disponibles hoy';
+                descEl.textContent = 'Premium te da 50 videos/día — empieza desde 25⭐';
+            } else if (videoUsed >= videoMax - 1 && videoMax > 0) {
+                // 1 video restante — urgencia alta
+                banner.style.background = 'linear-gradient(135deg, rgba(229,169,88,0.15), rgba(229,169,88,0.05))';
+                banner.style.borderColor = 'rgba(229,169,88,0.3)';
+                titleEl.textContent = '⚠️ Solo te queda 1 video hoy';
+                descEl.textContent = '¡Hazte Premium y nunca te quedes sin descargas!';
+            } else if (photoUsed >= photoMax && photoMax > 0) {
+                // Límite de fotos alcanzado
+                titleEl.textContent = '📸 Límite de fotos alcanzado';
+                descEl.textContent = 'Premium = fotos ilimitadas por 149⭐/mes';
+            } else {
+                // Normal — mostrar oferta
+                titleEl.textContent = '⭐ ¿Quieres descargar más?';
+                descEl.textContent = 'Prueba Premium 3 días por solo 25⭐';
+                banner.style.background = 'linear-gradient(135deg, #E5A958 0%, #F0C987 100%)';
+            }
+
+            banner.style.display = 'flex';
+        }
+
         // ========== UPDATE UI ==========
         function updateUI() {
             console.log('updateUI called');
@@ -2162,22 +2466,14 @@
             // Connection status title
             document.getElementById('connectionTitle').textContent = t('account_connection_status');
 
-            // Quick Stats
-            document.getElementById('todayVideos').textContent = userData.daily_video || 0;
-            document.getElementById('todayPhotos').textContent = userData.daily_photo || 0;
-            document.getElementById('todayMusic').textContent = userData.daily_music || 0;
-            document.getElementById('todayApk').textContent = userData.daily_apk || 0;
-
-            // Limits
-            const limits = userData.limits || {};
-            updateLimit('Video', limits.video || { used: 0, max: 3 });
-            updateLimit('Photo', limits.photo || { used: 0, max: 10 });
-            updateLimit('Music', limits.music || { used: 0, max: 0 });
-            updateLimit('Apk', limits.apk || { used: 0, max: 0 });
-
             // Connection status
             isConnected = userData.has_session || false;
             updateConnectionStatus();
+
+            // Mejora 1, 2 y 3: Componentes Visuales Nuevos
+            updateLimitBars();
+            updatePremiumBanner();
+            renderHistory();
         }
 
         function updateLimit(type, data) {
@@ -2267,6 +2563,11 @@
                     document.getElementById('statusIcon').textContent = '✅';
                     document.getElementById('statusText').textContent = 'Revisa el chat del bot';
                     input.value = '';
+
+                    // Mejora 3 y 5: Historial y Efectos
+                    addToHistory(link);
+                    showSuccessEffect();
+
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 } else if (result.error === 'no_session') {
                     status.className = 'download-status show error';
