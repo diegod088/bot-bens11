@@ -2345,6 +2345,7 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
     """Procesa la descarga del contenido con manejo optimizado de errores"""
     user_id = update.effective_user.id
     user = get_user(user_id)
+    lang = get_user_language(user)
     
     if not has_active_session(user_id):
         await status_msg.edit_text(
@@ -2358,207 +2359,189 @@ async def process_download(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     try:
         async with get_user_client(user_id) as client:
-            # Intentar obtener el canal
+            # 1. Resolver entidad (canal/grupo)
             try:
                 if channel_identifier.startswith('+'):
-                    # Canal privado con hash de invitación
-                    await status_msg.edit_text(
-                        "🔐 *Canal privado detectado*\n\n"
-                        "🤖 Intentando acceder al canal...",
-                        parse_mode='Markdown'
-                    )
-                    
+                    invite_hash = channel_identifier[1:]
                     try:
-                        invite_hash = channel_identifier[1:]
                         await client(ImportChatInviteRequest(invite_hash))
                         await asyncio.sleep(1)
                     except UserAlreadyParticipantError:
-                        pass  # Ya estamos en el canal
+                        pass
                     except (InviteHashExpiredError, InviteHashInvalidError):
                         await BotError.invite_link_expired(status_msg, is_message=True)
                         return
-                    
                     channel = await client.get_entity(invite_hash)
                 else:
-                    # Canal público o privado numérico
                     channel = await client.get_entity(int(channel_identifier) if channel_identifier.isdigit() else channel_identifier)
-            
-            except (ChannelPrivateError, ChatForbiddenError):
+            except (ChannelPrivateError, ChatForbiddenError, ValueError):
                 await BotError.private_channel_no_invite(status_msg, is_message=True)
                 return
             
-            # Obtener el mensaje
-            await status_msg.edit_text(
-                "📥 *Descargando contenido...*\n\n"
-                "⏳ Esto puede tardar unos segundos",
-                parse_mode='Markdown'
-            )
-            
-            message = await client.get_messages(channel, ids=message_id)
-            
-            if not message:
+            # 2. Obtener mensaje(s)
+            original_message = await client.get_messages(channel, ids=message_id)
+            if not original_message:
                 await BotError.message_not_found(status_msg, is_message=True)
                 return
             
-            # Verificar si es parte de un álbum (grupo de medios)
-            if hasattr(message, 'grouped_id') and message.grouped_id:
-                # Es un álbum, obtener todos los mensajes del grupo
-                await status_msg.edit_text(
-                    "📸 *Álbum detectado*\n\n"
-                    "🔄 Analizando contenido del álbum...",
-                    parse_mode='Markdown'
-                )
-                
-                # Obtener todos los mensajes del álbum (ventana de +/- 10 alrededor del mensaje original)
-                # FIX: usar get_messages con rango de IDs explícito, buscando en ambas direcciones
-                album_messages = []
-                grouped_id = message.grouped_id
-
-                # Los álbumes en Telegram son siempre <= 10 archivos y sus IDs son consecutivos
-                # Buscar en una ventana de ±10 alrededor del mensaje conocido
+            # Detectar si es álbum o mensaje único
+            is_album = hasattr(original_message, 'grouped_id') and original_message.grouped_id
+            media_messages = []
+            
+            if is_album:
+                # Buscar mensajes del mismo álbum
+                grouped_id = original_message.grouped_id
                 start_id = max(1, message_id - 10)
                 end_id = message_id + 10
                 ids_to_check = list(range(start_id, end_id + 1))
-
+                
                 try:
                     messages_batch = await client.get_messages(channel, ids=ids_to_check)
                     if messages_batch:
                         for msg in messages_batch:
                             if msg and hasattr(msg, 'grouped_id') and msg.grouped_id == grouped_id:
-                                album_messages.append(msg)
-                    
-                    if not album_messages:
-                        album_messages = [message]
-                    
-                    album_messages.sort(key=lambda m: m.id)
+                                if msg.media:
+                                    media_messages.append(msg)
+                    if not media_messages:
+                        media_messages = [original_message]
+                    media_messages.sort(key=lambda m: m.id)
                 except Exception as album_err:
-                    logger.error(f"Error getting album messages in process_download: {album_err}")
-                    album_messages = [message]
-                
-                # Filtrar solo los mensajes que tienen medios y extraer caption
-                media_messages = []
-                shared_caption = ""
-                media_counts = {'photo': 0, 'video': 0, 'music': 0, 'apk': 0, 'other': 0}
-                
-                for msg in album_messages:
-                    if not msg.media:
-                        continue
-                    
-                    c_type = detect_content_type(msg)
-                    if c_type != 'other':
-                        media_messages.append(msg)
-                        media_counts[c_type] += 1
-                        # Buscar el primer caption disponible en todo el álbum
-                        if not shared_caption:
-                            shared_caption = extract_message_caption(msg)
-                
-                if not media_messages:
+                    logger.error(f"Error fetching album: {album_err}")
+                    media_messages = [original_message]
+            else:
+                if not original_message.media:
                     await BotError.unsupported_content(status_msg, is_message=True)
                     return
+                media_messages = [original_message]
 
-                # Verificación PREVIA de límites para TODO el álbum
-                check_and_reset_daily_limits(user_id)
-                user = get_user(user_id)
-                is_premium = user['premium']
+            # 3. Analizar contenido y verificar límites
+            check_and_reset_daily_limits(user_id)
+            user = get_user(user_id)
+            is_premium = user['premium']
+            
+            # Contadores para el resumen
+            counts = {'photo': 0, 'video': 0, 'music': 0, 'apk': 0}
+            messages_to_download = []
+            limit_exceeded = False
+            
+            # Simulación de consumo de límites
+            sim_usage = {
+                'photo': user.get('daily_photo', 0),
+                'video': user.get('daily_video', 0) if is_premium else user.get('downloads', 0),
+                'music': user.get('daily_music', 0),
+                'apk': user.get('daily_apk', 0)
+            }
+            
+            shared_caption = ""
+            
+            for msg in media_messages:
+                c_type = detect_content_type(msg)
+                if c_type == 'other': continue
                 
-                # Simular descargas para verificar límites
-                can_batch_download = True
-                failing_reason = None
+                # Buscar caption compartido en el álbum
+                if not shared_caption:
+                    shared_caption = extract_message_caption(msg)
                 
-                # Copia de contadores para simulación
-                sim_photo = user.get('daily_photo', 0)
-                sim_video = user.get('daily_video', 0)
-                sim_downloads = user.get('downloads', 0)
-                
-                for c_type, count in media_counts.items():
-                    if count == 0: continue
-                    
-                    if c_type == 'photo':
-                        if not is_premium and sim_photo + count > FREE_PHOTO_LIMIT:
-                            can_batch_download = False
-                            failing_reason = f"Límite de fotos superado ({sim_photo + count}/{FREE_PHOTO_LIMIT})"
-                            break
-                        sim_photo += count
-                    elif c_type == 'video':
-                        if is_premium:
-                            if sim_video + count > PREMIUM_VIDEO_DAILY_LIMIT:
-                                can_batch_download = False
-                                failing_reason = f"Límite de videos premium superado ({sim_video + count}/{PREMIUM_VIDEO_DAILY_LIMIT})"
-                                break
-                            sim_video += count
-                        else:
-                            if sim_downloads + count > FREE_DOWNLOAD_LIMIT:
-                                can_batch_download = False
-                                failing_reason = f"Límite de videos gratuitos superado ({sim_downloads + count}/{FREE_DOWNLOAD_LIMIT})"
-                                break
-                            sim_downloads += count
-                    elif c_type in ['music', 'apk']:
-                        if not is_premium:
-                            can_batch_download = False
-                            failing_reason = "requeire_premium"
-                            break
-
-                if not can_batch_download:
-                    if failing_reason == "requeire_premium":
-                        await BotError.premium_required(status_msg, 'music/apk', is_message=True)
+                # Verificar si este ítem específico entra en el límite
+                can_item_download = True
+                if c_type == 'photo':
+                    if not is_premium and sim_usage['photo'] >= FREE_PHOTO_LIMIT:
+                        can_item_download = False
                     else:
-                        limit_msg = (
-                            f"⚠️ *Límite insuficiente*\n\n"
-                            f"El álbum contiene {media_counts['photo']} fotos y {media_counts['video']} videos.\n"
-                            f"No tienes suficiente saldo disponible para descargar todo el álbum.\n\n"
-                            f"❌ *Motivo:* {failing_reason}\n\n"
-                            f"💡 Usa /premium para obtener descargas ilimitadas."
-                        )
-                        await status_msg.edit_text(limit_msg, parse_mode='Markdown')
-                    return
+                        sim_usage['photo'] += 1
+                elif c_type == 'video':
+                    video_limit = PREMIUM_VIDEO_DAILY_LIMIT if is_premium else FREE_DOWNLOAD_LIMIT
+                    if sim_usage['video'] >= video_limit:
+                        can_item_download = False
+                    else:
+                        sim_usage['video'] += 1
+                elif c_type in ['music', 'apk']:
+                    if not is_premium:
+                        can_item_download = False
+                    else:
+                        limit_key = 'music' if c_type == 'music' else 'apk'
+                        limit_val = PREMIUM_MUSIC_DAILY_LIMIT if c_type == 'music' else PREMIUM_APK_DAILY_LIMIT
+                        if sim_usage[limit_key] >= limit_val:
+                            can_item_download = False
+                        else:
+                            sim_usage[limit_key] += 1
+                
+                counts[c_type] += 1
+                if can_item_download:
+                    messages_to_download.append(msg)
+                else:
+                    limit_exceeded = True
 
-                # Si llegamos aquí, podemos descargar todo
-                await status_msg.edit_text(
-                    f"📸 *Álbum con {len(media_messages)} archivos*\n\n"
-                    f"⏳ Descargando 1/{len(media_messages)}...",
-                    parse_mode='Markdown'
+            if not counts['photo'] and not counts['video'] and not counts['music'] and not counts['apk']:
+                await BotError.unsupported_content(status_msg, is_message=True)
+                return
+
+            # 4. Construir y enviar mensaje de REPORTE "Se detectó"
+            report_lines = [f"*{get_msg('status_detected_title', lang)}*"]
+            if is_album:
+                report_lines.append(get_msg('status_detected_album', lang))
+            
+            if counts['photo'] > 0:
+                report_lines.append(get_msg('status_detected_photos', lang, count=counts['photo']))
+            if counts['video'] > 0:
+                report_lines.append(get_msg('status_detected_videos', lang, count=counts['video']))
+            # (Opcional: agregar música/apk si el bot los detecta frecuentemente)
+            
+            if limit_exceeded:
+                report_lines.append(f"\n{get_msg('status_limit_warning', lang)}")
+            
+            report_lines.append(f"\n{get_msg('status_starting_download', lang)}")
+            
+            await status_msg.edit_text("\n".join(report_lines), parse_mode='Markdown')
+            await asyncio.sleep(1) # Breve pausa para que el usuario lea
+
+            # 5. Ejecutar descargas
+            if not messages_to_download:
+                # No se pudo descargar nada por límites
+                return # El mensaje ya tiene la advertencia
+
+            total_to_download = len(messages_to_download)
+            for idx, msg in enumerate(messages_to_download, 1):
+                msg_type = detect_content_type(msg)
+                
+                # Actualizar estado de descarga
+                if total_to_download > 1:
+                    status_text = (
+                        f"📥 *{get_msg('status_downloading', lang)}* ({idx}/{total_to_download})\n"
+                        f"📦 {msg_type.capitalize()}"
+                    )
+                    await status_msg.edit_text(status_text, parse_mode='Markdown')
+                
+                # Descargar - pasamos bypass_limits=True porque ya los verificamos nosotros
+                await handle_media_download(
+                    update, context, msg, user, status_msg,
+                    is_album=(total_to_download > 1),
+                    album_index=idx, album_total=total_to_download,
+                    bypass_limits=True, custom_caption=shared_caption
                 )
-                
-                # Descargar cada archivo del álbum
-                for idx, album_msg in enumerate(media_messages, 1):
-                    msg_type = detect_content_type(album_msg)
-                    await status_msg.edit_text(
-                        f"📸 *Álbum con {len(media_messages)} archivos*\n\n"
-                        f"⏳ Descargando {idx}/{len(media_messages)}...\n"
-                        f"📦 Tipo: {msg_type.capitalize()}",
-                        parse_mode='Markdown'
-                    )
-                    # Bypass limits porque ya los verificamos en lote
-                    await handle_media_download(
-                        update, context, album_msg, user, status_msg, 
-                        is_album=True, album_index=idx, album_total=len(media_messages),
-                        bypass_limits=True, custom_caption=shared_caption
-                    )
-                
-                # Mensaje final
+
+            # 6. Mensaje Final
+            if total_to_download > 1:
                 try:
                     await status_msg.edit_text(
-                        f"✅ *Álbum completado*\n\n"
-                        f"📥 {len(media_messages)} archivos descargados exitosamente.",
+                        f"✅ *{get_msg('success_download', lang).strip()}*\n\n"
+                        f"📥 {total_to_download} {get_msg('success_album', lang).split(' ')[-2]}",
                         parse_mode='Markdown'
                     )
                 except Exception:
-                    # Si el mensaje fue borrado o no se puede editar, enviar uno nuevo
-                    await context.bot.send_message(
-                        chat_id=user_id,
-                        text=f"✅ *Álbum completado*\n\n📥 {len(media_messages)} archivos descargados.",
-                        parse_mode='Markdown'
-                    )
-            else:
-                # Mensaje individual
-                await handle_media_download(update, context, message, user, status_msg)
+                    pass
+            elif not limit_exceeded:
+                # Para un solo archivo que se descargó con éxito, handle_media_download borra el status_msg
+                pass
 
-            
     except FloodWaitError as e:
         await BotError.flood_wait(status_msg, e.seconds, is_message=True)
     except Exception as e:
         logger.error(f"Error en process_download: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         await BotError.download_failed(status_msg, is_message=True)
+
 
 
 async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TYPE,

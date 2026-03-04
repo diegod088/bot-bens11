@@ -142,6 +142,12 @@ MESSAGES = {
         "status_sending_progress": "📤 Enviando {current}/{total}...",
         "status_downloading": "📥 Descargando...",
         "status_downloading_progress": "📥 Descargando {current}/{total}...",
+        "status_detected_title": "Se detectó:",
+        "status_detected_album": "×1 álbum",
+        "status_detected_photos": "🖼️ Fotos: {count}",
+        "status_detected_videos": "🎞️ Videos: {count}",
+        "status_limit_warning": "⚠️ Advertencia: has llegado a tu límite diario, solo obtendrás tus intentos restantes",
+        "status_starting_download": "✅ Iniciando descarga",
         
         # Success messages
         "success_download": "✅ *Descarga Completada*\n\n",
@@ -317,6 +323,12 @@ MESSAGES = {
         "status_sending_progress": "📤 Sending {current}/{total}...",
         "status_downloading": "📥 Downloading...",
         "status_downloading_progress": "📥 Downloading {current}/{total}...",
+        "status_detected_title": "Detected:",
+        "status_detected_album": "×1 album",
+        "status_detected_photos": "🖼️ Photos: {count}",
+        "status_detected_videos": "🎞️ Videos: {count}",
+        "status_limit_warning": "⚠️ Warning: you have reached your daily limit, you will only get your remaining attempts",
+        "status_starting_download": "✅ Starting download",
         
         # Success messages
         "success_download": "✅ *Download Completed*\n\n",
