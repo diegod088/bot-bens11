@@ -225,8 +225,8 @@ def get_users():
             # Preparar datos para la respuesta
             users.append({
                 'user_id': user_dict['user_id'],
-                'first_name': user_dict['first_name'],
-                'username': user_dict['username'],
+                'first_name': user_dict['first_name'] or f"Usuario #{user_dict['user_id']}",
+                'username': user_dict['username'] or '',
                 'downloads_count': user_dict['downloads'], # Renamed for frontend consistency
                 'is_premium': bool(user_dict['premium']),
                 'premium_expiry': user_dict['premium_until'], # Renamed for frontend consistency
@@ -394,9 +394,11 @@ def get_analytics():
         
         conn.close()
         
-        # Cálculos de monetización (asumiendo precio de $5 por premium)
-        premium_price = 5.0  # Puedes cambiar esto
-        estimated_revenue = premium_users * premium_price
+        # PROBLEMA 3b: Cálculos de monetización reales
+        STARS_PER_PREMIUM = 149
+        USD_PER_STAR = 0.017  # precio aproximado de Telegram Stars
+        estimated_revenue_usd = round(premium_users * STARS_PER_PREMIUM * USD_PER_STAR, 2)
+        estimated_revenue_stars = premium_users * STARS_PER_PREMIUM
         
         # Tasa de conversión (simplificada)
         conversion_rate = premium_percentage
@@ -406,7 +408,9 @@ def get_analytics():
             'premium_users': premium_users,
             'free_users': free_users,
             'premium_percentage': premium_percentage,
-            'estimated_revenue': estimated_revenue,
+            'estimated_revenue': estimated_revenue_usd,
+            'estimated_revenue_usd': estimated_revenue_usd,
+            'estimated_revenue_stars': estimated_revenue_stars,
             'conversion_rate': conversion_rate,
             'total_videos': total_videos,
             'total_photos': total_photos,
@@ -863,7 +867,7 @@ def get_activity_stats():
         cursor.execute("""
             SELECT COALESCE(SUM(daily_photo + daily_video + daily_music + daily_apk), 0)
             FROM users
-            WHERE date(last_reset) = ?
+            WHERE date(updated_at) = ?
         """, (today,))
         today_downloads = cursor.fetchone()[0]
         
@@ -1611,7 +1615,7 @@ def get_revenue_chart():
             count = cursor.fetchone()[0]
             revenue_data.append({
                 'date': date.isoformat(),
-                'revenue': count * 500  # 500 stars por usuario (aproximado)
+                'revenue': count * 149  # 149 stars = precio plan mensual
             })
         
         conn.close()

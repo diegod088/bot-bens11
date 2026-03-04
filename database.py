@@ -158,6 +158,13 @@ def init_database():
         except sqlite3.OperationalError:
             pass
 
+        # PROBLEMA 1: Asegurar que las columnas existen aunque la tabla ya existiera
+        for col, col_type in [("first_name", "TEXT"), ("username", "TEXT")]:
+            try:
+                cursor.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type} DEFAULT NULL")
+            except sqlite3.OperationalError:
+                pass
+
         # Create referrals tracking table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS referrals (

@@ -1585,11 +1585,22 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [
                 InlineKeyboardButton(get_msg("btn_how_to_use", lang), callback_data="show_guide"),
                 InlineKeyboardButton(get_msg("btn_plans", lang), callback_data="view_plans")
-            ],
+            ]
+        ]
+        
+        # PROBLEMA 2: Agregar botón de MiniApp al menú principal
+        miniapp_url_env = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+        if miniapp_url_env:
+            full_url = f"{miniapp_url_env}/miniapp?v=2&user_id={user_id}&lang={lang}"
+            keyboard.append([
+                InlineKeyboardButton("📱 Abrir App", web_app=WebAppInfo(url=full_url))
+            ])
+            
+        keyboard.extend([
             [InlineKeyboardButton(get_msg("btn_change_language", lang), callback_data="change_language")],
             [InlineKeyboardButton(get_msg("btn_support", lang), url="https://t.me/observer_bots/11")],
             [InlineKeyboardButton(get_msg("btn_official_channel", lang), url="https://t.me/observer_bots")]
-        ]
+        ])
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         await query.edit_message_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
@@ -2900,6 +2911,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             update_user_info(user_id, first_name, username)
         logger.info(f"✓ New user {user_id} created with language: {user_language}")
     else:
+        # PROBLEMA 1: Siempre actualizar info aunque el usuario exista
+        update_user_info(user_id, first_name, username)
+        
         # We don't forcefully overwrite their selected language if they already chose one
         user = get_user(user_id)
         lang = user.get('language') if user and user.get('language') else user_language
@@ -2924,6 +2938,22 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("🇮🇹 Italiano", callback_data="set_lang_it")
         ]
     ]
+    
+    # PROBLEMA 2: Agregar botón de MiniApp con user_id y lang
+    miniapp_url_env = (os.getenv('MINIAPP_URL', '') or '').strip().rstrip('/')
+    if miniapp_url_env:
+        # Usar la variable local lang si está definida (en el else de is_new_user)
+        # o user_language (que es el detectado por Telegram)
+        try:
+            current_lang = lang if 'lang' in locals() else user_language
+        except NameError:
+            current_lang = user_language
+            
+        full_url = f"{miniapp_url_env}/miniapp?v=2&user_id={user_id}&lang={current_lang}"
+        keyboard.append([
+            InlineKeyboardButton("📱 Abrir App", web_app=WebAppInfo(url=full_url))
+        ])
+    
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     if update.callback_query:
