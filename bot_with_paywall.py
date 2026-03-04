@@ -973,13 +973,29 @@ def detect_content_type(message) -> str:
     Detect content type from message
     Returns: 'photo', 'video', 'music', 'apk', or 'other'
     """
-    from telethon.tl.types import MessageMediaPhoto, MessageMediaDocument
+    from telethon.tl.types import MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage
     
-    if isinstance(message.media, MessageMediaPhoto):
+    if not message or not message.media:
+        return 'other'
+        
+    # Handle direct photos
+    if isinstance(message.media, MessageMediaPhoto) or hasattr(message, 'photo') and message.photo:
         return 'photo'
     
+    # Identify the document object if it exists
+    doc = None
     if isinstance(message.media, MessageMediaDocument):
         doc = message.media.document
+    elif isinstance(message.media, MessageMediaWebPage) and message.media.webpage:
+        wp = message.media.webpage
+        if hasattr(wp, 'photo') and wp.photo:
+            return 'photo'
+        if hasattr(wp, 'document') and wp.document:
+            doc = wp.document
+    elif hasattr(message, 'document') and message.document:
+        doc = message.document
+
+    if doc:
         mime_type = doc.mime_type if hasattr(doc, 'mime_type') else ''
         
         # Check file extension from attributes
@@ -994,13 +1010,17 @@ def detect_content_type(message) -> str:
         if file_name.endswith('.apk') or mime_type == 'application/vnd.android.package-archive':
             return 'apk'
         
-        # Music detection
-        if mime_type.startswith('audio/') or file_name.endswith(('.mp3', '.m4a', '.flac', '.wav', '.ogg')):
+        # Music detection (including voice notes)
+        if mime_type.startswith('audio/') or file_name.endswith(('.mp3', '.m4a', '.flac', '.wav', '.ogg')) or hasattr(message, 'voice') and message.voice:
             return 'music'
         
         # Video detection
-        if mime_type.startswith('video/') or file_name.endswith(('.mp4', '.mkv', '.avi', '.mov', '.webm')):
+        if mime_type.startswith('video/') or file_name.endswith(('.mp4', '.mkv', '.avi', '.mov', '.webm')) or hasattr(message, 'video') and message.video:
             return 'video'
+            
+        # Photo detection in documents
+        if mime_type.startswith('image/') or file_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff')):
+            return 'photo'
     
     return 'other'
 
@@ -2551,16 +2571,10 @@ async def handle_media_download(update: Update, context: ContextTypes.DEFAULT_TY
     """Maneja la descarga según el tipo de medio con validaciones optimizadas"""
     user_id = update.effective_user.id
     
-    # Determinar tipo de contenido
-    if message.photo:
-        content_type = 'photo'
-    elif message.video:
-        content_type = 'video'
-    elif message.audio or message.voice:
-        content_type = 'music'
-    elif message.document and message.document.mime_type == 'application/vnd.android.package-archive':
-        content_type = 'apk'
-    else:
+    # Determinar tipo de contenido usando la función unificada
+    content_type = detect_content_type(message)
+    
+    if content_type == 'other':
         await BotError.unsupported_content(status_msg, is_message=True)
         return
     
