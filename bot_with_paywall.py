@@ -4057,6 +4057,7 @@ async def async_main():
     application.add_handler(CommandHandler("miniapp", miniapp_command))
     application.add_handler(CommandHandler("testpay", testpay_command))
     application.add_handler(CommandHandler("adminstats", adminstats_command))
+    application.add_handler(CommandHandler("afiliados", set_affiliate_command))
     application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CommandHandler("referidos", referidos_command))
     application.add_handler(CallbackQueryHandler(button_callback))
