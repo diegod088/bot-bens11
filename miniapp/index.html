@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DownloadBot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="miniapp/translations.js"></script>
+    <script src="/miniapp/translations.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"
@@ -1693,57 +1693,8 @@
         }
 
         // ========== PREMIUM ==========
-        async function buyPremium(planKey = 'monthly') {
-            showToast(t('toast_payment_preparing'));
+        // La función buyPremium ahora está definida al final para mayor consistencia
 
-            // Plan details
-            const plans = {
-                'flash': { stars: 75, days: 3, name: '⚡ Venta Flash' },
-                'trial': { stars: 149, days: 3, name: '🚀 Básico' },
-                'weekly': { stars: 333, days: 7, name: '🔥 Pro' },
-                'monthly': { stars: 777, days: 30, name: '💎 Elite' },
-                'quarterly': { stars: 1499, days: 90, name: '👑 Master' }
-            };
-
-            const plan = plans[planKey] || plans['monthly'];
-
-            try {
-                const response = await fetch(`${API_BASE}/api/miniapp/create-invoice`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: userData?.user_id || tg.initDataUnsafe?.user?.id,
-                        plan_key: planKey
-                    })
-                });
-
-                const result = await response.json();
-
-                if (result.ok && result.invoice_link) {
-                    tg.openInvoice(result.invoice_link, (status) => {
-                        if (status === 'paid') {
-                            tg.showAlert(`${t('toast_payment_success')}`);
-                            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                            setTimeout(() => {
-                                loadUserData();
-                                tg.close();
-                            }, 2000);
-                        } else if (status === 'cancelled') {
-                            showToast(t('toast_payment_cancelled'));
-                        } else if (status === 'failed') {
-                            showToast(t('toast_payment_error'));
-                        }
-                        if (btn) btn.disabled = false;
-                    });
-                } else {
-                    throw new Error(result.error || 'Error al crear factura');
-                }
-            } catch (e) {
-                console.error(e);
-                showToast(t('toast_payment_error_text'));
-                if (btn) btn.disabled = false;
-            }
-        }
 
         // ========== REFERRALS ==========
         let referralData = null;

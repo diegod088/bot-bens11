@@ -1162,7 +1162,7 @@ def try_acquire_bot_leadership(instance_id: str, timeout_seconds: int = 60) -> b
             cursor.execute("SELECT value, updated_at FROM settings WHERE key = 'bot_leader'")
             row = cursor.fetchone()
             
-            now = datetime.now()
+            now = datetime.utcnow() # SQLite CURRENT_TIMESTAMP is UTC
             
             if row:
                 leader_id = row['value']
