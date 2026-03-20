@@ -954,13 +954,26 @@
     </nav>
 
     <script>
+        // Global error handler for debugging
+        window.onerror = function (msg, url, line, col, error) {
+            console.error(`GLOBAL ERROR: ${msg} at ${line}:${col}`);
+            const status = document.getElementById('loaderStatus');
+            if (status) status.innerHTML = `<span style="color:#ff6b6b">Error: ${msg.substring(0, 30)}...</span>`;
+            return false;
+        };
 
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
-
-        if (tg.setHeaderColor) tg.setHeaderColor('#17212B');
-        if (tg.setBackgroundColor) tg.setBackgroundColor('#17212B');
+        let tg = null;
+        try {
+            tg = window.Telegram.WebApp;
+            if (tg) {
+                tg.expand();
+                tg.ready();
+                if (tg.setHeaderColor) tg.setHeaderColor('#17212B');
+                if (tg.setBackgroundColor) tg.setBackgroundColor('#17212B');
+            }
+        } catch (e) {
+            console.warn('Telegram WebApp no disponible o error al inicializar:', e);
+        }
 
         const API_BASE = window.location.origin;
         let userData = null;
@@ -984,7 +997,13 @@
 
             // Check if user is new from URL parameters
             const isNewUser = urlParams.get('new') === 'true';
-            const hasSeenOnboarding = localStorage.getItem('onboarding_seen') === 'true';
+            let hasSeenOnboarding = false;
+
+            try {
+                hasSeenOnboarding = localStorage.getItem('onboarding_seen') === 'true';
+            } catch (e) {
+                console.warn('LocalStorage no disponible:', e);
+            }
 
             console.log(`¿Usuario nuevo? ${isNewUser}`);
             console.log(`¿Ya vio onboarding? ${hasSeenOnboarding}`);
@@ -1032,7 +1051,11 @@
                 console.log(`🌐 Idioma cambiado a: ${currentLanguage}`);
 
                 // Persist language choice
-                localStorage.setItem('user_lang', lang);
+                try {
+                    localStorage.setItem('user_lang', lang);
+                } catch (e) {
+                    console.warn('No se pudo guardar idioma en localStorage');
+                }
 
                 // Update text content across the app
                 updateUI();
@@ -1085,7 +1108,7 @@
             document.getElementById('tab-' + tabId).classList.add('active');
             document.querySelector(`[onclick="switchTab('${tabId}')"]`)?.classList.add('active');
 
-            if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
         // ========== TOAST ==========
@@ -1101,14 +1124,14 @@
             const status = document.getElementById('loaderStatus');
             if (status) status.textContent = "Obteniendo datos de usuario...";
             try {
-                const telegramUser = tg.initDataUnsafe?.user || {};
+                const telegramUser = tg?.initDataUnsafe?.user || {};
                 console.log('📱 Datos de usuario Telegram:', telegramUser);
 
                 const response = await fetch(`${API_BASE}/api/miniapp/user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        initData: tg.initData || '',
+                        initData: tg?.initData || '',
                         user: telegramUser
                     })
                 });
@@ -1134,7 +1157,7 @@
 
             // Fallback data - usar el ID de Telegram directamente
             if (!userData) {
-                const telegramUser = tg.initDataUnsafe?.user || {};
+                const telegramUser = tg?.initDataUnsafe?.user || {};
                 const telegramUserId = telegramUser.id;
 
                 console.warn('⚠️ Usando datos por defecto con user_id de Telegram:', telegramUserId);
@@ -1258,7 +1281,7 @@
             if (input) {
                 input.value = link;
                 showToast(t('toast_link_loaded'));
-                if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+                if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
             }
         }
 
@@ -1593,7 +1616,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: userData?.user_id || tg.initDataUnsafe?.user?.id,
+                        user_id: userData?.user_id || tg?.initDataUnsafe?.user?.id,
                         link: link
                     })
                 });
@@ -1610,7 +1633,7 @@
                     addToHistory(link);
                     showSuccessEffect();
 
-                    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 } else if (result.error === 'no_session') {
                     status.className = 'download-status show error';
                     document.getElementById('statusIcon').textContent = '⚠️';
@@ -1656,7 +1679,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: userData?.user_id || tg.initDataUnsafe?.user?.id
+                        user_id: userData?.user_id || tg?.initDataUnsafe?.user?.id
                     })
                 });
 
@@ -1683,7 +1706,7 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                user_id: userData?.user_id || tg.initDataUnsafe?.user?.id
+                                user_id: userData?.user_id || tg?.initDataUnsafe?.user?.id
                             })
                         });
 
@@ -1718,7 +1741,7 @@
 
         async function loadReferralStats() {
             try {
-                const userId = userData?.user_id || tg.initDataUnsafe?.user?.id;
+                const userId = userData?.user_id || tg?.initDataUnsafe?.user?.id;
 
                 console.log('loadReferralStats called with userId:', userId);
 
@@ -1824,7 +1847,7 @@
             try {
                 await navigator.clipboard.writeText(referralData.referral_link);
                 showToast(t('referrals_copy_success'));
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } catch (e) {
                 console.error('Clipboard error:', e);
                 showToast(t('referrals_copy_error'));
@@ -1891,7 +1914,7 @@
 
             // Notify the bot via API (best effort)
             try {
-                const userId = userData?.user_id || tg.initDataUnsafe?.user?.id;
+                const userId = userData?.user_id || tg?.initDataUnsafe?.user?.id;
                 if (userId) {
                     fetch(`${API_BASE}/api/miniapp/set_language`, {
                         method: 'POST',
@@ -1902,7 +1925,7 @@
             } catch (e) { }
 
             showToast(lang === 'es' ? '✅ Idioma actualizado' : '✅ Language updated');
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
 
         // ========== INIT ==========
@@ -1911,16 +1934,20 @@
             console.log('=== INIT MINIAPP ===');
             console.log('ReadyState:', document.readyState);
 
-            // Si el DOM ya está listo, ejecutar inmediatamente
-            if (document.readyState !== 'loading') {
-                console.log('DOM ya listo, ejecutando checkOnboarding...');
-                checkOnboarding();
-            } else {
-                // Esperar a que el DOM esté listo
-                document.addEventListener('DOMContentLoaded', function () {
-                    console.log('DOMContentLoaded fired, ejecutando checkOnboarding...');
-                    checkOnboarding();
-                });
+            try {
+                // Si el DOM ya está listo, ejecutar inmediatamente
+                if (document.readyState !== 'loading') {
+                    console.log('DOM ya listo, ejecutando initializeApp...');
+                    initializeApp();
+                } else {
+                    // Esperar a que el DOM esté listo
+                    document.addEventListener('DOMContentLoaded', function () {
+                        console.log('DOMContentLoaded fired, ejecutando initializeApp...');
+                        initializeApp();
+                    });
+                }
+            } catch (e) {
+                console.error('CRITICAL INIT ERROR:', e);
             }
         })();
 
@@ -2002,17 +2029,17 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: userData?.user_id || tg.initDataUnsafe?.user?.id,
+                        user_id: userData?.user_id || tg?.initDataUnsafe?.user?.id,
                         plan_key: planKey
                     })
                 });
                 const result = await response.json();
                 if (result.ok && result.invoice_link) {
-                    tg.openInvoice(result.invoice_link, (status) => {
+                    tg?.openInvoice(result.invoice_link, (status) => {
                         if (status === 'paid') {
-                            tg.showAlert('¡Pago exitoso! Disfruta Premium.');
-                            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                            setTimeout(() => { loadUserData(); tg.close(); }, 2000);
+                            tg?.showAlert('¡Pago exitoso! Disfruta Premium.');
+                            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                            setTimeout(() => { loadUserData(); tg?.close(); }, 2000);
                         } else if (status === 'cancelled') {
                             if (typeof showToast === 'function') showToast('Pago cancelado');
                         } else if (status === 'failed') {
