@@ -90,6 +90,15 @@ def init_database():
             )
         """)
         
+        # New settings table for global config and bot coordination
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
         # Add language column if it doesn't exist (for existing databases)
         try:
             cursor.execute("ALTER TABLE users ADD COLUMN language TEXT DEFAULT 'es'")
@@ -1116,4 +1125,91 @@ def update_download_status(download_id: int, status: str, error: str = None) -> 
                 (status, error, download_id)
             )
         return cursor.rowcount > 0
+
+
+# ==================== SETTINGS & COORDINATION ====================
+
+def get_setting(key: str, default: Optional[str] = None) -> Optional[str]:
+    """Get a global setting from the database"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM settings WHERE key = ?", (key,))
+        row = cursor.fetchone()
+        return row['value'] if row else default
+
+def set_setting(key: str, value: str):
+    """Set a global setting in the database"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO settings (key, value, updated_at)
+            VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(key) DO UPDATE SET
+                value = excluded.value,
+                updated_at = CURRENT_TIMESTAMP
+        """, (key, value))
+
+def try_acquire_bot_leadership(instance_id: str, timeout_seconds: int = 60) -> bool:
+    """
+    Attempt to become the bot leader.
+    Returns True if successful (already leader or took over), False otherwise.
+    """
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Check current leader
+            cursor.execute("SELECT value, updated_at FROM settings WHERE key = 'bot_leader'")
+            row = cursor.fetchone()
+            
+            now = datetime.now()
+            
+            if row:
+                leader_id = row['value']
+                updated_at_str = row['updated_at']
+                
+                # SQLite might store it in different formats
+                try:
+                    # Try common SQLite formats
+                    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S.%f"):
+                        try:
+                            updated_at = datetime.strptime(updated_at_str, fmt)
+                            break
+                        except ValueError:
+                            continue
+                    else:
+                        raise ValueError("Unknown date format")
+                except:
+                    # Fallback if format is weird
+                    updated_at = now - timedelta(days=1)
+                    
+                # If I'm the leader, update timestamp and return True
+                if leader_id == instance_id:
+                    cursor.execute("""
+                        UPDATE settings SET updated_at = CURRENT_TIMESTAMP 
+                        WHERE key = 'bot_leader'
+                    """)
+                    return True
+                    
+                # If leader is someone else but hasn't updated in long time, take over
+                if (now - updated_at).total_seconds() > timeout_seconds:
+                    logger.info(f"Leader {leader_id} is stale (last update: {updated_at_str}). Taking over...")
+                    cursor.execute("""
+                        UPDATE settings SET value = ?, updated_at = CURRENT_TIMESTAMP 
+                        WHERE key = 'bot_leader'
+                    """, (instance_id,))
+                    return True
+                    
+                # Someone else is leader and active
+                return False
+            else:
+                # No leader yet, become the first one
+                cursor.execute("""
+                    INSERT INTO settings (key, value, updated_at)
+                    VALUES ('bot_leader', ?, CURRENT_TIMESTAMP)
+                """, (instance_id,))
+                return True
+    except Exception as e:
+        logger.error(f"Error in leadership election: {e}")
+        return False
 

@@ -16,6 +16,8 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice, WebAppInfo
 from contextlib import asynccontextmanager
+import uuid
+import time
 
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -46,8 +48,15 @@ from database import (
     get_user_session, has_active_session, delete_user_session, set_user_session,
     confirm_referral, check_and_reward_referrer, get_referral_stats,
     check_and_reset_daily_limits,
-    get_next_pending_download, update_download_status
+    get_next_pending_download, update_download_status,
+    try_acquire_bot_leadership
 )
+
+# Unique ID for this instance
+INSTANCE_ID = str(uuid.uuid4())[:8]
+PID_FILE = "bot.pid"
+_bot_instance_lock = threading.Lock()
+_bot_instance_running = False
 
 # Import messages module for multi-language support
 from messages import get_msg, get_user_language
@@ -3970,7 +3979,22 @@ async def async_main():
         if _bot_instance_running:
             logger.warning("⚠️ Bot instance already running in this process. Skipping.")
             return
-        _bot_instance_running = True
+        
+    # 3. Distributed Protection (Database Leader Election)
+    # Give it a few tries in case of DB contention
+    acquired = False
+    for i in range(3):
+        if try_acquire_bot_leadership(INSTANCE_ID):
+            acquired = True
+            break
+        await asyncio.sleep(2)
+        
+    if not acquired:
+        logger.warning(f"⚠️ Instance {INSTANCE_ID} could not acquire leadership. Another instance is likely running. Skipping.")
+        return
+
+    _bot_instance_running = True
+    logger.info(f"👑 Instance {INSTANCE_ID} acquired leadership.")
 
     # Write current PID
     try:
@@ -4044,6 +4068,21 @@ async def async_main():
     
     # Initialize the application with retries (Railway puede tener latencia inicial)
     max_retries = 5
+    
+    # Start heartbeat task
+    async def leadership_heartbeat():
+        while _bot_instance_running:
+            try:
+                if not try_acquire_bot_leadership(INSTANCE_ID):
+                    logger.error("❌ Lost leadership! Shutting down this instance...")
+                    os._exit(1) # Radical shutdown to prevent Conflict 409
+                await asyncio.sleep(30) # Update leadership every 30s
+            except Exception as e:
+                logger.error(f"Error in heartbeat: {e}")
+                await asyncio.sleep(10)
+
+    asyncio.create_task(leadership_heartbeat())
+    
     for attempt in range(max_retries):
         try:
             logger.info(f"Initializing bot (attempt {attempt + 1}/{max_retries})...")
