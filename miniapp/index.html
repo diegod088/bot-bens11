@@ -42,7 +42,7 @@
         }
 
         body {
-            font-family: 'Nunito', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: var(--void);
             color: var(--txt);
             min-height: 100vh;
@@ -50,6 +50,7 @@
             flex-direction: column;
             overflow-x: hidden;
             position: relative;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Ambient Glow & Grain */
@@ -88,11 +89,12 @@
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(4, 9, 18, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(4, 9, 18, 0.85);
+            /* Slightly darker, more blur */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--line);
-            padding: 16px 20px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -124,15 +126,17 @@
         }
 
         .user-chip {
-            background: var(--card);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--line);
-            padding: 4px 12px 4px 4px;
+            padding: 5px 14px 5px 5px;
             border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--txt);
+            backdrop-filter: blur(4px);
         }
 
         .user-avatar {
@@ -157,27 +161,28 @@
             gap: 20px;
         }
 
-        /* TABS */
+        /* TABS & ANIMATIONS */
         .tab-panel {
             display: none;
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transform: translateY(8px) scale(0.98);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tab-panel.active {
             display: block;
-            animation: fadeIn 0.4s ease forwards;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        @keyframes fadeIn {
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(12px) scale(0.97);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
@@ -250,7 +255,8 @@
         .btn-gold {
             background: linear-gradient(135deg, var(--gold), #D97706);
             color: #000;
-            box-shadow: 0 4px 15px var(--gold-glow);
+            box-shadow: 0 4px 15px var(--gold-glow), inset 0 1px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
         }
 
         .btn-outline {
@@ -297,8 +303,8 @@
 
         /* PREMIUM PLANS */
         .plan-grid {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 12px;
         }
 
@@ -326,12 +332,13 @@
         .plan-badge {
             font-size: 10px;
             font-weight: 800;
-            background: var(--gold);
-            color: #000;
-            padding: 4px 8px;
-            border-radius: 12px;
-            margin-bottom: 6px;
+            background: rgba(255, 183, 0, 0.15);
+            color: var(--gold);
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 8px;
             display: inline-block;
+            border: 1px solid var(--gold-dim);
         }
 
         .plan-price-star {
@@ -467,12 +474,12 @@
             background: rgba(4, 9, 18, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid var(--line);
+            border-top: 1px solid rgba(255, 183, 0, 0.15);
             display: flex;
             justify-content: space-around;
-            padding: 10px;
+            padding: 8px 10px;
             z-index: 50;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
 
         .nav-btn {
@@ -493,11 +500,21 @@
         }
 
         .nav-icon {
-            font-size: 20px;
-            transition: 0.3s;
+            font-size: 22px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 2px;
             filter: grayscale(1);
-            opacity: 0.7;
+            opacity: 0.5;
+        }
+
+        .nav-btn.active .nav-icon {
+            filter: grayscale(0);
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            color: var(--gold);
         }
 
         .nav-btn.active {
@@ -786,7 +803,7 @@
                 <div class="plan-card" onclick="buyPremium('elite')">
                     <div>
                         <div class="plan-badge" style="background:var(--emerald); color:#000;"
-                            data-i18n="plan_max_badge">MÁXIMO PODER</div>
+                            data-i18n="plan_max_badge">ULTIMATE EXPERIENCE</div>
                         <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);"><span
                                 data-i18n="plan_monthly_name">Elite</span> <span
                                 style="font-size:14px; color:var(--txt-muted); font-weight:500;"
@@ -811,7 +828,8 @@
 
                 <div style="background:var(--bg-input); border-radius:var(--rs); padding:16px; margin-top:24px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                        <span style="font-size:12px; color:var(--txt-muted); font-weight:700;">PROGRESO</span>
+                        <span style="font-size:12px; color:var(--txt-muted); font-weight:700;"
+                            data-i18n="referral_progress">PROGRESS</span>
                         <div style="font-family:'Syne'; font-size:18px; font-weight:800; color:var(--cyan);"
                             id="refProgressText">0/15</div>
                     </div>
@@ -822,12 +840,13 @@
 
                 <div style="margin-top:20px; text-align:left;">
                     <label
-                        style="font-size:11px; color:var(--txt-soft); text-transform:uppercase; font-weight:700; display:block; margin-bottom:8px;">Tu
-                        enlace único:</label>
+                        style="font-size:11px; color:var(--txt-soft); text-transform:uppercase; font-weight:700; display:block; margin-bottom:8px;"
+                        data-i18n="referral_unique_link">Your unique link:</label>
                     <div
                         style="background:var(--card-hi); border:1px solid var(--line); border-radius:12px; padding:12px; display:flex; align-items:center; gap:10px;">
                         <code id="referralLink"
-                            style="flex:1; font-size:12px; color:var(--txt-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Cargando enlace...</code>
+                            style="flex:1; font-size:12px; color:var(--txt-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                            data-i18n="referral_link_loading">Loading link...</code>
                         <span onclick="copyReferralLink()"
                             style="cursor:pointer; color:var(--gold); font-size:18px;">📋</span>
                     </div>
@@ -887,11 +906,11 @@
             <div class="sec-label" style="margin-top:24px;" data-i18n="guide_how_start">Cómo empezar</div>
             <div class="card">
                 <ol class="guide-steps">
-                    <li>Ve a la pestaña <strong>Cuenta</strong> y toca "Configurar de nuevo" si no lo has hecho.</li>
-                    <li>Sigue las instrucciones en el chat y <strong>recibe tu código de acceso</strong> oficial.</li>
-                    <li>Ingresa el código en el bot para conectar tu cuenta de forma <strong>segura</strong>.</li>
-                    <li>Copia el enlace de cualquier mensaje de un canal privado al que pertenezcas.</li>
-                    <li>Pega el enlace en la pestaña <strong>Inicio</strong> y recibe el archivo descargable.</li>
+                    <li data-i18n="guide_step_1">Go to Account and sign up if you haven't.</li>
+                    <li data-i18n="guide_step_2">Follow chat instructions to receive your code.</li>
+                    <li data-i18n="guide_step_3">Enter the code to link your account safely.</li>
+                    <li data-i18n="guide_step_4">Copy the link of any message from a private channel.</li>
+                    <li data-i18n="guide_step_5">Paste link in Home and receive your ready file.</li>
                 </ol>
             </div>
 
@@ -901,17 +920,17 @@
                 <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
                     <div
                         style="background:var(--card-hi); padding:10px 12px; border-radius:8px; font-family:monospace; font-size:13px; color:var(--txt);">
-                        t.me/nombrecanal/123 <span
-                            style="float:right; color:var(--txt-muted); font-family:'Nunito';">Canal público</span>
+                        t.me/channel/123 <span style="float:right; color:var(--txt-muted); font-family:'Nunito';"
+                            data-i18n="guide_public_label">Public channel</span>
                     </div>
                     <div
                         style="background:var(--card-hi); padding:10px 12px; border-radius:8px; font-family:monospace; font-size:13px; color:var(--cyan);">
-                        t.me/c/1234567890/456 <span style="float:right; opacity:0.8; font-family:'Nunito';">Canal
-                            privado</span></div>
+                        t.me/c/12345/456 <span style="float:right; opacity:0.8; font-family:'Nunito';"
+                            data-i18n="guide_private_label">Private channel</span></div>
                     <div
                         style="background:var(--card-hi); padding:10px 12px; border-radius:8px; font-family:monospace; font-size:13px; color:var(--txt);">
-                        t.me/+ABCxyz123/789 <span
-                            style="float:right; color:var(--txt-muted); font-family:'Nunito';">Grupo</span></div>
+                        t.me/+ABCxyz/789 <span style="float:right; color:var(--txt-muted); font-family:'Nunito';"
+                            data-i18n="guide_group_label">Group</span></div>
                 </div>
                 <div style="background:var(--gold-dim); border:1px solid var(--gold); padding:10px 12px; border-radius:8px; font-size:12px; color:var(--gold);"
                     data-i18n="guide_tip">
@@ -943,40 +962,37 @@
             <div class="sec-label" style="margin-top:24px;" data-i18n="faq_title">Preguntas Frecuentes</div>
             <div class="card" style="padding:0;">
                 <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Es seguro conectar mi cuenta?</span><span
-                            class="faq-q-icon">+</span></div>
-                    <div class="faq-a">Totalmente. El túnel de inicio de sesión usa una conexión segura de Telegram. No
-                        leemos ni interactuamos con tus chats personales o ajenos al enlace proporcionado.</div>
+                    <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_3_q">Is it safe to link
+                            account?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a" data-i18n="faq_3_a">Totally. We use official Telegram secure authentication.
+                    </div>
                 </div>
                 <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Por qué mi descarga está tardando?</span><span
-                            class="faq-q-icon">+</span></div>
-                    <div class="faq-a">La carga de archivos gigantes puede tardar. Los usuarios Premium siempre saltarán
-                        la cola y tendrán prioridad de procesamiento de velocidad.</div>
+                    <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_4_q">Why is my download
+                            slow?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a" data-i18n="faq_4_a">Large files take time. Premium offers priority speed.</div>
                 </div>
                 <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Referidos pendientes no suman?</span><span
-                            class="faq-q-icon">+</span></div>
-                    <div class="faq-a">Se marcan en verde apenas inicien al menos por vez primera el bot. Usuarios
-                        falsos o bots se descartan.</div>
+                    <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_1_q">How does pasting
+                            work?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a" data-i18n="faq_1_a">Just copy on Telegram and use 'Paste' button to go faster.
+                    </div>
                 </div>
                 <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿De qué canales puedo extraer?</span><span
-                            class="faq-q-icon">+</span></div>
-                    <div class="faq-a">De cualquiera. Al aportar tu autorización segura en Cuenta, puedes invocar
-                        material restringido de canales públicos o privados a los que tú estés unido.</div>
+                    <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_2_q">Are there video
+                            limits?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a" data-i18n="faq_2_a">Videos require Premium due to their large size.</div>
                 </div>
                 <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué son las Telegram Stars?</span><span
-                            class="faq-q-icon">+</span></div>
-                    <div class="faq-a">Son la moneda hiper segura oficial de Telegram. Evitan salir de tu App para pagar
-                        y admiten Google Pay/Apple Pay.</div>
+                    <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_5_q">What are Telegram
+                            Stars?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a" data-i18n="faq_5_a">Official Telegram currency for fast and secure payments.
+                    </div>
                 </div>
                 <div class="faq-item">
-                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Baja la calidad del archivo?</span><span
-                            class="faq-q-icon">+</span></div>
-                    <div class="faq-a">Negativo. Enviamos en crudo tal cual el archivo host original sin comprimir un
-                        solo bit.</div>
+                    <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_6_q">Does quality
+                            drop?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a" data-i18n="faq_6_a">No. We send the original file without any compression.</div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span>¿Hay renovación automática?</span><span
