@@ -746,11 +746,12 @@
             conectada. Ya puedes descargar cualquier archivo de Telegram.</p>
         <div style="display: flex; gap: 8px; margin-top: 12px;">
             <div class="chip" style="background: var(--glass); border: 1px solid var(--line); color: var(--txt-soft);">
-                🔒 Privado</div>
+                🔒 <span data-i18n="hero_chip_private">Privado</span></div>
             <div class="chip" style="background: var(--glass); border: 1px solid var(--line); color: var(--txt-soft);">⚡
-                Ilimitado</div>
+                <span data-i18n="hero_chip_instant">Ilimitado</span>
+            </div>
             <div class="chip" style="background: var(--glass); border: 1px solid var(--line); color: var(--txt-soft);">
-                🎯 Sin compresión</div>
+                🎯 <span data-i18n="hero_chip_quality">Sin compresión</span></div>
         </div>
         <div class="credits-bar"
             style="position: absolute; bottom: 40px; left: 24px; right: 24px; height: 4px; border-radius: 2px;">
@@ -988,15 +989,19 @@
                         <tr style="border-bottom: 1px solid var(--line);">
                             <th style="padding: 12px 0; color: var(--txt-soft);" data-i18n="feature_label">
                                 Característica</th>
-                            <th style="padding: 12px 0; color: var(--txt); text-align: center;">Básico</th>
-                            <th style="padding: 12px 0; color: var(--gold); text-align: center;">Pro</th>
+                            <th style="padding: 12px 0; color: var(--txt); text-align: center;"
+                                data-i18n="compare_basic">Básico</th>
+                            <th style="padding: 12px 0; color: var(--gold); text-align: center;"
+                                data-i18n="compare_pro">Pro</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr style="border-bottom: 1px solid var(--line-hi);">
                             <td style="padding: 12px 0; color: var(--txt-soft);" data-i18n="feat_speed">Velocidad</td>
-                            <td style="padding: 12px 0; text-align: center; color: var(--txt-muted);">Estándar</td>
-                            <td style="padding: 12px 0; text-align: center; color: var(--gold); font-weight: bold;">
+                            <td style="padding: 12px 0; text-align: center; color: var(--txt-muted);"
+                                data-i18n="compare_standard">Estándar</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--gold); font-weight: bold;"
+                                data-i18n="compare_max">
                                 Máxima</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--line-hi);">
@@ -1008,8 +1013,10 @@
                         </tr>
                         <tr>
                             <td style="padding: 12px 0; color: var(--txt-soft);" data-i18n="feat_support">Soporte</td>
-                            <td style="padding: 12px 0; text-align: center; color: var(--txt-muted);">Común</td>
-                            <td style="padding: 12px 0; text-align: center; color: var(--gold); font-weight: bold;">
+                            <td style="padding: 12px 0; text-align: center; color: var(--txt-muted);"
+                                data-i18n="compare_common">Común</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--gold); font-weight: bold;"
+                                data-i18n="compare_priority">
                                 Prioritario</td>
                         </tr>
                     </tbody>
@@ -1261,6 +1268,15 @@
                         data-i18n="login_gate_desc">Necesitas una cuenta...</p>
                     <button class="btn btn-gold" style="width: 100%; font-size: 16px; font-weight: 700;"
                         onclick="configureAccount()" data-i18n="btn_login">🔐 Iniciar Sesión</button>
+                </div>
+                <div class="card" style="margin-top: 16px;" onclick="showLanguageSelector()">
+                    <div class="ami" style="border:none;">
+                        <span class="ami-icon">🌐</span>
+                        <div class="ami-text">
+                            <div class="ami-title" style="text-align: left;" data-i18n="account_lang_label">Idioma</div>
+                        </div>
+                        <span class="ami-arrow">›</span>
+                    </div>
                 </div>
             </div>
 
@@ -1934,9 +1950,9 @@
                             flashBanner.onclick = () => buyPremium('flash');
                             flashBanner.innerHTML = `
                                 <div style="background:linear-gradient(135deg, #f59e0b, #dc2626); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center; color:white; animation: floatUp 2s infinite alternate; cursor:pointer; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);">
-                                    <div style="font-size:24px; margin-bottom:4px; font-weight:800; letter-spacing:1px;">⚡ VENTA FLASH ACTIVA ⚡</div>
-                                    <div style="font-size:14px; margin-bottom:12px;">Termina en: <strong id="flashCountdown" style="font-size:18px; font-family:'Syne',sans-serif;">00:00:00</strong></div>
-                                    <button style="background:white; color:#dc2626; border:none; border-radius:8px; padding:10px 20px; font-weight:800; text-transform:uppercase; cursor:pointer;">Aprovechar Promoción</button>
+                                    <div style="font-size:24px; margin-bottom:4px; font-weight:800; letter-spacing:1px;">${t('flash_sale_active')}</div>
+                                    <div style="font-size:14px; margin-bottom:12px;">${t('flash_sale_ends')} <strong id="flashCountdown" style="font-size:18px; font-family:'Syne',sans-serif;">00:00:00</strong></div>
+                                    <button style="background:white; color:#dc2626; border:none; border-radius:8px; padding:10px 20px; font-weight:800; text-transform:uppercase; cursor:pointer;">${t('flash_sale_btn')}</button>
                                 </div>
                             `;
                             const premiumOffer = document.getElementById('premiumOffer');

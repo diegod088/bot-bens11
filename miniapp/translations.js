@@ -152,7 +152,16 @@ const TRANSLATIONS = {
         "limit_reached_desc": "Para seguir descargando contenido exclusivo, necesitas recargar tus descargas.",
         "faq_title": "Preguntas Frecuentes",
         "guide_tips": "Consejos útiles",
-        "account_title": "Tu Cuenta"
+        "account_title": "Tu Cuenta",
+        "flash_sale_active": "⚡ VENTA FLASH ACTIVA ⚡",
+        "flash_sale_ends": "Termina en:",
+        "flash_sale_btn": "Aprovechar Promoción",
+        "compare_basic": "Básico",
+        "compare_pro": "Pro",
+        "compare_standard": "Estándar",
+        "compare_max": "Máxima",
+        "compare_common": "Común",
+        "compare_priority": "Prioritario"
     },
     "en": {
         "onboarding_title_1": "Discover the Power",
@@ -306,7 +315,16 @@ const TRANSLATIONS = {
         "limit_reached_desc": "To continue downloading exclusive content, you need to recharge your downloads.",
         "faq_title": "Frequently Asked Questions",
         "guide_tips": "Useful tips",
-        "account_title": "Your Account"
+        "account_title": "Your Account",
+        "flash_sale_active": "⚡ FLASH SALE ACTIVE ⚡",
+        "flash_sale_ends": "Ends in:",
+        "flash_sale_btn": "Grab the Promo",
+        "compare_basic": "Basic",
+        "compare_pro": "Pro",
+        "compare_standard": "Standard",
+        "compare_max": "Maximum",
+        "compare_common": "Common",
+        "compare_priority": "Priority"
     },
     "pt": {
         "onboarding_title_1": "Descubra o Poder",
@@ -460,7 +478,16 @@ const TRANSLATIONS = {
         "limit_reached_desc": "Para continuar baixando conteúdo exclusivo, você precisa recarregar seus downloads.",
         "faq_title": "Perguntas Frequentes",
         "guide_tips": "Dicas úteis",
-        "account_title": "Sua Conta"
+        "account_title": "Sua Conta",
+        "flash_sale_active": "⚡ VENDA FLASH ATIVA ⚡",
+        "flash_sale_ends": "Termina em:",
+        "flash_sale_btn": "Aproveitar Promoção",
+        "compare_basic": "Básico",
+        "compare_pro": "Pro",
+        "compare_standard": "Padrão",
+        "compare_max": "Máxima",
+        "compare_common": "Comum",
+        "compare_priority": "Prioritário"
     },
     "it": {
         "onboarding_title_1": "Scopri il Potere",
@@ -614,7 +641,16 @@ const TRANSLATIONS = {
         "limit_reached_desc": "Per continuare a scaricare contenuti esclusivi, devi ricaricare i tuoi download.",
         "faq_title": "Domande Frequenti",
         "guide_tips": "Consigli utili",
-        "account_title": "Il Tuo Account"
+        "account_title": "Il Tuo Account",
+        "flash_sale_active": "⚡ VENDITA LAMPO ATTIVA ⚡",
+        "flash_sale_ends": "Termina tra:",
+        "flash_sale_btn": "Approfitta della Promo",
+        "compare_basic": "Base",
+        "compare_pro": "Pro",
+        "compare_standard": "Standard",
+        "compare_max": "Massima",
+        "compare_common": "Comune",
+        "compare_priority": "Prioritario"
     }
 };
 
