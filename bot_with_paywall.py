@@ -2029,7 +2029,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         miniapp_msg += "Haz clic en el botón de abajo para abrir la aplicación.\n\n"
         
         keyboard = [
-            [InlineKeyboardButton("🚀 Abrir MiniApp", web_app=WebAppInfo(url=miniapp_url))],
+            [InlineKeyboardButton("📱 " + get_msg("btn_open_miniapp", lang), web_app=WebAppInfo(url=miniapp_url))],
             [InlineKeyboardButton("◀️ Volver", callback_data="back_to_menu")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -2857,25 +2857,29 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if lang == 'es':
         if is_new_user:
             welcome_message = (
-                f"👋 ¡Hola {first_name}! Bienvenido al bot de descargas.\n\n"
-                "📥 Descarga fotos, videos, música y APKs de canales privados de Telegram.\n\n"
-                "👇 *Abre la app para empezar:*"
+                f"👋 ¡Hola {first_name}! Bienvenido a *DownloadBot*.\n\n"
+                "🚀 Tu portal premium para descargar contenido de Telegram:\n"
+                "✨ Videos, Fotos, Música y APKs de canales privados.\n\n"
+                "👇 *Presiona el botón para empezar:*"
             )
         else:
             welcome_message = (
                 f"👋 ¡Hola de nuevo, {first_name}!\n\n"
+                "🚀 *DownloadBot* está listo. ¿Qué quieres descargar hoy?\n\n"
                 "👇 *Abre la app para continuar:*"
             )
     else:
         if is_new_user:
             welcome_message = (
-                f"👋 Hello {first_name}! Welcome to the downloads bot.\n\n"
-                "📥 Download photos, videos, music and APKs from private Telegram channels.\n\n"
-                "👇 *Open the app to get started:*"
+                f"👋 Hello {first_name}! Welcome to *DownloadBot*.\n\n"
+                "🚀 Your premium portal for Telegram downloads:\n"
+                "✨ Videos, Photos, Music and APKs from private channels.\n\n"
+                "👇 *Press the button to get started:*"
             )
         else:
             welcome_message = (
                 f"👋 Welcome back, {first_name}!\n\n"
+                "🚀 *DownloadBot* is ready. What do you want to download today?\n\n"
                 "👇 *Open the app to continue:*"
             )
 
@@ -3857,7 +3861,7 @@ async def post_init(application: Application):
         try:
             await application.bot.set_chat_menu_button(
                 menu_button=MenuButtonWebApp(
-                    text="Abrir App (RW)",
+                    text="📱 Abrir App",
                     web_app=WebAppInfo(url=full_miniapp_url)
                 )
             )

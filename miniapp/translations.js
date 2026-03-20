@@ -209,6 +209,7 @@ const TRANSLATIONS = {
         "limit_reached_title": "Sin descargas disponibles",
         "limit_reached_desc": "Para seguir descargando contenido exclusivo, necesitas recargar tus descargas.",
         "referrals_earned_label": "Ganadas",
+        "credits_count_label": "Créditos Disponibles",
     },
 
     "en": {
@@ -414,6 +415,7 @@ const TRANSLATIONS = {
         "limit_reached_title": "No downloads available",
         "limit_reached_desc": "To continue downloading exclusive content, you need to recharge your downloads.",
         "referrals_earned_label": "Earned",
+        "credits_count_label": "Available Credits",
     },
 
     "pt": {
@@ -624,6 +626,7 @@ const TRANSLATIONS = {
         "limit_reached_title": "Sem downloads disponíveis",
         "limit_reached_desc": "Para continuar baixando conteúdo exclusivo, você precisa recarregar seus downloads.",
         "referrals_earned_label": "Ganhos",
+        "credits_count_label": "Créditos Disponíveis",
     },
 
     "it": {
@@ -835,6 +838,7 @@ const TRANSLATIONS = {
         "limit_reached_title": "Nessun download disponibile",
         "limit_reached_desc": "Per continuare a scaricare contenuti esclusivi, devi ricaricare i tuoi download.",
         "referrals_earned_label": "Guadagnati",
+        "credits_count_label": "Crediti Disponibili",
     },
 };
 
