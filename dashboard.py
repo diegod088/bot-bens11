@@ -36,10 +36,33 @@ app.config['SESSION_REFRESH_EACH_REQUEST'] = True  # Refresh session on each req
 
 # Token de administrador desde variables de entorno
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "admin123")
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-BOT_USERNAME_CACHE = None
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN") or os.getenv("TELEGRAM_BOT_TOKEN")
+BOT_USERNAME_CACHE = os.getenv("BOT_USERNAME")
 
 from database import DB_FILE
+import requests
+
+def get_bot_username_cached():
+    """Obtener el username del bot, intentando variable de entorno primero y luego API"""
+    global BOT_USERNAME_CACHE
+    if BOT_USERNAME_CACHE:
+        return BOT_USERNAME_CACHE
+    
+    token = os.getenv("TELEGRAM_TOKEN") or os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        return "bot"
+        
+    try:
+        response = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=5)
+        if response.ok:
+            data = response.json()
+            if data.get("ok"):
+                BOT_USERNAME_CACHE = data["result"].get("username")
+                return BOT_USERNAME_CACHE
+    except Exception as e:
+        print(f"Error fetching bot username: {e}")
+        
+    return os.getenv("BOT_USERNAME", "bot")
 
 
 def get_db_connection():
@@ -1334,7 +1357,9 @@ def miniapp_get_user():
             'flash_sale': {
                 'active': flash_sale_active,
                 'end': flash_sale_end
-            }
+            },
+            'referrals': get_referral_stats(user_id),
+            'referral_link': f"https://t.me/{get_bot_username_cached()}?start=ref_{user_id}"
         })
         
     except Exception as e:

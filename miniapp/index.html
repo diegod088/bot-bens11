@@ -710,7 +710,7 @@
                         <input type="text" id="linkInput" class="input-box" placeholder="https://t.me/c/12345/678"
                             style="margin-bottom: 12px;">
                         <button class="btn btn-gold" id="downloadBtn" onclick="startDownload()">
-                            <span>⚡ Procesar Enlace</span>
+                            <span data-i18n="btn_process">⚡ Procesar Enlace</span>
                         </button>
                     </div>
                 </div>
@@ -745,9 +745,10 @@
             <div class="sec-label">🌟 Status</div>
             <div class="card card-gold" style="text-align:center;">
                 <div style="font-size:40px; margin-bottom:12px;">👑</div>
-                <div id="premiumStatus" style="font-size:18px; font-weight:700; color:var(--gold); margin-bottom:4px;">
-                    Cuenta Gratuita</div>
-                <div id="userPlan" style="font-size:13px; color:var(--txt-soft);">Sin suscripción activa</div>
+                <div id="premiumStatus" style="font-size:18px; font-weight:700; color:var(--gold); margin-bottom:4px;"
+                    data-i18n="status_free">Cuenta Gratuita</div>
+                <div id="userPlan" style="font-size:13px; color:var(--txt-soft);" data-i18n="no_subscription">Sin
+                    suscripción activa</div>
             </div>
 
             <div class="sec-label" style="margin-top: 24px;">💎 Planes VIP</div>
@@ -757,9 +758,12 @@
                 <!-- Basic -->
                 <div class="plan-card" onclick="buyPremium('basic')">
                     <div>
-                        <div class="plan-badge" style="background:var(--txt-muted); color:#FFF;">INICIAL</div>
-                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);">Básico <span
-                                style="font-size:14px; color:var(--txt-muted); font-weight:500;">/ 7 días</span></div>
+                        <div class="plan-badge" style="background:var(--txt-muted); color:#FFF;"
+                            data-i18n="plan_inicial_badge">INICIAL</div>
+                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);"><span
+                                data-i18n="plan_trial_name">Básico</span> <span
+                                style="font-size:14px; color:var(--txt-muted); font-weight:500;"
+                                data-i18n="plan_desc_basic">/ 7 días</span></div>
                     </div>
                     <div style="text-align:right;">
                         <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">333⭐</div>
@@ -768,9 +772,11 @@
                 <!-- Pro -->
                 <div class="plan-card pro" onclick="buyPremium('pro')">
                     <div>
-                        <div class="plan-badge">🔥 RECOMENDADO</div>
-                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);">Pro <span
-                                style="font-size:14px; color:var(--txt-muted); font-weight:500;">/ 30 días</span></div>
+                        <div class="plan-badge" data-i18n="plan_weekly_badge">🔥 RECOMENDADO</div>
+                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);"><span
+                                data-i18n="plan_weekly_name">Pro</span> <span
+                                style="font-size:14px; color:var(--txt-muted); font-weight:500;"
+                                data-i18n="plan_desc_pro">/ 30 días</span></div>
                     </div>
                     <div style="text-align:right;">
                         <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">777⭐</div>
@@ -779,9 +785,12 @@
                 <!-- Elite -->
                 <div class="plan-card" onclick="buyPremium('elite')">
                     <div>
-                        <div class="plan-badge" style="background:var(--emerald); color:#000;">MÁXIMO PODER</div>
-                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);">Elite <span
-                                style="font-size:14px; color:var(--txt-muted); font-weight:500;">/ 90 días</span></div>
+                        <div class="plan-badge" style="background:var(--emerald); color:#000;"
+                            data-i18n="plan_max_badge">MÁXIMO PODER</div>
+                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);"><span
+                                data-i18n="plan_monthly_name">Elite</span> <span
+                                style="font-size:14px; color:var(--txt-muted); font-weight:500;"
+                                data-i18n="plan_desc_elite">/ 90 días</span></div>
                     </div>
                     <div style="text-align:right;">
                         <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">1499⭐</div>
@@ -828,8 +837,8 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
                 <div class="card"
                     style="margin:0; padding:16px; display:flex; flex-direction:column; align-items:center;">
-                    <div
-                        style="color:var(--txt-soft); font-size:11px; text-transform:uppercase; font-weight:700; margin-bottom:8px;">
+                    <div style="color:var(--txt-soft); font-size:11px; text-transform:uppercase; font-weight:700; margin-bottom:8px;"
+                        data-i18n="referrals_total_label">
                         Totales</div>
                     <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--txt);"
                         id="refConfirmed">0</div>
@@ -845,7 +854,7 @@
             </div>
 
             <button class="btn btn-cyan" onclick="shareReferralLink()">
-                <span style="font-size:18px;">🔗</span> Compartir Enlace
+                <span style="font-size:18px;">🔗</span> <span data-i18n="btn_share">Compartir Enlace</span>
             </button>
         </div>
 
@@ -904,8 +913,8 @@
                         t.me/+ABCxyz123/789 <span
                             style="float:right; color:var(--txt-muted); font-family:'Nunito';">Grupo</span></div>
                 </div>
-                <div
-                    style="background:var(--gold-dim); border:1px solid var(--gold); padding:10px 12px; border-radius:8px; font-size:12px; color:var(--gold);">
+                <div style="background:var(--gold-dim); border:1px solid var(--gold); padding:10px 12px; border-radius:8px; font-size:12px; color:var(--gold);"
+                    data-i18n="guide_tip">
                     💡 <strong>Tip:</strong> Si estás en Android, toca el mensaje y usa "Copiar Enlace".
                 </div>
             </div>
@@ -915,18 +924,19 @@
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <div class="card"
                     style="border-color:var(--cyan); background:linear-gradient(135deg, var(--card), rgba(0,212,255,0.05));">
-                    <h4 style="color:var(--cyan); font-size:15px; font-weight:700; margin-bottom:6px;">👥 Invitando
-                        Amigos</h4>
-                    <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;">Recomienda a tus referidos. Cada
-                        15 usuarios que inicien el bot a través de tu enlace, recibirás 10 descargas gratis
-                        inmediatamente y de forma automática.</p>
+                    <h4 style="color:var(--cyan); font-size:15px; font-weight:700; margin-bottom:6px;"
+                        data-i18n="guide_invite_title">👥 Invitando Amigos</h4>
+                    <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;" data-i18n="guide_invite_desc">
+                        Recomienda a tus referidos. Cada 15 usuarios que inicien el bot a través de tu enlace, recibirás
+                        10 descargas gratis inmediatamente y de forma automática.</p>
                 </div>
                 <div class="card"
                     style="border-color:var(--gold); background:linear-gradient(135deg, var(--card), rgba(255,183,0,0.05));">
-                    <h4 style="color:var(--gold); font-size:15px; font-weight:700; margin-bottom:6px;">💎 Adquiriendo
-                        Premium</h4>
-                    <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;">Elige tranquilidad. Descargas
-                        ILIMITADAS sin cortes ni demoras. Contamos con membresías Premium a partir de 333⭐ por mes.</p>
+                    <h4 style="color:var(--gold); font-size:15px; font-weight:700; margin-bottom:6px;"
+                        data-i18n="guide_premium_title">💎 Adquiriendo Premium</h4>
+                    <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;" data-i18n="guide_premium_desc">
+                        Elige tranquilidad. Descargas ILIMITADAS sin cortes ni demoras. Contamos con membresías Premium
+                        a partir de 333⭐ por mes.</p>
                 </div>
             </div>
 
@@ -996,9 +1006,9 @@
                 </div>
             </div>
 
-            <button class="btn btn-outline" onclick="openSupport()" style="margin-top:16px; margin-bottom: 20px;"
-                data-i18n="btn_support">💬
-                Contactar Soporte Técnico</button>
+            <button class="btn btn-outline" onclick="openSupport()" style="margin-top:16px; margin-bottom: 20px;">
+                <span style="font-size:18px;">💬</span> <span data-i18n="btn_support">Contactar Soporte Técnico</span>
+            </button>
         </div>
 
         <!-- PROFILE TAB -->
@@ -1016,23 +1026,23 @@
                 <div class="ami" id="connBtn" onclick="isConnected ? disconnectAccount() : configureAccount()">
                     <span class="ami-icon" id="connIcon">🔌</span>
                     <div class="ami-text">
-                        <div class="ami-title" id="connTitle">Estado de la cuenta</div>
-                        <div class="ami-sub" id="connSub">Verificando...</div>
+                        <div class="ami-title" id="connTitle" data-i18n="account_status_label">Estado de la cuenta</div>
+                        <div class="ami-sub" id="connSub" data-i18n="account_verifying">Verificando...</div>
                     </div>
                     <span class="ami-arrow">›</span>
                 </div>
                 <div class="ami" onclick="openSupport()">
                     <span class="ami-icon">💬</span>
                     <div class="ami-text">
-                        <div class="ami-title">Centro de soporte</div>
-                        <div class="ami-sub">Resolución de problemas</div>
+                        <div class="ami-title" data-i18n="account_support_label">Centro de soporte</div>
+                        <div class="ami-sub" data-i18n="account_support_desc">Resolución de problemas</div>
                     </div>
                     <span class="ami-arrow">›</span>
                 </div>
                 <div class="ami" onclick="showLanguageSelector()" style="border:none;">
                     <span class="ami-icon">🌐</span>
                     <div class="ami-text">
-                        <div class="ami-title">Idioma</div>
+                        <div class="ami-title" data-i18n="account_lang_label">Idioma</div>
                         <div class="ami-sub" id="currentLangLabel">Español</div>
                     </div>
                     <span class="ami-arrow">›</span>
@@ -1048,19 +1058,19 @@
     <!-- BOTTOM NAV -->
     <nav class="nav" id="bottomNav" style="display: none;">
         <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
-            <span class="nav-icon">⬇</span><span>Inicio</span>
+            <span class="nav-icon">⬇</span><span data-i18n="nav_home">Inicio</span>
         </button>
         <button class="nav-btn" id="nav-premium" onclick="switchTab('premium')">
-            <span class="nav-icon">⭐</span><span>Premium</span>
+            <span class="nav-icon">⭐</span><span data-i18n="nav_premium">Premium</span>
         </button>
         <button class="nav-btn" id="nav-referrals" onclick="switchTab('referrals')">
-            <span class="nav-icon">👥</span><span>Referidos</span>
+            <span class="nav-icon">👥</span><span data-i18n="nav_referrals">Referidos</span>
         </button>
         <button class="nav-btn" id="nav-guide" onclick="switchTab('guide')">
-            <span class="nav-icon">📖</span><span>Guía</span>
+            <span class="nav-icon">📖</span><span data-i18n="guide_title">Guía</span>
         </button>
         <button class="nav-btn" id="nav-profile" onclick="switchTab('profile')">
-            <span class="nav-icon">👤</span><span>Cuenta</span>
+            <span class="nav-icon">👤</span><span data-i18n="nav_account">Cuenta</span>
         </button>
     </nav>
 
@@ -1604,6 +1614,13 @@
                 const welcomeTextEl = document.getElementById('welcomeText');
                 if (welcomeTextEl) welcomeTextEl.textContent = `${t('welcome_text')}, ${name}!`;
 
+                // Update Language Label in Profile
+                const langLabelEl = document.getElementById('currentLangLabel');
+                if (langLabelEl) {
+                    const langNames = { 'es': 'Español', 'en': 'English', 'pt': 'Português', 'it': 'Italiano' };
+                    langLabelEl.textContent = langNames[currentLanguage] || 'Español';
+                }
+
                 // Actualizar plan y banners
                 const userPlanEl = document.getElementById('userPlan');
                 const planBadgeEl = document.getElementById('planBadge');
@@ -1613,12 +1630,8 @@
                 const premiumOfferEl = document.getElementById('premiumOffer');
 
                 if (userData.premium) {
-                    if (userPlanEl) userPlanEl.textContent = t('panel_plan_premium');
-                    if (planBadgeEl) {
-                        planBadgeEl.textContent = 'PREMIUM';
-                        planBadgeEl.style.color = '#E5A958';
-                    }
-                    if (premiumStatusEl) premiumStatusEl.textContent = t('account_premium_active');
+                    if (userPlanEl) userPlanEl.textContent = t('status_premium');
+                    if (premiumStatusEl) premiumStatusEl.textContent = t('status_premium');
                     if (premiumBannerEl) premiumBannerEl.style.display = 'none';
                     if (premiumActiveEl) premiumActiveEl.style.display = 'block';
                     if (premiumOfferEl) premiumOfferEl.style.display = 'none';
@@ -1629,12 +1642,8 @@
                         if (daysLeftEl) daysLeftEl.textContent = Math.max(0, days);
                     }
                 } else {
-                    if (userPlanEl) userPlanEl.textContent = t('panel_plan_free');
-                    if (planBadgeEl) {
-                        planBadgeEl.textContent = 'FREE';
-                        planBadgeEl.style.color = 'var(--accent-blue)';
-                    }
-                    if (premiumStatusEl) premiumStatusEl.textContent = t('account_premium_buy');
+                    if (userPlanEl) userPlanEl.textContent = t('status_free');
+                    if (premiumStatusEl) premiumStatusEl.textContent = t('status_free');
                     if (premiumBannerEl) premiumBannerEl.style.display = 'flex';
                     if (premiumActiveEl) premiumActiveEl.style.display = 'none';
                     if (premiumOfferEl) premiumOfferEl.style.display = 'block';
@@ -1658,7 +1667,7 @@
             }
 
             // Load referral stats
-            setTimeout(() => loadReferralStats(), 300);
+            updateReferralUI();
         }
 
 
@@ -1928,30 +1937,39 @@
         }
 
         function updateReferralUI() {
-            if (!referralData) {
-                console.warn('updateReferralUI called but referralData is null');
-                return;
+            // Use referrals object from userData (sent by modern /api/miniapp/user)
+            const stats = userData?.referrals || {};
+            const refLink = userData?.referral_link || 'error';
+
+            console.log('Updating referral UI with stats:', stats);
+
+            // Update stats cards
+            const confirmedEl = document.getElementById('refConfirmed');
+            const earnedEl = document.getElementById('refEarned');
+
+            if (confirmedEl) confirmedEl.textContent = stats.confirmed || 0;
+            if (earnedEl) earnedEl.textContent = stats.downloads_earned || 0;
+
+            // Update Progress Bar section
+            const progressTextEl = document.getElementById('refProgressText');
+            const progressBarEl = document.getElementById('progressBar');
+
+            if (progressTextEl) progressTextEl.textContent = `${stats.progress || 0}/${stats.next_reward_at || 15}`;
+
+            if (progressBarEl) {
+                const percent = ((stats.progress || 0) / (stats.next_reward_at || 15)) * 100;
+                progressBarEl.style.width = `${Math.min(100, percent)}%`;
             }
 
-            console.log('Updating referral UI with data:', referralData);
-
-            const stats = referralData.stats;
-
-            // Actualizar números
-            document.getElementById('confirmedReferrals').textContent = stats.confirmed || 0;
-            document.getElementById('pendingReferrals').textContent = stats.pending || 0;
-            document.getElementById('daysEarned').textContent = stats.downloads_earned || 0;
-            document.getElementById('progressText').textContent = `${stats.progress || 0}/${stats.next_reward_at || 1}`;
-
-            // Actualizar barra de progreso
-            const progressPercent = ((stats.progress || 0) / (stats.next_reward_at || 1)) * 100;
-            document.getElementById('progressBar').style.width = `${Math.min(progressPercent, 100)}%`;
-
-            // Actualizar enlace
+            // Update Referral Link
             const linkEl = document.getElementById('referralLink');
             if (linkEl) {
-                linkEl.textContent = referralData.referral_link;
-                linkEl.style.color = 'var(--accent-blue)'; // Restaurar color normal
+                if (refLink !== 'error') {
+                    linkEl.textContent = refLink;
+                    linkEl.style.color = 'var(--text-soft)';
+                } else {
+                    linkEl.textContent = 'Cargando...';
+                }
             }
         }
 
