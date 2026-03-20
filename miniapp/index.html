@@ -779,28 +779,28 @@
                 <span style="color:var(--txt-muted); font-size:18px;">›</span>
             </div>
 
-            <div style="padding: 28px 8px 32px; text-align: center;">
+            <div style="padding: 12px 8px 16px; text-align: center;">
                 <h1 id="heroHeadline"
-                    style="font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 300; letter-spacing: -0.5px; line-height: 1.15; color: var(--txt); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0s both;"
+                    style="font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 300; letter-spacing: -0.5px; line-height: 1.15; color: var(--txt); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0s both;"
                     data-i18n="home_title_line1">descargador Telegram</h1>
-                <h1 style="font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; color: var(--gold); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0.06s both;"
+                <h1 style="font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; color: var(--gold); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0.06s both;"
                     data-i18n="home_title_vip">V.i.P</h1>
             </div>
 
             <div id="downloadArea" style="position: relative; animation: tabEnter 0.5s var(--ease-out) 0.12s both;">
-                <div style="position: relative; margin-bottom: 14px;">
+                <div style="position: relative; margin-bottom: 10px;">
                     <input type="text" id="linkInput" placeholder="Pegar link de video/foto"
-                        style="width: 100%; padding: 20px 64px 20px 24px; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18); border-radius: 60px; color: var(--txt); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 500; outline: none; box-sizing: border-box; transition: border-color 0.25s, box-shadow 0.25s; -webkit-appearance: none; appearance: none;"
+                        style="width: 100%; padding: 16px 56px 16px 20px; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18); border-radius: 60px; color: var(--txt); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 500; outline: none; box-sizing: border-box; transition: border-color 0.25s, box-shadow 0.25s; -webkit-appearance: none; appearance: none;"
                         onfocus="this.style.borderColor='var(--gold)'; this.style.boxShadow='0 0 0 3px var(--gold-dim)';"
                         onblur="this.style.borderColor='rgba(255,255,255,0.18)'; this.style.boxShadow='none';"
                         data-i18n-placeholder="input_placeholder">
                     <div
-                        style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 26px; pointer-events: none;">
+                        style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 22px; pointer-events: none;">
                         ⬇</div>
                 </div>
 
                 <button id="downloadBtn" onclick="startDownload()"
-                    style="width: 100%; padding: 19px 24px; background: #ffffff; border: none; border-radius: 60px; font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 1px; color: #0a0f1e; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.18s, box-shadow 0.2s; box-shadow: 0 8px 32px rgba(255,255,255,0.15);"
+                    style="width: 100%; padding: 16px 24px; background: #ffffff; border: none; border-radius: 60px; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; letter-spacing: 1px; color: #0a0f1e; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.18s, box-shadow 0.2s; box-shadow: 0 6px 24px rgba(255,255,255,0.15);"
                     onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform=''"
                     onpointerleave="this.style.transform=''">
                     <span data-i18n="btn_get_file">OBTENER ARCHIVO</span>
@@ -837,14 +837,14 @@
             </div>
 
             <div id="tutorialSpace" onclick="switchTab('guide')"
-                style="margin-top: 28px; padding: 16px 20px; background: var(--glass); border: 1px solid var(--line); border-radius: var(--r); display: flex; align-items: center; justify-content: space-between; cursor: pointer; animation: tabEnter 0.5s var(--ease-out) 0.24s both;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 24px;">📖</span>
+                style="margin-top: 14px; padding: 12px 16px; background: var(--glass); border: 1px solid var(--line); border-radius: var(--r); display: flex; align-items: center; justify-content: space-between; cursor: pointer; animation: tabEnter 0.5s var(--ease-out) 0.24s both;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">📖</span>
                     <div style="display: flex; flex-direction: column;">
                         <span
-                            style="font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; color: var(--txt);"
+                            style="font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; color: var(--txt);"
                             data-i18n="guide_title">Tutorial</span>
-                        <span style="font-size: 12px; color: var(--txt-soft);" data-i18n="guide_subtitle">Aprende a
+                        <span style="font-size: 11px; color: var(--txt-soft);" data-i18n="guide_subtitle">Aprende a
                             sacar el máximo provecho</span>
                     </div>
                 </div>
@@ -852,45 +852,45 @@
             </div>
 
             <div
-                style="display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 28px; padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); animation: tabEnter 0.5s var(--ease-out) 0.30s both;">
+                style="display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 14px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); animation: tabEnter 0.5s var(--ease-out) 0.30s both;">
                 <div
-                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8px; border-right: 1px solid var(--line);">
+                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; border-right: 1px solid var(--line);">
                     <span
-                        style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--txt); line-height: 1.4;"
+                        style="font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; color: var(--txt); line-height: 1.4;"
                         data-i18n="stat_multimedia_label">Multimedia descargada</span>
                     <span
-                        style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; margin-top: 6px; color: var(--gold);"
+                        style="font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 900; margin-top: 4px; color: var(--gold);"
                         data-i18n="stat_multimedia_value">+99,999GB</span>
                 </div>
                 <div
-                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8px; border-right: 1px solid var(--line);">
+                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; border-right: 1px solid var(--line);">
                     <span
-                        style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--txt); line-height: 1.4;"
+                        style="font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; color: var(--txt); line-height: 1.4;"
                         data-i18n="stat_users_label">usuarios activos</span>
                     <span
-                        style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; margin-top: 6px; color: var(--cyan);"
+                        style="font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 900; margin-top: 4px; color: var(--cyan);"
                         data-i18n="stat_users_value">+100</span>
                 </div>
                 <div
-                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8px;">
+                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px;">
                     <span
-                        style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--txt); line-height: 1.4;"
+                        style="font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; color: var(--txt); line-height: 1.4;"
                         data-i18n="stat_rating_label">valoración usuarios</span>
                     <span
-                        style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; margin-top: 6px; color: var(--emerald);"
+                        style="font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 900; margin-top: 4px; color: var(--emerald);"
                         data-i18n="stat_rating_value">5/5 ⭐</span>
                 </div>
             </div>
 
-            <div id="historyCard" class="card" style="display:none; padding: 0; margin-top: 20px;">
+            <div id="historyCard" class="card" style="display:none; padding: 0; margin-top: 12px;">
                 <div
-                    style="padding: 16px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between;">
-                    <span class="sec-label" style="margin:0;">Últimas Descargas</span>
+                    style="padding: 12px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between;">
+                    <span class="sec-label" style="margin:0;" data-i18n="history_title">Últimas Descargas</span>
                 </div>
                 <div id="historyEmpty"
-                    style="display: none; padding: 28px 20px; flex-direction: column; align-items: center; text-align: center;">
-                    <div style="font-size: 40px; animation: iconFloat 3s ease-in-out infinite;">📭</div>
-                    <h4 style="font-size: 15px; font-family: 'Syne', sans-serif; color: var(--txt-soft); margin: 12px 0 4px;"
+                    style="display: none; padding: 16px 20px; flex-direction: column; align-items: center; text-align: center;">
+                    <div style="font-size: 32px; animation: iconFloat 3s ease-in-out infinite;">📭</div>
+                    <h4 style="font-size: 14px; font-family: 'Syne', sans-serif; color: var(--txt-soft); margin: 8px 0 4px;"
                         data-i18n="history_empty_title">Sin descargas aún</h4>
                     <p style="font-size: 12px; color: var(--txt-muted); margin: 0;" data-i18n="history_empty_desc">Aquí
                         aparecerán tus archivos descargados.</p>
