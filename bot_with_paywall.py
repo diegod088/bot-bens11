@@ -4104,7 +4104,7 @@ async def async_main():
     
     # Manual startup to be compatible with existing event loop in start.py
     try:
-        await application.initialize()
+        # application.initialize() is handled in the retry loop above
         # Manually call post_init as initialize() might not call it in some contexts or we want to be sure
         await post_init(application)
         await application.start()

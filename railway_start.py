@@ -105,8 +105,8 @@ def main():
 
         options = {
             'bind': f'{host}:{port}',
-            'workers': 4,
-            'threads': 2,
+            'workers': 1,
+            'threads': 4,
             'timeout': 120,
             'accesslog': '-',
             'errorlog': '-',

@@ -14,7 +14,7 @@ from functools import wraps
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import sqlite3
-from database import get_user_stats, has_active_session, delete_user_session
+from database import get_user_stats, has_active_session, delete_user_session, get_referral_stats
 import logging
 import requests
 
@@ -1631,7 +1631,7 @@ def miniapp_referrals():
             return jsonify({'ok': False, 'error': 'User ID required'}), 400
         
         # Importar funciones de database
-        from database import get_referral_stats
+        # get_referral_stats is now imported at top level
         
         # Obtener estadísticas
         stats = get_referral_stats(user_id)
