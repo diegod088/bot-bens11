@@ -3217,6 +3217,54 @@ async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
+async def set_affiliate_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Configura el programa de afiliados de Telegram Stars."""
+    user_id = update.effective_user.id
+    if user_id not in ADMIN_USER_IDS:
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "💎 *Configuración de Afiliados*\n\n"
+            "Uso: `/afiliados [permille]`\n"
+            "Ejemplo: `/afiliados 100` (Para dar un 10% de comisión)\n\n"
+            "ℹ️ _El valor es en milésimas (100 = 10%, 150 = 15%, etc)._",
+            parse_mode="Markdown"
+        )
+        return
+
+    try:
+        permille = int(context.args[0])
+        if not (0 <= permille <= 1000):
+            await update.message.reply_text("❌ La comisión debe estar entre 0 y 1000.")
+            return
+
+        import requests
+        token = context.bot.token
+        url = f"https://api.telegram.org/bot{token}/editBotAffiliateProgram"
+        
+        # Telegram API: editBotAffiliateProgram
+        payload = {"commission_permille": permille}
+        response = requests.post(url, json=payload, timeout=10).json()
+
+        if response.get("ok"):
+            pct = permille / 10
+            await update.message.reply_text(
+                f"✅ *¡Programa Activado!*\n\n"
+                f"Has establecido una comisión del *{pct}%*.\n"
+                f"Ahora tu bot aparecerá en el catálogo de afiliados de Telegram.",
+                parse_mode="Markdown"
+            )
+        else:
+            error_msg = response.get("description", "Error desconocido")
+            await update.message.reply_text(f"❌ *Error de Telegram:* {error_msg}", parse_mode="Markdown")
+
+    except ValueError:
+        await update.message.reply_text("❌ Por favor, introduce un número válido.")
+    except Exception as e:
+        logger.error(f"Error en set_affiliate_command: {e}")
+        await update.message.reply_text(f"❌ Error interno: {str(e)}")
+
 async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /adminstats command - Panel de ADMINISTRACIÓN con estadísticas globales"""
     user_id = update.effective_user.id
