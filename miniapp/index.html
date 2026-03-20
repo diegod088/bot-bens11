@@ -540,9 +540,19 @@
             inset: 0;
             background: var(--void);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 9000;
+            gap: 20px;
+        }
+
+        #loaderStatus {
+            font-size: 13px;
+            color: var(--txt-soft);
+            font-family: 'Nunito', sans-serif;
+            letter-spacing: 0.5px;
+            text-align: center;
         }
 
         .spinner {
@@ -566,6 +576,7 @@
 
     <div id="loading">
         <div class="spinner"></div>
+        <div id="loaderStatus">Iniciando sistema...</div>
     </div>
 
     <div id="toast"></div>
@@ -959,6 +970,8 @@
 
         // ========== AUTO-DETECT LANGUAGE & SHOW ONBOARDING FOR NEW USERS ==========
         function initializeApp() {
+            const status = document.getElementById('loaderStatus');
+            if (status) status.textContent = "Verificando entorno...";
             console.log('Inicializando app...');
 
             // Extract language from URL if provided
@@ -1085,6 +1098,8 @@
 
         // ========== LOAD USER DATA ==========
         async function loadUserData() {
+            const status = document.getElementById('loaderStatus');
+            if (status) status.textContent = "Obteniendo datos de usuario...";
             try {
                 const telegramUser = tg.initDataUnsafe?.user || {};
                 console.log('📱 Datos de usuario Telegram:', telegramUser);
@@ -1403,6 +1418,8 @@
 
         // ========== UPDATE UI ==========
         function updateUI() {
+            const status = document.getElementById('loaderStatus');
+            if (status) status.textContent = "Sincronizando interfaz...";
             console.log(`🌐 updateUI: Actualizando interfaz (${currentLanguage})`);
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
