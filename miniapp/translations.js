@@ -146,7 +146,13 @@ const TRANSLATIONS = {
         "download_step_1": "Obteniendo archivo de Telegram...",
         "download_step_2": "Procesando el archivo...",
         "download_step_3": "Eliminando límites...",
-        "download_step_4": "Subiendo archivo al servidor seguro..."
+        "download_step_4": "Subiendo archivo al servidor seguro...",
+        "limits_title": "Descargas Disponibles",
+        "limit_reached_title": "Sin descargas disponibles",
+        "limit_reached_desc": "Para seguir descargando contenido exclusivo, necesitas recargar tus descargas.",
+        "faq_title": "Preguntas Frecuentes",
+        "guide_tips": "Consejos útiles",
+        "account_title": "Tu Cuenta"
     },
     "en": {
         "onboarding_title_1": "Discover the Power",
@@ -294,7 +300,13 @@ const TRANSLATIONS = {
         "download_step_1": "Getting file from Telegram...",
         "download_step_2": "Processing file...",
         "download_step_3": "Removing restrictions...",
-        "download_step_4": "Uploading to secure server..."
+        "download_step_4": "Uploading to secure server...",
+        "limits_title": "Available Downloads",
+        "limit_reached_title": "No downloads available",
+        "limit_reached_desc": "To continue downloading exclusive content, you need to recharge your downloads.",
+        "faq_title": "Frequently Asked Questions",
+        "guide_tips": "Useful tips",
+        "account_title": "Your Account"
     },
     "pt": {
         "onboarding_title_1": "Descubra o Poder",
@@ -442,7 +454,13 @@ const TRANSLATIONS = {
         "download_step_1": "Obtendo arquivo do Telegram...",
         "download_step_2": "Processando o arquivo...",
         "download_step_3": "Removendo limites...",
-        "download_step_4": "Enviando arquivo ao servidor..."
+        "download_step_4": "Enviando arquivo ao servidor...",
+        "limits_title": "Downloads Disponíveis",
+        "limit_reached_title": "Sem downloads disponíveis",
+        "limit_reached_desc": "Para continuar baixando conteúdo exclusivo, você precisa recarregar seus downloads.",
+        "faq_title": "Perguntas Frequentes",
+        "guide_tips": "Dicas úteis",
+        "account_title": "Sua Conta"
     },
     "it": {
         "onboarding_title_1": "Scopri il Potere",
@@ -590,7 +608,13 @@ const TRANSLATIONS = {
         "download_step_1": "Recupero file da Telegram...",
         "download_step_2": "Elaborazione file...",
         "download_step_3": "Rimozione dei limiti...",
-        "download_step_4": "Caricamento sul server sicuro..."
+        "download_step_4": "Caricamento sul server sicuro...",
+        "limits_title": "Download Disponibili",
+        "limit_reached_title": "Nessun download disponibile",
+        "limit_reached_desc": "Per continuare a scaricare contenuti esclusivi, devi ricaricare i tuoi download.",
+        "faq_title": "Domande Frequenti",
+        "guide_tips": "Consigli utili",
+        "account_title": "Il Tuo Account"
     }
 };
 
