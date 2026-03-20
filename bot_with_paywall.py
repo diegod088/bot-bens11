@@ -3217,61 +3217,6 @@ async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def set_affiliate_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Configura el programa de afiliados de Telegram Stars."""
-    user_id = update.effective_user.id
-    
-    # Feedback si no es admin para debuggear
-    if user_id not in ADMIN_USER_IDS:
-        await update.message.reply_text(f"🚫 *Acceso Denegado*\nTu ID no está en la lista de administradores.\nID: `{user_id}`", parse_mode="Markdown")
-        logger.warning(f"Intento de uso de /afiliados por no-admin: {user_id}")
-        return
-
-    if not context.args:
-        await update.message.reply_text(
-            "💎 *Configuración de Afiliados*\n\n"
-            "Uso: `/afiliados [permille]`\n"
-            "Ejemplo: `/afiliados 100` (Para dar un 10% de comisión)\n\n"
-            "ℹ️ _El valor es en milésimas (100 = 10%, 150 = 15%, etc)._",
-            parse_mode="Markdown"
-        )
-        return
-
-    try:
-        try:
-            permille = int(context.args[0])
-        except ValueError:
-            await update.message.reply_text("❌ Por favor, introduce un número válido (ej: 100).")
-            return
-
-        if not (0 <= permille <= 1000):
-            await update.message.reply_text("❌ La comisión debe estar entre 0 y 1000.")
-            return
-
-        import requests
-        token = context.bot.token
-        url = f"https://api.telegram.org/bot{token}/editBotAffiliateProgram"
-        
-        # Telegram API: editBotAffiliateProgram
-        payload = {"commission_permille": permille}
-        response = requests.post(url, json=payload, timeout=20).json()
-
-        if response.get("ok"):
-            pct = permille / 10
-            await update.message.reply_text(
-                f"✅ *¡Programa Activado!*\n\n"
-                f"Has establecido una comisión del *{pct}%*.\n"
-                f"Ahora tu bot aparecerá en el catálogo de afiliados de Telegram.",
-                parse_mode="Markdown"
-            )
-        else:
-            error_msg = response.get("description", "Error desconocido")
-            await update.message.reply_text(f"❌ *Error de Telegram:* {error_msg}", parse_mode="Markdown")
-
-    except Exception as e:
-        logger.error(f"Error en set_affiliate_command: {e}")
-        await update.message.reply_text(f"❌ Error interno: {str(e)}")
-
 async def adminstats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /adminstats command - Panel de ADMINISTRACIÓN con estadísticas globales"""
     user_id = update.effective_user.id
@@ -4112,7 +4057,6 @@ async def async_main():
     application.add_handler(CommandHandler("miniapp", miniapp_command))
     application.add_handler(CommandHandler("testpay", testpay_command))
     application.add_handler(CommandHandler("adminstats", adminstats_command))
-    application.add_handler(CommandHandler("afiliados", set_affiliate_command))
     application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CommandHandler("referidos", referidos_command))
     application.add_handler(CallbackQueryHandler(button_callback))
