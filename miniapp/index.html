@@ -765,7 +765,7 @@
         <!-- INICIO TAB -->
         <div id="tab-home" class="tab-panel active">
             <div id="expiryBanner"
-                style="display:none; background:linear-gradient(135deg, rgba(229,169,88,0.15), rgba(229,169,88,0.05)); border:1px solid rgba(229,169,88,0.3); border-radius:var(--rs); padding:12px; margin-bottom:16px; align-items:center; justify-content:space-between; cursor:pointer;"
+                style="display:none; background:var(--gold-dim); border:1px solid rgba(245,166,35,0.3); border-radius:var(--rm); padding:12px; margin-bottom:16px; align-items:center; justify-content:space-between; cursor:pointer;"
                 onclick="switchTab('premium'); highlightProPlan();">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <span style="font-size:20px;">⚠️</span>
@@ -778,135 +778,110 @@
                 </div>
                 <span style="color:var(--txt-muted); font-size:18px;">›</span>
             </div>
-            <!-- VALUE HERO SECTION -->
-            <div style="padding: 0; background: transparent; margin-bottom: 24px;">
+
+            <div style="padding: 28px 8px 32px; text-align: center;">
                 <h1 id="heroHeadline"
-                    style="font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1.1; color: var(--txt); margin-bottom: 12px; animation: slideUp 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) 0s backwards;"
-                    data-i18n="hero_headline">Descarga todo<br>de Telegram</h1>
-                <p style="font-size: 14px; color: var(--txt-soft); line-height: 1.55; max-width: 300px; margin-bottom: 20px; animation: slideUp 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) 0.08s backwards;"
-                    data-i18n="hero_sub">Accede a canales privados, videos y archivos restringidos en segundos.</p>
+                    style="font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 300; letter-spacing: -0.5px; line-height: 1.15; color: var(--txt); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0s both;"
+                    data-i18n="home_title_line1">descargador Telegram</h1>
+                <h1 style="font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; color: var(--gold); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0.06s both;"
+                    data-i18n="home_title_vip">V.i.P</h1>
+            </div>
 
-                <!-- FEATURE CHIPS -->
-                <div
-                    style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; -ms-overflow-style: none;">
-                    <style>
-                        .status-spinner {
-                            display: inline-block;
-                            width: 18px;
-                            height: 18px;
-                            border: 2px solid var(--gold-dim);
-                            border-top-color: var(--gold);
-                            border-radius: 50%;
-                            animation: spin 0.7s linear infinite;
-                            vertical-align: middle;
-                        }
-
-                        @keyframes successPop {
-                            from {
-                                transform: scale(0);
-                                opacity: 0;
-                            }
-
-                            80% {
-                                transform: scale(1.1);
-                            }
-
-                            to {
-                                transform: scale(1);
-                                opacity: 1;
-                            }
-                        }
-
-                        #tab-home div::-webkit-scrollbar {
-                            display: none;
-                        }
-                    </style>
-                    <div
-                        style="background: var(--glass); border: 1px solid var(--line-white); border-radius: 20px; padding: 6px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--txt-soft); animation: fadeIn 0.5s ease 0.12s backwards;">
-                        <span>🔒</span> <span data-i18n="hero_chip_private">Canales privados</span>
-                    </div>
-                    <div
-                        style="background: var(--glass); border: 1px solid var(--line-white); border-radius: 20px; padding: 6px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--txt-soft); animation: fadeIn 0.5s ease 0.18s backwards;">
-                        <span>⚡</span> <span data-i18n="hero_chip_instant">Al instante</span>
-                    </div>
-                    <div
-                        style="background: var(--glass); border: 1px solid var(--line-white); border-radius: 20px; padding: 6px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--txt-soft); animation: fadeIn 0.5s ease 0.24s backwards;">
-                        <span>🎯</span> <span data-i18n="hero_chip_quality">Sin compresión</span>
-                    </div>
+            <div id="downloadArea" style="position: relative; animation: tabEnter 0.5s var(--ease-out) 0.12s both;">
+                <div id="downloadOverlay"
+                    style="display: none; position: absolute; inset: 0; background: rgba(2,8,16,0.85); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; z-index: 2; cursor: pointer; bottom: 30px;"
+                    onclick="openLoginGate()">
+                    <div style="font-size: 24px;">🔐</div>
+                    <div style="font-size: 14px; font-weight: 700; color: var(--txt);" data-i18n="hero_gate_hint">Inicia
+                        sesión para descargar</div>
                 </div>
 
-                <!-- SOCIAL PROOF ROW -->
-                <div
-                    style="background: var(--glass); border: 1px solid var(--line-white); border-radius: var(--rm); padding: 14px 20px; display: flex; align-items: center; justify-content: space-around; margin-top: 16px; animation: fadeIn 0.5s ease 0.3s backwards;">
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <span id="heroStatDownloads"
-                            style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--gold);">+12,000</span>
-                        <span
-                            style="font-size: 11px; color: var(--txt-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;"
-                            data-i18n="hero_stat_downloads">archivos entregados</span>
-                    </div>
-                    <div style="border-left: 1px solid var(--line-white); height: 32px;"></div>
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <span
-                            style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--emerald);">4.9
-                            ★</span>
-                        <span
-                            style="font-size: 11px; color: var(--txt-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;"
-                            data-i18n="hero_stat_rating">valoración media</span>
-                    </div>
+                <div style="position: relative; margin-bottom: 14px;">
+                    <input type="text" id="linkInput" placeholder="Pegar link de video/foto"
+                        style="width: 100%; padding: 20px 64px 20px 24px; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18); border-radius: 60px; color: var(--txt); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 500; outline: none; box-sizing: border-box; transition: border-color 0.25s, box-shadow 0.25s; -webkit-appearance: none; appearance: none;"
+                        onfocus="if(!isConnected){ this.blur(); openLoginGate(); } this.style.borderColor='var(--gold)'; this.style.boxShadow='0 0 0 3px var(--gold-dim)';"
+                        onblur="this.style.borderColor='rgba(255,255,255,0.18)'; this.style.boxShadow='none';"
+                        data-i18n-placeholder="input_placeholder">
+                    <div
+                        style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 26px; pointer-events: none;">
+                        ⬇</div>
+                </div>
+
+                <button id="downloadBtn" onclick="startDownload()"
+                    style="width: 100%; padding: 19px 24px; background: #ffffff; border: none; border-radius: 60px; font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 1px; color: #0a0f1e; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.18s, box-shadow 0.2s; box-shadow: 0 8px 32px rgba(255,255,255,0.15);"
+                    onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform=''"
+                    onpointerleave="this.style.transform=''">
+                    <span data-i18n="btn_get_file">OBTENER ARCHIVO</span>
+                </button>
+
+                <div class="download-status" id="downloadStatus" style="margin-top:12px;">
+                    <span id="statusIcon">⏳</span><span id="statusText"></span>
                 </div>
             </div>
 
-            <div class="card home-hero" style="padding-bottom: 24px;">
-                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;" data-i18n="app_brand">Descarga Mágica
-                </h2>
-                <p style="color: var(--txt-soft); font-size: 14px; margin-bottom: 20px;" data-i18n="welcome_hint">Obtén
-                    cualquier archivo de canales privados al instante.</p>
-
-                <div id="creditsBlock">
-                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
-                        <span style="color:var(--txt-soft);" data-i18n="limits_title">Descargas Disponibles</span>
-                        <span id="creditsCountText" style="color:var(--gold);">0</span>
-                    </div>
-                    <div class="credits-bar">
-                        <div class="credits-fill" id="creditsFill"></div>
-                    </div>
-                    <div style="margin-top:24px; position:relative;" id="downloadArea">
-                        <!-- OVERLAY LOCKEADO -->
-                        <div id="downloadOverlay"
-                            style="display: none; position: absolute; inset: 0; background: rgba(2,8,16,0.85); border-radius: var(--rm); flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 2; cursor: pointer;"
-                            onclick="openLoginGate()">
-                            <div style="font-size: 24px;">🔐</div>
-                            <div style="font-size: 14px; font-weight: 700; color: var(--txt);"
-                                data-i18n="hero_gate_hint">Inicia sesión para descargar</div>
-                        </div>
-
-                        <input type="text" id="linkInput" class="input-box" placeholder="https://t.me/c/12345/678"
-                            style="margin-bottom: 12px;" onfocus="if(!isConnected) { this.blur(); openLoginGate(); }">
-                        <button class="btn btn-gold" id="downloadBtn" onclick="startDownload()">
-                            <span data-i18n="btn_process">⚡ Procesar Enlace</span>
-                        </button>
-                    </div>
+            <div id="creditsBlock" style="display:none;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+                    <span style="color:var(--txt-soft);" data-i18n="limits_title">Descargas Disponibles</span>
+                    <span id="creditsCountText" style="color:var(--gold);">0</span>
                 </div>
-
-                <div id="lockedBlock" class="locked-block" style="display:none;">
-                    <div class="locked-icon">🔒</div>
-                    <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--rose);"
-                        data-i18n="limit_reached_title">Sin descargas disponibles</h3>
-                    <p style="font-size: 13px; color: var(--txt-soft); margin-bottom: 24px; line-height: 1.5;"
-                        data-i18n="limit_reached_desc">Para seguir descargando contenido exclusivo, necesitas recargar
-                        tus descargas.</p>
-                    <div style="display:flex; flex-direction:column; gap:12px;">
-                        <button class="btn btn-gold" onclick="switchTab('premium'); highlightProPlan();">💎 Ver Planes
-                            Premium</button>
-                        <button class="btn btn-outline" onclick="switchTab('referrals')"
-                            style="border-color:var(--cyan); color:var(--cyan);">👥 Obtener Gratis (Invitar)</button>
-                    </div>
+                <div class="credits-bar">
+                    <div class="credits-fill" id="creditsFill"></div>
                 </div>
             </div>
 
-            <!-- History UI (kept simple) -->
-            <div id="historyCard" class="card" style="display:none; padding: 0;">
+            <div id="lockedBlock" class="locked-block" style="display:none;">
+                <div class="locked-icon">🔒</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--rose);" data-i18n="limit_reached_title">Sin
+                    descargas disponibles</h3>
+                <p style="font-size: 13px; color: var(--txt-soft); margin-bottom: 24px; line-height: 1.5;"
+                    data-i18n="limit_reached_desc">Para seguir descargando contenido exclusivo, necesitas recargar tus
+                    descargas.</p>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <button class="btn btn-gold" onclick="switchTab('premium'); highlightProPlan();">💎 Ver Planes
+                        Premium</button>
+                    <button class="btn btn-outline" onclick="switchTab('referrals')"
+                        style="border-color:var(--cyan); color:var(--cyan);">👥 Obtener Gratis (Invitar)</button>
+                </div>
+            </div>
+
+            <div id="tutorialSpace"
+                style="margin-top: 28px; padding: 24px 20px; background: var(--glass); border: 1.5px dashed rgba(255,255,255,0.10); border-radius: var(--r); text-align: center; animation: tabEnter 0.5s var(--ease-out) 0.24s both;">
+                <p style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--txt-muted); margin: 0;"
+                    data-i18n="tutorial_placeholder">Espacio para tutorial, texto o imágenes</p>
+            </div>
+
+            <div
+                style="display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 28px; padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); animation: tabEnter 0.5s var(--ease-out) 0.30s both;">
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8px; border-right: 1px solid var(--line);">
+                    <span
+                        style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--txt); line-height: 1.4;"
+                        data-i18n="stat_multimedia_label">Multimedia descargada</span>
+                    <span
+                        style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; margin-top: 6px; color: var(--gold);"
+                        data-i18n="stat_multimedia_value">+99,999GB</span>
+                </div>
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8px; border-right: 1px solid var(--line);">
+                    <span
+                        style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--txt); line-height: 1.4;"
+                        data-i18n="stat_users_label">usuarios activos</span>
+                    <span
+                        style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; margin-top: 6px; color: var(--cyan);"
+                        data-i18n="stat_users_value">+100</span>
+                </div>
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8px;">
+                    <span
+                        style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--txt); line-height: 1.4;"
+                        data-i18n="stat_rating_label">valoración usuarios</span>
+                    <span
+                        style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; margin-top: 6px; color: var(--emerald);"
+                        data-i18n="stat_rating_value">5/5 ⭐</span>
+                </div>
+            </div>
+
+            <div id="historyCard" class="card" style="display:none; padding: 0; margin-top: 20px;">
                 <div
                     style="padding: 16px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between;">
                     <span class="sec-label" style="margin:0;">Últimas Descargas</span>

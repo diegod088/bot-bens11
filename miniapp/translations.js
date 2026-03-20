@@ -161,7 +161,18 @@ const TRANSLATIONS = {
         "compare_standard": "Estándar",
         "compare_max": "Máxima",
         "compare_common": "Común",
-        "compare_priority": "Prioritario"
+        "compare_priority": "Prioritario",
+        "home_title_line1": "descargador Telegram",
+        "home_title_vip": "V.i.P",
+        "input_placeholder": "Pegar link de video/foto",
+        "btn_get_file": "OBTENER ARCHIVO",
+        "tutorial_placeholder": "Espacio para tutorial, texto o imágenes",
+        "stat_multimedia_label": "Multimedia descargada",
+        "stat_multimedia_value": "+99,999GB",
+        "stat_users_label": "usuarios activos",
+        "stat_users_value": "+100",
+        "stat_rating_label": "valoración usuarios",
+        "stat_rating_value": "5/5 ⭐"
     },
     "en": {
         "onboarding_title_1": "Discover the Power",
@@ -324,7 +335,18 @@ const TRANSLATIONS = {
         "compare_standard": "Standard",
         "compare_max": "Maximum",
         "compare_common": "Common",
-        "compare_priority": "Priority"
+        "compare_priority": "Priority",
+        "home_title_line1": "Telegram downloader",
+        "home_title_vip": "V.i.P",
+        "input_placeholder": "Paste video/photo link",
+        "btn_get_file": "GET FILE",
+        "tutorial_placeholder": "Tutorial space, text or images",
+        "stat_multimedia_label": "Downloaded media",
+        "stat_multimedia_value": "+99,999GB",
+        "stat_users_label": "active users",
+        "stat_users_value": "+100",
+        "stat_rating_label": "user rating",
+        "stat_rating_value": "5/5 ⭐"
     },
     "pt": {
         "onboarding_title_1": "Descubra o Poder",
@@ -487,7 +509,18 @@ const TRANSLATIONS = {
         "compare_standard": "Padrão",
         "compare_max": "Máxima",
         "compare_common": "Comum",
-        "compare_priority": "Prioritário"
+        "compare_priority": "Prioritário",
+        "home_title_line1": "downloader Telegram",
+        "home_title_vip": "V.i.P",
+        "input_placeholder": "Colar link de vídeo/foto",
+        "btn_get_file": "OBTER ARQUIVO",
+        "tutorial_placeholder": "Espaço para tutorial, texto ou imagens",
+        "stat_multimedia_label": "Mídia baixada",
+        "stat_multimedia_value": "+99.999GB",
+        "stat_users_label": "usuários ativos",
+        "stat_users_value": "+100",
+        "stat_rating_label": "avaliação usuários",
+        "stat_rating_value": "5/5 ⭐"
     },
     "it": {
         "onboarding_title_1": "Scopri il Potere",
@@ -650,7 +683,18 @@ const TRANSLATIONS = {
         "compare_standard": "Standard",
         "compare_max": "Massima",
         "compare_common": "Comune",
-        "compare_priority": "Prioritario"
+        "compare_priority": "Prioritario",
+        "home_title_line1": "downloader Telegram",
+        "home_title_vip": "V.i.P",
+        "input_placeholder": "Incolla link video/foto",
+        "btn_get_file": "OTTIENI FILE",
+        "tutorial_placeholder": "Spazio per tutorial, testo o immagini",
+        "stat_multimedia_label": "Media scaricati",
+        "stat_multimedia_value": "+99.999GB",
+        "stat_users_label": "utenti attivi",
+        "stat_users_value": "+100",
+        "stat_rating_label": "valutazione utenti",
+        "stat_rating_value": "5/5 ⭐"
     }
 };
 
