@@ -1,2019 +1,522 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Bot de Descargas</title>
+    <title>DownloadBot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="miniapp/translations.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #17212B;
-            --bg-primary: #232E3C;
-            --bg-card: #2B3945;
-            --bg-input: #1C2733;
-            --text-primary: #FFFFFF;
-            --text-secondary: #8B9AA5;
-            --text-muted: #708499;
-            --accent-blue: #2AABEE;
-            --accent-green: #6DC26D;
-            --accent-red: #E55B5B;
-            --accent-orange: #E5A958;
-            --accent-purple: #9B7BEA;
+            --void: #040912;
+            --deep: #070D1B;
+            --surface: #0C1526;
+            --card: #111E32;
+            --card-hi: #16263F;
+            --line: rgba(255,183,0,0.08);
+            --gold: #FFB700;
+            --gold-dim: rgba(255,183,0,0.18);
+            --gold-glow: rgba(255,183,0,0.35);
+            --cyan: #00D4FF;
+            --cyan-dim: rgba(0,212,255,0.14);
+            --emerald: #10D9A0;
+            --rose: #FF5E7A;
+            --violet: #A855F7;
+            --txt: #EEF2F8;
+            --txt-soft: #8899B8;
+            --txt-muted: #4A5878;
+            --r: 16px;
+            --rs: 10px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-primary);
+            font-family: 'Nunito', sans-serif;
+            background: var(--void);
+            color: var(--txt);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 100%;
-            padding: 16px;
-            padding-bottom: 100px;
-            margin: 0 auto;
-        }
-
-        /* Responsive container */
-        @media (min-width: 768px) {
-            .container {
-                padding: 24px;
-                padding-bottom: 120px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .container {
-                max-width: 800px;
-                padding: 32px 24px;
-                padding-bottom: 120px;
-            }
-        }
-
-        @media (min-width: 1280px) {
-            .container {
-                max-width: 900px;
-            }
-        }
-
-        /* ========== ONBOARDING ========== */
-        .onboarding {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-deep);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .onboarding-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 30px;
-            text-align: center;
-            overflow-y: auto;
-        }
-
-        .onboarding-icon {
-            font-size: 80px;
-            margin-bottom: 30px;
-            animation: float 2s ease-in-out infinite;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .onboarding-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--accent-blue);
-        }
-
-        .onboarding-description {
-            max-width: 320px;
-            width: 100%;
-        }
-
-        .onboarding-desc {
-            font-size: 16px;
-            color: var(--text-primary);
-            line-height: 1.5;
-            margin-bottom: 30px;
-        }
-
-        .feature-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            text-align: left;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(42, 171, 238, 0.1);
-            border-radius: 12px;
-            border: 1px solid rgba(42, 171, 238, 0.2);
-        }
-
-        .feature-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .feature-text {
-            flex: 1;
-        }
-
-        .feature-text strong {
-            color: var(--text-primary);
-            font-size: 15px;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .feature-text small {
-            color: var(--text-secondary);
-            font-size: 13px;
-            line-height: 1.4;
-        }
-
-        .onboarding-footer {
-            padding: 20px 30px 40px;
-        }
-
-        .onboarding-btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            background: var(--accent-blue);
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .onboarding-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3);
-        }
-
-        .onboarding-skip {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 14px;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .onboarding-skip {
-            margin-top: 12px;
-            width: 100%;
-        }
-
-        /* ========== HEADER ========== */
-        .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 4px 16px;
-        }
-
-        .app-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .app-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent-blue), #1E96D1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .app-title {
-            font-size: 17px;
-            font-weight: 700;
-        }
-
-        .app-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--accent-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* ========== BOTTOM NAV ========== */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-primary);
-            border-top: 1px solid var(--bg-card);
-            display: flex !important;
-            justify-content: space-around;
-            align-items: stretch;
-            padding: 8px 0;
-            padding-bottom: calc(8px + env(safe-area-inset-bottom));
-            z-index: 100;
-            height: 70px;
-            min-height: 70px;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            padding: 6px 12px;
-            min-width: 60px;
-            border: none;
-            background: none;
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        .nav-item:active {
-            transform: scale(0.95);
-        }
-
-        .nav-item.active {
-            color: var(--accent-blue);
-        }
-
-        .nav-item .nav-icon {
-            font-size: 24px;
-            line-height: 1;
-        }
-
-        /* Responsive nav */
-        @media (max-width: 480px) {
-            .bottom-nav {
-                height: 65px;
-                min-height: 65px;
-                padding: 6px 0;
-                padding-bottom: calc(6px + env(safe-area-inset-bottom));
-            }
-
-            .nav-item {
-                min-width: 50px;
-                padding: 4px 8px;
-                font-size: 9px;
-                gap: 2px;
-            }
-
-            .nav-item .nav-icon {
-                font-size: 20px;
-            }
-        }
-
-        /* ========== CARDS ========== */
-        .card {
-            background: var(--bg-primary);
-            border-radius: 20px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Responsive card spacing */
-        @media (min-width: 768px) {
-            .card {
-                border-radius: 24px;
-                margin-bottom: 20px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .card {
-                max-width: 600px;
-                margin-left: auto;
-                margin-right: auto;
-                margin-bottom: 24px;
-            }
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--bg-card);
-        }
-
-        @media (min-width: 768px) {
-            .card-header {
-                padding: 18px 24px;
-            }
-        }
-
-        .card-title {
-            font-size: 15px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        @media (min-width: 768px) {
-            .card-title {
-                font-size: 16px;
-            }
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .card-body {
-                padding: 24px;
-            }
-        }
-
-        /* ========== TABS ========== */
-        .tab-panel {
-            display: none;
-            animation: fadeIn 0.25s ease;
-        }
-
-        .tab-panel.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ========== TAB: INICIO ========== */
-        .welcome-banner {
-            background: linear-gradient(135deg, rgba(42, 171, 238, 0.15), rgba(42, 171, 238, 0.05));
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .welcome-emoji {
-            font-size: 36px;
-            margin-bottom: 8px;
-        }
-
-        .welcome-text {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .welcome-hint {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .download-box {
             position: relative;
         }
 
-        .download-input {
-            width: 100%;
-            padding: 16px 54px 16px 16px;
-            border: 2px solid var(--bg-card);
-            border-radius: 14px;
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-size: 15px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .download-input:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-        }
-
-        .download-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .download-btn {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 42px;
-            height: 42px;
-            border: none;
-            border-radius: 12px;
-            background: var(--accent-blue);
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .download-btn:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
-        .download-btn:disabled {
-            background: var(--bg-card);
-            cursor: not-allowed;
-        }
-
-        .download-status {
-            margin-top: 12px;
-            padding: 12px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            display: none;
-        }
-
-        .download-status.show {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .download-status.loading {
-            background: rgba(42, 171, 238, 0.1);
-            color: var(--accent-blue);
-        }
-
-        .download-status.success {
-            background: rgba(109, 194, 109, 0.1);
-            color: var(--accent-green);
-        }
-
-        .download-status.error {
-            background: rgba(229, 91, 91, 0.1);
-            color: var(--accent-red);
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            border: none;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-family: inherit;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .action-btn:active {
-            opacity: 0.8;
-        }
-
-        /* Quick Stats */
-        .quick-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .quick-stat {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-        }
-
-        .quick-stat-icon {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        .quick-stat-value {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .quick-stat-label {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        /* Premium Banner */
-        .premium-mini {
-            background: linear-gradient(135deg, #E5A958 0%, #F0C987 100%);
-            border-radius: 14px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-        }
-
-        .premium-mini-icon {
-            font-size: 28px;
-        }
-
-        .premium-mini-text {
-            flex: 1;
-        }
-
-        .premium-mini-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .premium-mini-desc {
-            font-size: 11px;
-            color: #4a4a4a;
-        }
-
-        .premium-mini-arrow {
-            font-size: 18px;
-            color: #1a1a1a;
-        }
-
-        /* ========== TAB: PREMIUM ========== */
-        .premium-hero {
-            text-align: center;
-            padding: 24px 16px;
-            background: linear-gradient(180deg, rgba(229, 169, 88, 0.15), transparent);
-            border-radius: 16px;
-            margin-bottom: 16px;
-        }
-
-        .premium-crown {
-            font-size: 56px;
-            margin-bottom: 12px;
-        }
-
-        .premium-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .premium-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        /* Comparison Table */
-        .compare-table {
-            margin-bottom: 16px;
-        }
-
-        .compare-row {
-            display: flex;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--bg-card);
-        }
-
-        .compare-row:last-child {
-            border-bottom: none;
-        }
-
-        .compare-feature {
-            flex: 1;
-            font-size: 13px;
-        }
-
-        .compare-free,
-        .compare-premium {
-            width: 60px;
-            text-align: center;
-            font-size: 13px;
-        }
-
-        .compare-header {
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .compare-check {
-            color: var(--accent-green);
-        }
-
-        .compare-x {
-            color: var(--accent-red);
-        }
-
-        .compare-value {
-            color: var(--text-secondary);
-        }
-
-        .compare-value.gold {
-            color: var(--accent-orange);
-            font-weight: 600;
-        }
-
-        /* Price */
-        .price-card {
-            background: linear-gradient(135deg, var(--accent-orange), #F0C987);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .price-amount {
-            font-size: 42px;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
-        .price-star {
-            font-size: 28px;
-        }
-
-        .price-period {
-            font-size: 14px;
-            color: #4a4a4a;
-            margin-top: 4px;
-        }
-
-        .buy-button {
-            width: 100%;
-            padding: 16px 24px;
-            border: none;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--accent-blue), #1E96D1);
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .buy-button::before {
+        /* Ambient Glow & Grain */
+        body::before {
             content: '';
-            position: absolute;
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle at 50% 0%, var(--gold-dim) 0%, transparent 60%);
+            z-index: -2;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        h1, h2, h3, .syne, .price, .stat-value { font-family: 'Syne', sans-serif; }
+
+        /* HEADER */
+        .header {
+            position: sticky;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .buy-button:hover::before {
-            left: 100%;
-        }
-
-        .buy-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(42, 171, 238, 0.4);
-        }
-
-        .buy-button:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow: 0 2px 8px rgba(42, 171, 238, 0.3);
-        }
-
-        .buy-button:disabled {
-            background: var(--bg-card);
-            cursor: not-allowed;
-            box-shadow: none;
-            opacity: 0.5;
-        }
-
-        /* Responsive button sizes */
-        @media (min-width: 768px) {
-            .buy-button {
-                padding: 18px 32px;
-                font-size: 17px;
-                border-radius: 18px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .buy-button {
-                padding: 20px 40px;
-                font-size: 18px;
-            }
-        }
-
-        /* ========== PREMIUM PLAN CARDS ========== */
-        .plan-card {
-            background: var(--bg-primary);
-            border-radius: 20px;
-            margin-top: 16px;
-            overflow: visible;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .plan-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        .plan-card.featured {
-            border-width: 2px;
-            box-shadow: 0 4px 16px rgba(42, 171, 238, 0.2);
-        }
-
-        .plan-card.featured:hover {
-            box-shadow: 0 8px 32px rgba(42, 171, 238, 0.3);
-        }
-
-        .plan-badge {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            letter-spacing: 0.5px;
-        }
-
-        @media (min-width: 768px) {
-            .plan-badge {
-                font-size: 12px;
-                padding: 7px 20px;
-            }
-        }
-
-        .plan-header {
+            z-index: 50;
+            background: rgba(4, 9, 18, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+            padding: 16px 20px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
+        }
+        .app-brand { display: flex; align-items: center; gap: 12px; }
+        .app-logo {
+            width: 36px; height: 36px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--gold), #D97706);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: 0 0 15px var(--gold-glow);
+        }
+        .app-name { font-size: 18px; font-weight: 800; color: #FFF; letter-spacing: 0.5px; }
+        
+        .user-chip {
+            background: var(--card); border: 1px solid var(--line);
+            padding: 4px 12px 4px 4px; border-radius: 20px;
+            display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+        }
+        .user-avatar {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: var(--card-hi); display: flex; align-items: center; justify-content: center;
+            color: var(--gold); font-weight: bold;
         }
 
-        .plan-info h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+        /* CONTAINER */
+        .container { flex: 1; padding: 20px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* TABS */
+        .tab-panel { display: none; opacity: 0; transition: opacity 0.4s ease;  }
+        .tab-panel.active { display: block; animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @media (min-width: 768px) {
-            .plan-info h3 {
-                font-size: 22px;
-            }
-        }
-
-        .plan-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        @media (min-width: 768px) {
-            .plan-desc {
-                font-size: 14px;
-            }
-        }
-
-        .plan-price {
-            text-align: right;
-        }
-
-        .plan-price-main {
-            font-size: 28px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        @media (min-width: 768px) {
-            .plan-price-main {
-                font-size: 32px;
-            }
-        }
-
-        .plan-price-star {
-            font-size: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .plan-price-star {
-                font-size: 22px;
-            }
-        }
-
-        .plan-price-sub {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .plan-savings {
-            background: rgba(229, 165, 88, 0.15);
-            padding: 10px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        @media (min-width: 768px) {
-            .plan-savings {
-                padding: 12px;
-            }
-        }
-
-        .referral-bonus-card {
-            background: linear-gradient(135deg, rgba(42, 171, 238, 0.1), rgba(155, 123, 234, 0.1));
-            border: 1px solid rgba(42, 171, 238, 0.2);
-            border-radius: 20px;
+        /* CARDS */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--r);
             padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .referral-bonus-card {
-                padding: 24px;
-            }
-        }
-
-        .referral-bonus-btn {
-            margin-top: 14px;
-            padding: 10px 20px;
-            background: rgba(42, 171, 238, 0.2);
-            border: none;
-            border-radius: 12px;
-            color: var(--accent-blue);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .referral-bonus-btn:hover {
-            background: rgba(42, 171, 238, 0.3);
-            transform: scale(1.05);
-        }
-
-        @media (min-width: 768px) {
-            .referral-bonus-btn {
-                padding: 12px 24px;
-                font-size: 14px;
-            }
-        }
-
-        /* Premium Active */
-        .premium-active {
-            text-align: center;
-            padding: 30px 16px;
-        }
-
-        @media (min-width: 768px) {
-            .premium-active {
-                padding: 40px 24px;
-            }
-        }
-
-        .premium-active-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(229, 169, 88, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            color: var(--accent-orange);
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .premium-active-days {
-            font-size: 64px;
-            font-weight: 700;
-            color: var(--accent-orange);
-        }
-
-        .premium-active-text {
-            font-size: 15px;
-            color: var(--text-secondary);
-        }
-
-        /* ========== TAB: CUENTA ========== */
-        .account-card {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 16px;
-        }
-
-        .account-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-        }
-
-        .account-icon.connected {
-            background: rgba(109, 194, 109, 0.15);
-        }
-
-        .account-icon.disconnected {
-            background: rgba(229, 91, 91, 0.15);
-        }
-
-        .account-info h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .account-info p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .account-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .account-btn.primary {
-            background: var(--accent-blue);
-            color: white;
-        }
-
-        .account-btn.danger {
-            background: rgba(229, 91, 91, 0.15);
-            color: var(--accent-red);
-        }
-
-        .account-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Limits */
-        .limit-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--bg-card);
-        }
-
-        .limit-item:last-child {
-            border-bottom: none;
-        }
-
-        .limit-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .limit-info {
-            flex: 1;
-        }
-
-        .limit-name {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .limit-bar {
-            height: 4px;
-            background: var(--bg-card);
-            border-radius: 2px;
-            margin-top: 6px;
+            position: relative;
             overflow: hidden;
         }
+        .card-gold { background: linear-gradient(145deg, var(--card), #1B2910); border-color: var(--gold-dim); }
 
-        .limit-fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.3s;
+        .sec-label { font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--gold); letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+        /* INPUTS & BUTTONS */
+        .input-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: var(--rs);
+            padding: 16px; width: 100%; color: #FFF; font-family: 'Nunito'; font-size: 15px; outline: none; transition: 0.3s;
         }
-
-        .limit-fill.blue {
-            background: var(--accent-blue);
+        .input-box:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+        
+        .btn {
+            width: 100%; padding: 16px; border: none; border-radius: var(--rs);
+            font-family: 'Syne'; font-weight: 700; font-size: 15px; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+        .btn:active { transform: scale(0.97); }
+        .btn-gold { background: linear-gradient(135deg, var(--gold), #D97706); color: #000; box-shadow: 0 4px 15px var(--gold-glow); }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+        .btn-cyan { background: linear-gradient(135deg, var(--cyan), #0284C7); color: #FFF; box-shadow: 0 4px 15px var(--cyan-dim); }
 
-        .limit-fill.green {
-            background: var(--accent-green);
+        /* CREDITS BAR */
+        .credits-bar { background: rgba(0,0,0,0.5); border-radius: 30px; height: 12px; width: 100%; overflow: hidden; margin-top: 10px; }
+        .credits-fill { background: linear-gradient(90deg, var(--gold), #FDE047); height: 100%; width: 0%; border-radius: 30px; transition: 1s cubic-bezier(0.1, 0.8, 0.2, 1); }
+
+        /* LOCKED STATE */
+        .locked-block { text-align: center; padding: 30px 10px; }
+        .locked-icon { font-size: 48px; margin-bottom: 16px; filter: drop-shadow(0 0 10px var(--gold-glow)); }
+
+        /* PREMIUM PLANS */
+        .plan-grid { display: flex; flex-direction: column; gap: 12px; }
+        .plan-card {
+            background: var(--card-hi); border: 1px solid var(--line); border-radius: var(--r);
+            padding: 20px; display: flex; align-items: center; justify-content: space-between;
+            transition: 0.3s; cursor: pointer;
         }
+        .plan-card:active { transform: scale(0.98); }
+        .plan-card.pro { border-color: var(--gold); background: linear-gradient(145deg, var(--card-hi), rgba(255,183,0,0.05)); }
+        .plan-badge { font-size: 10px; font-weight: 800; background: var(--gold); color: #000; padding: 4px 8px; border-radius: 12px; margin-bottom: 6px; display: inline-block;}
+        .plan-price-star { font-size: 18px; margin-left: 2px; }
 
-        .limit-fill.orange {
-            background: var(--accent-orange);
+        /* GUIE FAQ */
+        .faq-item { border-bottom: 1px solid var(--line); }
+        .faq-q { display:flex; justify-content:space-between; padding:14px 16px; cursor:pointer; font-weight: 600; font-size: 15px; color: var(--txt); }
+        .faq-q-icon { font-family:'Syne'; transition: transform .25s; color: var(--gold); font-size: 18px; line-height: 1; }
+        .faq-item.open .faq-q-icon { transform: rotate(45deg); }
+        .faq-a { max-height:0; overflow:hidden; transition: max-height .35s ease, padding .25s; padding:0 16px; font-size:13px; color: var(--txt-soft); line-height: 1.6; }
+        .faq-item.open .faq-a { max-height:400px; padding:0 16px 14px; }
+
+        ol.guide-steps { padding-left: 20px; display:flex; flex-direction:column; gap:12px; color: var(--txt-soft); font-size: 14px; margin: 0; }
+        ol.guide-steps li strong { color: var(--txt); }
+        
+        .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .chip { background: var(--card-hi); border: 1px solid var(--line); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--txt-soft); }
+
+        /* ACCOUNT MENU */
+        .ami { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+        .ami:last-child { border-bottom: none; }
+        .ami-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--card-hi); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--gold); }
+        .ami-text { flex: 1; }
+        .ami-title { font-size: 15px; font-weight: 600; color: var(--txt); }
+        .ami-sub { font-size: 12px; color: var(--txt-muted); margin-top: 2px; }
+        .ami-arrow { color: var(--txt-muted); font-size: 20px; }
+
+        /* BOTTOM NAV */
+        .nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(4, 9, 18, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--line); display: flex; justify-content: space-around;
+            padding: 10px; z-index: 50; padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
-
-        .limit-fill.purple {
-            background: var(--accent-purple);
+        .nav-btn {
+            background: transparent; border: none; color: var(--txt-muted);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-family: 'Nunito'; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s;
+            width: 20%; flex-shrink: 0;
         }
-
-        .limit-count {
-            font-size: 13px;
-            color: var(--text-muted);
+        .nav-icon { font-size: 20px; transition: 0.3s; margin-bottom: 2px; filter: grayscale(1); opacity: 0.7;}
+        .nav-btn.active { color: var(--gold); }
+        .nav-btn.active .nav-icon { filter: grayscale(0); opacity: 1; transform: translateY(-2px) scale(1.1); filter: drop-shadow(0 2px 4px var(--gold-glow)); }
+        
+        #toast {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: var(--card-hi); border: 1px solid var(--line); color: #FFF;
+            padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: 0.3s; z-index: 9999;
         }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        #loading { position: fixed; inset: 0; background: var(--void); display: flex; align-items: center; justify-content: center; z-index: 9000; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--line); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Menu */
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--bg-card);
-            cursor: pointer;
-        }
-
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .menu-item:active {
-            background: var(--bg-card);
-        }
-
-        .menu-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .menu-text {
-            flex: 1;
-        }
-
-        .menu-title {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .menu-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .menu-arrow {
-            color: var(--text-muted);
-            font-size: 18px;
-        }
-
-        /* ========== LOADING ========== */
-        .loader-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            gap: 16px;
-        }
-
-        .loader-ring {
-            width: 44px;
-            height: 44px;
-            border: 3px solid var(--bg-card);
-            border-top-color: var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loader-text {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        /* ========== TOAST ========== */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-primary);
-            border: 1px solid var(--bg-card);
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 13px;
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 200;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        /* Footer */
-        .app-footer {
-            text-align: center;
-            padding: 20px 16px;
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-120px) scale(0.5);
-                opacity: 0;
-            }
-        }
     </style>
 </head>
-
 <body>
-    <!-- Onboarding -->
-    <div id="onboarding" class="onboarding" style="display: flex;">
-        <div class="onboarding-content">
-            <div class="onboarding-icon">👋</div>
-            <h2 class="onboarding-title" data-i18n="onboarding_title_1">¡Bienvenido al Bot!</h2>
-            <div class="onboarding-description">
-                <p class="onboarding-desc" data-i18n="onboarding_desc_1">Soy tu asistente para descargar contenido de
-                    Telegram.</p>
 
-                <div class="feature-list">
-                    <div class="feature-item">
-                        <span class="feature-icon">🔗</span>
-                        <div class="feature-text">
-                            <strong data-i18n="onboarding_title_2">Pega cualquier enlace</strong><br>
-                            <small data-i18n="onboarding_desc_2">Copia el enlace t.me/ y pégalo aquí</small>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">⬇️</span>
-                        <div class="feature-text">
-                            <strong data-i18n="onboarding_title_3">Recibe tu contenido</strong><br>
-                            <small data-i18n="onboarding_desc_3">Videos: 3 gratis, luego Premium. Fotos: siempre
-                                gratis</small>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">⭐</span>
-                        <div class="feature-text">
-                            <strong data-i18n="premium_mini_title">Beneficios Premium</strong><br>
-                            <small data-i18n="premium_mini_desc">Descargas ilimitadas por solo 179 ⭐</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div id="loading"><div class="spinner"></div></div>
+
+    <div id="toast"></div>
+
+    <header class="header">
+        <div class="app-brand">
+            <div class="app-logo">⚜️</div>
+            <div class="app-name">DownloadBot</div>
         </div>
-        <div class="onboarding-footer">
-            <button class="onboarding-btn" id="onboardingBtn" data-i18n="onboarding_start">Comenzar</button>
-            <button class="onboarding-skip" id="skipBtn" data-i18n="onboarding_skip">Omitir</button>
+        <div class="user-chip" id="connBtn" onclick="isConnected ? disconnectAccount() : configureAccount()">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span id="userName">Usuario</span>
+            <span id="connIcon" style="font-size: 10px; margin-left: 4px;">⛔</span>
         </div>
-    </div>
+    </header>
 
-    <!-- Loading -->
-    <div id="loading" class="loader-screen">
-        <div class="loader-ring"></div>
-        <p class="loader-text" data-i18n="loading">Cargando...</p>
-    </div>
-
-    <!-- App -->
-    <div id="app" class="container" style="display: none;">
-
-        <!-- Header -->
-        <div class="app-header">
-            <div class="app-brand">
-                <div class="app-logo">📥</div>
-                <div>
-                    <div class="app-title" id="appTitleText" data-i18n="app_title">Bot de Descargas</div>
-                    <div class="app-subtitle" id="userPlan" data-i18n="plan_free">Plan Free</div>
-                </div>
-            </div>
-            <div class="user-avatar" id="userAvatar" onclick="switchTab('account')">U</div>
-        </div>
-
-        <!-- ==================== TAB: INICIO ==================== -->
+    <div class="container" id="app" style="display: none;">
+        
+        <!-- INICIO TAB -->
         <div id="tab-home" class="tab-panel active">
-
-            <!-- Welcome -->
-            <div class="welcome-banner" id="welcomeBanner">
-                <div class="welcome-emoji">👋</div>
-                <div class="welcome-text" id="welcomeText" data-i18n="welcome_text">¡Hola!</div>
-                <div class="welcome-hint" id="welcomeHint" data-i18n="welcome_hint">Pega un enlace de Telegram para
-                    descargar</div>
-            </div>
-
-            <!-- Download Box -->
-            <div class="card">
-                <div class="card-body">
-                    <div class="download-box">
-                        <input type="text" class="download-input" id="linkInput"
-                            placeholder="Pega el enlace t.me/ aquí..." autocomplete="off"
-                            data-i18n-placeholder="link_placeholder">
-                        <button class="download-btn" id="downloadBtn" onclick="startDownload()">
-                            ➤
-                        </button>
+            <div class="card" style="padding-bottom: 24px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Descarga Mágica</h2>
+                <p style="color: var(--txt-soft); font-size: 14px; margin-bottom: 20px;">Obtén cualquier archivo de canales privados al instante.</p>
+                
+                <div id="creditsBlock">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+                        <span style="color:var(--txt-soft);">Descargas Disponibles</span>
+                        <span id="creditsCountText" style="color:var(--gold);">0</span>
                     </div>
-                    <div class="download-status" id="downloadStatus">
-                        <span id="statusIcon">⏳</span>
-                        <span id="statusText" data-i18n="status_processing">Procesando...</span>
+                    <div class="credits-bar">
+                        <div class="credits-fill" id="creditsFill"></div>
                     </div>
-                    <div class="action-btns">
-                        <button class="action-btn" onclick="pasteFromClipboard()">
-                            <span data-i18n="btn_paste">📋 Pegar</span>
-                        </button>
-                        <button class="action-btn" onclick="showHelp()">
-                            <span data-i18n="btn_help">❓ Ayuda</span>
+                    <div style="margin-top:24px;" id="downloadArea">
+                        <input type="text" id="linkInput" class="input-box" placeholder="https://t.me/c/12345/678" style="margin-bottom: 12px;">
+                        <button class="btn btn-gold" id="downloadBtn" onclick="startDownload()">
+                            <span>⚡ Procesar Enlace</span>
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Mejora 1: Barra de límites con urgencia visual -->
-            <div class="card" id="limitsCard">
-                <div class="card-header">
-                    <span class="card-title" data-i18n="limits_title">📊 Tus límites de hoy</span>
-                    <span id="resetTimer" style="font-size:11px; color:var(--text-muted)">Resetea en 24h</span>
-                </div>
-                <div class="card-body" style="display:flex; flex-direction:column; gap:14px;">
-                    <div class="limit-row" id="limitRowVideo">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_videos">🎬 Videos</span>
-                            <span id="limitTextVideo" style="font-size:12px; color:var(--text-muted)">0/3</span>
-                        </div>
-                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
-                            <div id="limitBarVideo"
-                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
-                            </div>
-                        </div>
-                        <div id="unlockBtnVideo"></div>
+                <div id="lockedBlock" class="locked-block" style="display:none;">
+                    <div class="locked-icon">🔒</div>
+                    <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--rose);">Sin descargas disponibles</h3>
+                    <p style="font-size: 13px; color: var(--txt-soft); margin-bottom: 24px; line-height: 1.5;">Para seguir descargando contenido exclusivo, necesitas recargar tus descargas.</p>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <button class="btn btn-gold" onclick="switchTab('premium')">💎 Ver Planes Premium</button>
+                        <button class="btn btn-outline" onclick="switchTab('referrals')" style="border-color:var(--cyan); color:var(--cyan);">👥 Obtener Gratis (Invitar)</button>
                     </div>
-                    <div class="limit-row" id="limitRowPhoto">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_photos">📸 Fotos</span>
-                            <span id="limitTextPhoto" style="font-size:12px; color:var(--text-muted)">0/10</span>
-                        </div>
-                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
-                            <div id="limitBarPhoto"
-                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
-                            </div>
-                        </div>
-                        <div id="unlockBtnPhoto"></div>
-                    </div>
-                    <!-- Nuevas filas para Premium -->
-                    <div class="limit-row" id="limitRowMusic" style="display:none;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_music">🎵 Música</span>
-                            <span id="limitTextMusic" style="font-size:12px; color:var(--text-muted)">0/50</span>
-                        </div>
-                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
-                            <div id="limitBarMusic"
-                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
-                            </div>
-                        </div>
-                        <div id="unlockBtnMusic"></div>
-                    </div>
-                    <div class="limit-row" id="limitRowApk" style="display:none;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="font-size:13px; font-weight:600;" data-i18n="stats_apk">📱 APKs</span>
-                            <span id="limitTextApk" style="font-size:12px; color:var(--text-muted)">0/50</span>
-                        </div>
-                        <div style="background:var(--bg-card); border-radius:999px; height:8px; overflow:hidden;">
-                            <div id="limitBarApk"
-                                style="height:100%; border-radius:999px; transition:width 0.5s, background 0.3s; width:0%; background:var(--accent-green);">
-                            </div>
-                        </div>
-                        <div id="unlockBtnApk"></div>
-                    </div>
-                    <!-- Para música y APK mostrar como bloqueados si no es premium -->
-                    <div id="lockedRow" style="display:flex; gap:10px;">
-                        <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:10px; text-align:center; opacity:0.6; cursor:pointer;"
-                            onclick="switchTab('premium')">
-                            <div style="font-size:18px;">🎵</div>
-                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 <span
-                                    data-i18n="nav_premium">Premium</span></div>
-                        </div>
-                        <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:10px; text-align:center; opacity:0.6; cursor:pointer;"
-                            onclick="switchTab('premium')">
-                            <div style="font-size:18px;">📱</div>
-                            <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">🔒 <span
-                                    data-i18n="nav_premium">Premium</span></div>
-                        </div>
-                    </div>
-                    <!-- Contenedor para el botón de unlock que se mostrará vía JS -->
-                    <div id="premiumUnlockBtnContainer" style="display:none;"></div>
                 </div>
             </div>
 
-            <!-- Mejora 3: Historial de descargas recientes -->
-            <div class="card" id="historyCard" style="display:none; margin-top: 12px;">
-                <div class="card-header">
-                    <span class="card-title">🕓 <span data-i18n="account_history_title">Recientes</span></span>
-                    <button onclick="clearHistory()"
-                        style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer;"
-                        data-i18n="account_history_clear">Limpiar</button>
+            <!-- History UI (kept simple) -->
+            <div id="historyCard" class="card" style="display:none; padding: 0;">
+                <div style="padding: 16px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between;">
+                    <span class="sec-label" style="margin:0;">Últimas Descargas</span>
                 </div>
-                <div class="card-body" style="padding:0;">
-                    <div id="historyList"></div>
-                </div>
+                <div id="historyList"></div>
             </div>
-
-            <!-- Premium Mini Banner (only for free users) -->
-            <div class="premium-mini" id="premiumBanner" onclick="switchTab('premium')">
-                <span class="premium-mini-icon">⭐</span>
-                <div class="premium-mini-text">
-                    <div class="premium-banner-title" id="premiumTitleText" data-i18n="premium_mini_title">¡Hazte
-                        Premium!</div>
-                    <div class="premium-banner-desc" id="premiumDescText" data-i18n="premium_mini_desc">Desbloquea todo
-                        por solo 179 ⭐</div>
-                </div>
-                <span class="premium-mini-arrow">›</span>
-            </div>
-
         </div>
 
-        <!-- ==================== TAB: PREMIUM ==================== -->
+        <!-- PREMIUM TAB -->
         <div id="tab-premium" class="tab-panel">
-
-            <!-- Si ya es premium -->
-            <div id="premiumActive" style="display: none;">
-                <div class="premium-active">
-                    <div class="premium-active-badge" data-i18n="premium_active_badge">👑 Premium Activo</div>
-                    <div class="premium-active-days" id="daysLeft">0</div>
-                    <div class="premium-active-text" data-i18n="premium_active_days">días restantes</div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <button class="buy-button" onclick="buyPremium()">
-                            <span data-i18n="premium_active_extend">⭐ Extender Premium</span>
-                        </button>
-                    </div>
-                </div>
+            <div class="sec-label">🌟 Status</div>
+            <div class="card card-gold" style="text-align:center;">
+                <div style="font-size:40px; margin-bottom:12px;">👑</div>
+                <div id="premiumStatus" style="font-size:18px; font-weight:700; color:var(--gold); margin-bottom:4px;">Cuenta Gratuita</div>
+                <div id="userPlan" style="font-size:13px; color:var(--txt-soft);">Sin suscripción activa</div>
             </div>
 
-            <!-- Si no es premium -->
-            <div id="premiumOffer">
-                <div class="premium-hero">
-                    <div class="premium-crown">⭐</div>
-                    <h2 class="premium-title" data-i18n="premium_title">Elige tu Plan Premium</h2>
-                    <p class="premium-desc" data-i18n="premium_desc">4 opciones para ti</p>
-                </div>
-
-                <!-- Mejora 4a: Destacar el plan de prueba como "gancho" -->
-                <div
-                    style="background:linear-gradient(135deg, rgba(155,123,234,0.2), rgba(42,171,238,0.1)); border:1px solid rgba(155,123,234,0.4); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center;">
-                    <div style="font-size:28px; margin-bottom:8px;">🎁</div>
-                    <div style="font-size:15px; font-weight:700; margin-bottom:4px;" data-i18n="premium_trial_hook">
-                        ¿Primera vez? Prueba 3 días por 25⭐
+            <div class="sec-label" style="margin-top: 24px;">💎 Planes VIP</div>
+            <div class="plan-grid">
+                <!-- Flash (Hidden by default, will be controlled by JS if needed, or removed as per user prompt we rely on basic/pro/elite only now) -->
+                
+                <!-- Basic -->
+                <div class="plan-card" onclick="buyPremium('basic')">
+                    <div>
+                        <div class="plan-badge" style="background:var(--txt-muted); color:#FFF;">INICIAL</div>
+                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);">Básico <span style="font-size:14px; color:var(--txt-muted); font-weight:500;">/ 7 días</span></div>
                     </div>
-                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;"
-                        data-i18n="premium_trial_sub">Sin riesgo — si no te gusta, simplemente no renuevas</div>
-                    <button onclick="buyPremium('trial')"
-                        style="background:linear-gradient(135deg, #9B7BEA, #7B5BD4); border:none; border-radius:10px; padding:12px 24px; color:white; font-size:14px; font-weight:700; cursor:pointer; width:100%;"
-                        data-i18n="premium_trial_btn_now">
-                        ⭐ Probar ahora — 25 Stars
-                    </button>
-                </div>
-
-                <!-- Mejora 4b: Comparativa Free vs Premium -->
-                <div class="card" style="margin-bottom:16px;">
-                    <div class="card-body" style="padding:16px;">
-                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                            <thead>
-                                <tr>
-                                    <th style="text-align:left; padding:8px 0; color:var(--text-muted); font-weight:600;"
-                                        data-i18n="table_header_feature">
-                                        Función</th>
-                                    <th style="text-align:center; padding:8px; color:var(--text-muted); font-weight:600;"
-                                        data-i18n="table_header_free">
-                                        Free</th>
-                                    <th style="text-align:center; padding:8px; color:var(--accent-green); font-weight:700;"
-                                        data-i18n="table_header_premium">
-                                        Premium</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;" data-i18n="feature_videos_day">🎬 Videos/día</td>
-                                    <td style="text-align:center; color:var(--accent-red);">3</td>
-                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">50</td>
-                                </tr>
-                                <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;" data-i18n="feature_photos_day">📸 Fotos/día</td>
-                                    <td style="text-align:center; color:var(--accent-orange);">10</td>
-                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;"
-                                        data-i18n="val_unlimited">∞</td>
-                                </tr>
-                                <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;" data-i18n="feature_music">🎵 Música</td>
-                                    <td style="text-align:center;" data-i18n="val_locked">🔒</td>
-                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">50/día
-                                    </td>
-                                </tr>
-                                <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;" data-i18n="feature_apks">📱 APKs</td>
-                                    <td style="text-align:center;" data-i18n="val_locked">🔒</td>
-                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;">50/día
-                                    </td>
-                                </tr>
-                                <tr style="border-top:1px solid var(--bg-card);">
-                                    <td style="padding:10px 0;" data-i18n="feature_albums">📂 Álbumes</td>
-                                    <td style="text-align:center; color:var(--accent-orange);" data-i18n="val_limited">
-                                        Limitado</td>
-                                    <td style="text-align:center; color:var(--accent-green); font-weight:700;"
-                                        data-i18n="val_complete">Completos
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div style="text-align:right;">
+                        <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">333⭐</div>
                     </div>
                 </div>
-
-                <!-- Bonus Referidos -->
-                <div class="referral-bonus-card">
-                    <div style="font-size: 40px; margin-bottom: 12px;">🎁</div>
-                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;"
-                        data-i18n="referral_bonus_title">BONUS REFERIDOS GRATIS</div>
-                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;"
-                        data-i18n="referral_bonus_desc">
-                        15 referidos confirmados = <span style="color: var(--accent-green); font-weight: 700;">+1 día
-                            Premium</span><br>
-                        Máximo acumulable: 15 días
+                <!-- Pro -->
+                <div class="plan-card pro" onclick="buyPremium('pro')">
+                    <div>
+                        <div class="plan-badge">🔥 RECOMENDADO</div>
+                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);">Pro <span style="font-size:14px; color:var(--txt-muted); font-weight:500;">/ 30 días</span></div>
                     </div>
-                    <button class="referral-bonus-btn" onclick="switchTab('referrals')" data-i18n="referral_bonus_btn">
-                        👥 Ver Mis Referidos
-                    </button>
-                </div>
-
-                <!-- Plan 1: Prueba -->
-                <div class="plan-card">
-                    <div class="card-body">
-                        <div class="plan-header">
-                            <div class="plan-info">
-                                <div style="font-size: 12px; color: var(--accent-purple); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;"
-                                    data-i18n="plan_trial_badge">
-                                    ✨ PRUEBA</div>
-                                <h3 data-i18n="plan_trial_name">🎁 Prueba</h3>
-                                <p class="plan-desc" data-i18n="plan_trial_desc">Perfecto para probar (8.3⭐/día)</p>
-                            </div>
-                            <div class="plan-price">
-                                <div class="plan-price-main" style="color: var(--accent-blue);">
-                                    25 <span class="plan-price-star">⭐</span>
-                                </div>
-                                <div class="plan-price-sub" id="trialPlanPeriod">3 días</div>
-                            </div>
-                        </div>
-                        <button class="buy-button" onclick="buyPremium('trial')" data-i18n="plan_trial_btn">
-                            ⭐ Obtener Prueba
-                        </button>
+                    <div style="text-align:right;">
+                        <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">777⭐</div>
                     </div>
                 </div>
-
-                <!-- Plan 2: Semanal (MÁS POPULAR) -->
-                <div class="plan-card featured" style="border-color: var(--accent-blue); position: relative;">
-                    <div class="plan-badge" style="background: var(--accent-blue);" data-i18n="plan_weekly_badge">
-                        🔥 MÁS POPULAR
+                <!-- Elite -->
+                <div class="plan-card" onclick="buyPremium('elite')">
+                    <div>
+                        <div class="plan-badge" style="background:var(--emerald); color:#000;">MÁXIMO PODER</div>
+                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);">Elite <span style="font-size:14px; color:var(--txt-muted); font-weight:500;">/ 90 días</span></div>
                     </div>
-                    <div class="card-body" style="padding-top: 24px;">
-                        <div class="plan-header">
-                            <div class="plan-info">
-                                <h3 data-i18n="plan_weekly_name">🔥 Semanal</h3>
-                                <p class="plan-desc" data-i18n="plan_weekly_desc">Mejor precio/día (10.7⭐/día)</p>
-                            </div>
-                            <div class="plan-price">
-                                <div class="plan-price-main" style="color: var(--accent-blue);">
-                                    75 <span class="plan-price-star">⭐</span>
-                                </div>
-                                <div class="plan-price-sub" id="weeklyPlanPeriod">7 días</div>
-                            </div>
-                        </div>
-                        <button class="buy-button" id="weeklyPlanBtn"
-                            style="background: linear-gradient(135deg, var(--accent-blue), #1E96D1);"
-                            onclick="buyPremium('weekly')" data-i18n="plan_weekly_btn">
-                            🔥 Obtener Semanal
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Plan 3: Mensual (RECOMENDADO) -->
-                <div class="plan-card featured" style="border-color: var(--accent-green); position: relative;">
-                    <div class="plan-badge" style="background: var(--accent-green);" data-i18n="plan_monthly_badge">
-                        ⭐ RECOMENDADO
-                    </div>
-                    <div class="card-body" style="padding-top: 24px;">
-                        <div class="plan-header">
-                            <div class="plan-info">
-                                <h3 data-i18n="plan_monthly_name">💎 Mensual</h3>
-                                <p class="plan-desc" data-i18n="plan_monthly_desc">El más elegido (5.0⭐/día)</p>
-                            </div>
-                            <div class="plan-price">
-                                <div class="plan-price-main" style="color: var(--accent-green);">
-                                    149 <span class="plan-price-star">⭐</span>
-                                </div>
-                                <div class="plan-price-sub" id="monthlyPlanPeriod">30 días</div>
-                            </div>
-                        </div>
-                        <button class="buy-button" id="monthlyPlanBtn"
-                            style="background: linear-gradient(135deg, var(--accent-green), #5BB05B);"
-                            onclick="buyPremium('monthly')" data-i18n="plan_monthly_btn">
-                            💎 Obtener Mensual
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Plan 4: Trimestral (MEJOR VALOR) -->
-                <div class="plan-card featured" style="border-color: var(--accent-orange); position: relative;">
-                    <div class="plan-badge" style="background: var(--accent-orange);" data-i18n="plan_quarterly_badge">
-                        💰 MEJOR VALOR
-                    </div>
-                    <div class="card-body" style="padding-top: 24px;">
-                        <div class="plan-header">
-                            <div class="plan-info">
-                                <h3 data-i18n="plan_quarterly_name">👑 Trimestral</h3>
-                                <p class="plan-desc" data-i18n="plan_quarterly_desc">Ahorra 11% (4.4⭐/día)</p>
-                            </div>
-                            <div class="plan-price">
-                                <div class="plan-price-main" style="color: var(--accent-orange);">
-                                    399 <span class="plan-price-star">⭐</span>
-                                </div>
-                                <div class="plan-price-sub" id="quarterlyPlanPeriod">90 días</div>
-                            </div>
-                        </div>
-                        <div class="plan-savings">
-                            <span style="font-size: 12px; color: var(--accent-orange); font-weight: 700;"
-                                data-i18n="plan_quarterly_savings">💰 AHORRAS 48⭐
-                                vs 3 meses separados</span>
-                        </div>
-                        <button class="buy-button" id="quarterlyPlanBtn"
-                            style="background: linear-gradient(135deg, var(--accent-orange), #D89640);"
-                            onclick="buyPremium('quarterly')" data-i18n="plan_quarterly_btn">
-                            👑 Obtener Trimestral
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Comparativa de beneficios -->
-                <div class="card" style="margin-top: 16px;">
-                    <div class="card-header">
-                        <span class="card-title" id="premiumBenefitsTitle" data-i18n="premium_benefits_title">✨
-                            Beneficios Premium</span>
-                    </div>
-                    <div class="card-body">
-                        <div
-                            style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size: 24px;">📸</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_photos">Fotos
-                                    Ilimitadas</div>
-                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_photos_desc">
-                                    Descarga todas las que quieras
-                                </div>
-                            </div>
-                            <div style="color: var(--accent-green); font-weight: 600;" data-i18n="val_unlimited">∞</div>
-                        </div>
-                        <div
-                            style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size: 24px;">🎬</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_videos">50 Videos/día
-                                </div>
-                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_videos_desc">
-                                    vs 3 en plan gratuito</div>
-                            </div>
-                            <div style="color: var(--accent-green); font-weight: 600;">50</div>
-                        </div>
-                        <div
-                            style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size: 24px;">🎵</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_music">50
-                                    Canciones/día</div>
-                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_music_desc">
-                                    Música sin límites</div>
-                            </div>
-                            <div style="color: var(--accent-green); font-weight: 600;">50</div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0;">
-                            <div style="font-size: 24px;">🚫</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600;" data-i18n="benefit_no_ads">Sin Anuncios
-                                </div>
-                                <div style="font-size: 11px; color: var(--text-muted);" data-i18n="benefit_no_ads_desc">
-                                    Experiencia premium</div>
-                            </div>
-                            <div style="color: var(--accent-green); font-weight: 600;">✓</div>
-                        </div>
+                    <div style="text-align:right;">
+                        <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">1499⭐</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== TAB: CUENTA ==================== -->
-        <div id="tab-account" class="tab-panel">
-
-            <!-- Connection Status -->
-            <div class="card">
-                <div class="account-card">
-                    <div class="account-icon" id="connectionIcon">🔗</div>
-                    <div class="account-info">
-                        <h3 id="connectionTitle" data-i18n="connection_status">Estado de conexión</h3>
-                        <p id="connectionText" data-i18n="connection_verifying">Verificando...</p>
-                    </div>
-                </div>
-                <div class="card-body" style="padding-top: 0;">
-                    <button class="account-btn primary" id="connectBtn" onclick="configureAccount()"
-                        data-i18n="btn_configure">
-                        ⚙️ Configurar cuenta
-                    </button>
-                </div>
-            </div>
-
-            <!-- Limits -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title" data-i18n="limits_title">📊 Límites de hoy</span>
-                    <span id="planBadge" style="font-size: 11px; color: var(--accent-blue);">FREE</span>
-                </div>
-                <div class="card-body">
-                    <div class="limit-item">
-                        <div class="limit-icon">🎬</div>
-                        <div class="limit-info">
-                            <div class="limit-name" data-i18n="limit_videos">Videos</div>
-                            <div class="limit-bar">
-                                <div class="limit-fill blue" id="limitVideo" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div class="limit-count" id="countVideo">0/3</div>
-                    </div>
-                    <div class="limit-item">
-                        <div class="limit-icon">📸</div>
-                        <div class="limit-info">
-                            <div class="limit-name" data-i18n="limit_photos">Fotos</div>
-                            <div class="limit-bar">
-                                <div class="limit-fill green" id="limitPhoto" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div class="limit-count" id="countPhoto">0/10</div>
-                    </div>
-                    <div class="limit-item">
-                        <div class="limit-icon">🎵</div>
-                        <div class="limit-info">
-                            <div class="limit-name" data-i18n="limit_music">Música</div>
-                            <div class="limit-bar">
-                                <div class="limit-fill orange" id="limitMusic" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div class="limit-count" id="countMusic">🔒</div>
-                    </div>
-                    <div class="limit-item">
-                        <div class="limit-icon">📱</div>
-                        <div class="limit-info">
-                            <div class="limit-name" data-i18n="limit_apk">APKs</div>
-                            <div class="limit-bar">
-                                <div class="limit-fill purple" id="limitApk" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div class="limit-count" id="countApk">🔒</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Menu -->
-            <div class="card">
-                <div class="menu-item" onclick="switchTab('premium')">
-                    <div class="menu-icon">⭐</div>
-                    <div class="menu-text">
-                        <div class="menu-title" data-i18n="nav_premium">Premium</div>
-                        <div class="menu-subtitle" id="premiumStatus" data-i18n="menu_premium_desc">Ver planes</div>
-                    </div>
-                    <span class="menu-arrow">›</span>
-                </div>
-                <div class="menu-item" onclick="openSupport()">
-                    <div class="menu-icon">💬</div>
-                    <div class="menu-text">
-                        <div class="menu-title" data-i18n="menu_support">Soporte</div>
-                        <div class="menu-subtitle" data-i18n="menu_support_desc">¿Necesitas ayuda?</div>
-                    </div>
-                    <span class="menu-arrow">›</span>
-                </div>
-                <div class="menu-item" onclick="showLanguageSelector()">
-                    <div class="menu-icon">🌐</div>
-                    <div class="menu-text">
-                        <div class="menu-title" data-i18n="nav_account">Idioma</div>
-                        <div class="menu-subtitle" id="currentLangLabel">Español</div>
-                    </div>
-                    <span class="menu-arrow">›</span>
-                </div>
-            </div>
-
-            <div class="app-footer" data-i18n="footer">
-                Bot de Descargas v3.0<br>
-                Hecho con ❤️
-            </div>
-        </div>
-
-        <!-- ==================== TAB: REFERIDOS ==================== -->
+        <!-- REFERRALS TAB -->
         <div id="tab-referrals" class="tab-panel">
-
-            <!-- Header -->
-            <div class="card">
-                <div class="card-body" style="text-align: center; padding: 24px;">
-                    <div style="font-size: 56px; margin-bottom: 12px;">👥</div>
-                    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;" data-i18n="referrals_title">
-                        Sistema de Referidos</h2>
-                    <p style="font-size: 13px; color: var(--text-muted);" data-i18n="referrals_desc">Invita amigos y
-                        gana Premium gratis</p>
+            <div class="card" style="text-align:center; padding: 30px 20px;">
+                <div style="font-size:48px; margin-bottom:16px;">🎁</div>
+                <h2 style="font-size:22px; font-weight:800; margin-bottom:8px;">Gana Descargas</h2>
+                <!-- Cada 15 refs = 10 descargas -->
+                <p style="color:var(--txt-soft); font-size:14px; line-height:1.5;">Invita a 15 amigos a iniciar el bot y recibe 10 descargas gratis inmediatamente.</p>
+                
+                <div style="background:var(--bg-input); border-radius:var(--rs); padding:16px; margin-top:24px;">
+                    <div style="font-family:'Syne'; font-size:32px; font-weight:800; color:var(--cyan); margin-bottom:4px;" id="refProgressText">0/15</div>
+                    <div style="font-size:12px; color:var(--txt-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700;">Progreso actual</div>
                 </div>
             </div>
 
-            <!-- Progreso -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title" data-i18n="referrals_progress_title">📊 Tu Progreso</span>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                <div class="card" style="margin:0; padding:16px; display:flex; flex-direction:column; align-items:center;">
+                    <div style="color:var(--txt-soft); font-size:11px; text-transform:uppercase; font-weight:700; margin-bottom:8px;">Totales</div>
+                    <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--txt);" id="refConfirmed">0</div>
                 </div>
-                <div class="card-body">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div
-                            style="background: rgba(42, 171, 238, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 28px; font-weight: 700; color: var(--accent-blue);"
-                                id="confirmedReferrals">0</div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"
-                                data-i18n="referrals_confirmed">Confirmados</div>
-                        </div>
-                        <div
-                            style="background: rgba(229, 165, 88, 0.1); padding: 16px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 28px; font-weight: 700; color: var(--accent-orange);"
-                                id="pendingReferrals">0</div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"
-                                data-i18n="referrals_pending">Pendientes</div>
-                        </div>
-                    </div>
-
-                    <!-- Barra de progreso -->
-                    <div style="margin-bottom: 8px;">
-                        <div
-                            style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
-                            <span data-i18n="referrals_progress">Progreso hacia recompensa</span>
-                            <span id="progressText">0/15</span>
-                        </div>
-                        <div style="background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div id="progressBar"
-                                style="height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); width: 0%; transition: width 0.3s;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Días ganados -->
-                    <div
-                        style="background: rgba(109, 194, 109, 0.1); padding: 14px; border-radius: 10px; margin-top: 12px; text-align: center;">
-                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;"
-                            data-i18n="referrals_days_earned">🎁 Días Premium
-                            Ganados</div>
-                        <div style="font-size: 24px; font-weight: 700; color: var(--accent-green);" id="daysEarned">0
-                        </div>
-                    </div>
+                <div class="card" style="margin:0; padding:16px; display:flex; flex-direction:column; align-items:center;">
+                    <!-- 'Ganadas' -->
+                    <div style="color:var(--txt-soft); font-size:11px; text-transform:uppercase; font-weight:700; margin-bottom:8px;">Ganadas</div>
+                    <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--emerald);" id="refEarned">0</div>
                 </div>
             </div>
 
-            <!-- Cómo funciona -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title" data-i18n="referrals_how_title">🎯 Cómo Funciona</span>
-                </div>
-                <div class="card-body">
-                    <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                        <div
-                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
-                            1️⃣</div>
-                        <div style="font-size: 13px; line-height: 1.5;">
-                            <div style="font-weight: 600; margin-bottom: 2px;" data-i18n="referrals_step1">Comparte tu
-                                enlace</div>
-                            <div style="color: var(--text-muted);" data-i18n="referrals_step1_desc">Invita a tus amigos
-                                a usar el bot</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                        <div
-                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
-                            2️⃣</div>
-                        <div style="font-size: 13px; line-height: 1.5;">
-                            <div style="font-weight: 600; margin-bottom: 2px;" data-i18n="referrals_step2">Ellos usan el
-                                bot</div>
-                            <div style="color: var(--text-muted);" data-i18n="referrals_step2_desc">Deben conectar su
-                                cuenta y hacer 1 descarga</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 12px;">
-                        <div
-                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42, 171, 238, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
-                            3️⃣</div>
-                        <div style="font-size: 13px; line-height: 1.5;">
-                            <div style="font-weight: 600; margin-bottom: 2px;" data-i18n="referrals_step3">Ganas
-                                recompensas</div>
-                            <div style="color: var(--text-muted);" data-i18n="referrals_step3_desc">Cada 15 referidos =
-                                1 día Premium (máx. 15 días)
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tu enlace -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title" data-i18n="referrals_link_title">🔗 Tu Enlace Personal</span>
-                </div>
-                <div class="card-body">
-                    <div style="background: var(--bg-input); padding: 14px; border-radius: 10px; margin-bottom: 12px; word-break: break-all; font-size: 12px; font-family: 'Courier New', monospace; color: var(--accent-blue);"
-                        id="referralLink" data-i18n="referrals_loading">
-                        Cargando...
-                    </div>
-                    <button class="account-btn primary" onclick="copyReferralLink()" data-i18n="referrals_copy_btn">
-                        📋 Copiar Enlace
-                    </button>
-                    <button class="account-btn"
-                        style="background: rgba(42, 171, 238, 0.1); color: var(--accent-blue); margin-top: 8px;"
-                        onclick="shareReferralLink()" data-i18n="referrals_share_btn">
-                        📤 Compartir
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Modal de idioma -->
-    <div id="langModal"
-        style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:500; align-items:flex-end; justify-content:center;">
-        <div
-            style="background:var(--bg-primary); border-radius:20px 20px 0 0; padding:24px; width:100%; max-width:500px;">
-            <div style="text-align:center; font-size:16px; font-weight:700; margin-bottom:20px;"
-                data-i18n="lang_selector_title">🌐 Seleccionar idioma
-            </div>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                <button onclick="selectLanguage('es')" id="langBtn_es"
-                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
-                    <span style="font-size:22px;">🇪🇸</span> <span>Español</span>
-                </button>
-                <button onclick="selectLanguage('en')" id="langBtn_en"
-                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
-                    <span style="font-size:22px;">🇬🇧</span> <span>English</span>
-                </button>
-                <button onclick="selectLanguage('pt')" id="langBtn_pt"
-                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
-                    <span style="font-size:22px;">🇧🇷</span> <span>Português</span>
-                </button>
-                <button onclick="selectLanguage('it')" id="langBtn_it"
-                    style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-primary); font-size:15px; cursor:pointer; text-align:left;">
-                    <span style="font-size:22px;">🇮🇹</span> <span>Italiano</span>
-                </button>
-            </div>
-            <button onclick="closeLangModal()"
-                style="width:100%; margin-top:16px; padding:14px; border-radius:12px; border:none; background:var(--bg-card); color:var(--text-muted); font-size:14px; cursor:pointer;"
-                data-i18n="btn_cancel">
-                Cancelar
+            <button class="btn btn-cyan" onclick="shareReferralLink()">
+                <span style="font-size:18px;">🔗</span> Compartir Enlace
             </button>
         </div>
+
+        <!-- GUIDE TAB -->
+        <div id="tab-guide" class="tab-panel">
+            <div class="card" style="text-align:center; background:linear-gradient(180deg, rgba(255,183,0,0.1) 0%, var(--card) 100%); padding-top: 30px; padding-bottom: 30px;">
+                <div style="font-size:48px; margin-bottom:12px;">📖</div>
+                <h2 style="font-size:24px; font-weight:800; color:var(--gold);">Guía Completa</h2>
+                <p style="color:var(--txt-soft); font-size:14px; margin-top:8px;">Todo lo que necesitas saber para dominar el bot.</p>
+            </div>
+
+            <div class="sec-label" style="margin-top:24px;">¿Qué es DownloadBot?</div>
+            <div class="card">
+                <p style="color:var(--txt-soft); font-size:14px; line-height:1.6;">Somos tu pasarela para extraer contenido restringido de Telegram. Archivos que no se pueden guardar, reenviar o descargar de canales privados ahora están a tu alcance.</p>
+                <div class="chip-wrap">
+                    <div class="chip">📹 Videos</div><div class="chip">📸 Fotos</div><div class="chip">🎵 Música</div><div class="chip">📦 APKs</div><div class="chip">📚 Álbumes</div>
+                </div>
+            </div>
+
+            <div class="sec-label" style="margin-top:24px;">Cómo empezar</div>
+            <div class="card">
+                <ol class="guide-steps">
+                    <li>Ve a la pestaña <strong>Cuenta</strong> y toca "Configurar de nuevo" si no lo has hecho.</li>
+                    <li>Sigue las instrucciones en el chat y <strong>recibe tu código de acceso</strong> oficial.</li>
+                    <li>Ingresa el código en el bot para conectar tu cuenta de forma <strong>segura</strong>.</li>
+                    <li>Copia el enlace de cualquier mensaje de un canal privado al que pertenezcas.</li>
+                    <li>Pega el enlace en la pestaña <strong>Inicio</strong> y recibe el archivo descargable.</li>
+                </ol>
+            </div>
+
+            <div class="sec-label" style="margin-top:24px;">Formatos de enlace válidos</div>
+            <div class="card">
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+                    <div style="background:var(--card-hi); padding:10px 12px; border-radius:8px; font-family:monospace; font-size:13px; color:var(--txt);">t.me/nombrecanal/123 <span style="float:right; color:var(--txt-muted); font-family:'Nunito';">Canal público</span></div>
+                    <div style="background:var(--card-hi); padding:10px 12px; border-radius:8px; font-family:monospace; font-size:13px; color:var(--cyan);">t.me/c/1234567890/456 <span style="float:right; opacity:0.8; font-family:'Nunito';">Canal privado</span></div>
+                    <div style="background:var(--card-hi); padding:10px 12px; border-radius:8px; font-family:monospace; font-size:13px; color:var(--txt);">t.me/+ABCxyz123/789 <span style="float:right; color:var(--txt-muted); font-family:'Nunito';">Grupo</span></div>
+                </div>
+                <div style="background:var(--gold-dim); border:1px solid var(--gold); padding:10px 12px; border-radius:8px; font-size:12px; color:var(--gold);">
+                    💡 <strong>Tip:</strong> Si estás en Android, toca el mensaje y usa "Copiar Enlace".
+                </div>
+            </div>
+
+            <div class="sec-label" style="margin-top:24px;">¿Cómo consigo descargas?</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div class="card" style="border-color:var(--cyan); background:linear-gradient(135deg, var(--card), rgba(0,212,255,0.05));">
+                    <h4 style="color:var(--cyan); font-size:15px; font-weight:700; margin-bottom:6px;">👥 Invitando Amigos</h4>
+                    <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;">Recomienda a tus referidos. Cada 15 usuarios que inicien el bot a través de tu enlace, recibirás 10 descargas gratis inmediatamente y de forma automática.</p>
+                </div>
+                <div class="card" style="border-color:var(--gold); background:linear-gradient(135deg, var(--card), rgba(255,183,0,0.05));">
+                    <h4 style="color:var(--gold); font-size:15px; font-weight:700; margin-bottom:6px;">💎 Adquiriendo Premium</h4>
+                    <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;">Elige tranquilidad. Descargas ILIMITADAS sin cortes ni demoras. Contamos con membresías Premium a partir de 333⭐ por mes.</p>
+                </div>
+            </div>
+
+            <div class="sec-label" style="margin-top:24px;">Preguntas Frecuentes</div>
+            <div class="card" style="padding:0;">
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Es seguro conectar mi cuenta?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">Totalmente. El túnel de inicio de sesión usa una conexión segura de Telegram. No leemos ni interactuamos con tus chats personales o ajenos al enlace proporcionado.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Por qué mi descarga está tardando?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">La carga de archivos gigantes puede tardar. Los usuarios Premium siempre saltarán la cola y tendrán prioridad de procesamiento de velocidad.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Referidos pendientes no suman?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">Se marcan en verde apenas inicien al menos por vez primera el bot. Usuarios falsos o bots se descartan.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿De qué canales puedo extraer?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">De cualquiera. Al aportar tu autorización segura en Cuenta, puedes invocar material restringido de canales públicos o privados a los que tú estés unido.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué son las Telegram Stars?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">Son la moneda hiper segura oficial de Telegram. Evitan salir de tu App para pagar y admiten Google Pay/Apple Pay.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Baja la calidad del archivo?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">Negativo. Enviamos en crudo tal cual el archivo host original sin comprimir un solo bit.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Hay renovación automática?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">No hay cobros recurrentes sorpresivos. Recargarás tus días estrella tan solo si tú lo confirmas manualmente cada mes.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span>¿Aún necesitas ayuda soporte?</span><span class="faq-q-icon">+</span></div>
+                    <div class="faq-a">Puedes ir tranquilamente a la pestaña "Cuenta" y presionar Centro de Soporte para comunicarte en privado con el Staff en Telegram.</div>
+                </div>
+            </div>
+
+            <div class="sec-label" style="margin-top:24px;">Consejos útiles</div>
+            <div class="card">
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:13px; color:var(--txt-soft);">
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">⚡</span> Copia, Pega, Envía rápido, la memoria retiene el caché para que descargues en lotes ágiles.</div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🎯</span> Usa el cliente Telegram Desktop para copiar lotes masivos más sencillo.</div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">✨</span> Comprueba cuánta fecha te queda en Configuración periódicamente.</div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🚀</span> Comparte tu referido entre alumnos o en redes TikTok con un video tutorial del bot para ganancias ilimitadas.</div>
+                </div>
+            </div>
+
+            <button class="btn btn-outline" onclick="openSupport()" style="margin-top:16px; margin-bottom: 20px;">💬 Contactar Soporte Técnico</button>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div id="tab-profile" class="tab-panel">
+            <div class="sec-label">Tu Cuenta</div>
+            <div class="card">
+                <div class="ami" onclick="switchTab('guide')">
+                    <span class="ami-icon">📖</span>
+                    <div class="ami-text">
+                        <div class="ami-title">Guía de uso</div>
+                        <div class="ami-sub">Cómo usar el bot paso a paso</div>
+                    </div>
+                    <span class="ami-arrow">›</span>
+                </div>
+                <div class="ami" id="connBtn" onclick="isConnected ? disconnectAccount() : configureAccount()">
+                    <span class="ami-icon" id="connIcon">🔌</span>
+                    <div class="ami-text">
+                        <div class="ami-title" id="connTitle">Estado de la cuenta</div>
+                        <div class="ami-sub" id="connSub">Verificando...</div>
+                    </div>
+                    <span class="ami-arrow">›</span>
+                </div>
+                <div class="ami" onclick="openSupport()">
+                    <span class="ami-icon">💬</span>
+                    <div class="ami-text">
+                        <div class="ami-title">Centro de soporte</div>
+                        <div class="ami-sub">Resolución de problemas</div>
+                    </div>
+                    <span class="ami-arrow">›</span>
+                </div>
+                <div class="ami" onclick="switchTab('referrals')" style="border:none;">
+                    <span class="ami-icon">🎁</span>
+                    <div class="ami-text">
+                        <div class="ami-title">Referidos</div>
+                        <div class="ami-sub">Gana descargas gratis</div>
+                    </div>
+                    <span class="ami-arrow">›</span>
+                </div>
+            </div>
+            
+            <div style="text-align:center; font-size:11px; color:var(--txt-muted); margin-top:20px;">
+                DownloadBot v3.0 Luxury<br>Dark Edition
+            </div>
+        </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav" id="bottomNav" style="display: none;">
-        <button class="nav-item active" onclick="switchTab('home')">
-            <span class="nav-icon">🏠</span>
-            <span data-i18n="nav_home">Inicio</span>
+    <!-- BOTTOM NAV -->
+    <nav class="nav" id="bottomNav" style="display: none;">
+        <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
+            <span class="nav-icon">⬇</span><span>Inicio</span>
         </button>
-        <button class="nav-item" onclick="switchTab('premium')">
-            <span class="nav-icon">⭐</span>
-            <span data-i18n="nav_premium">Premium</span>
+        <button class="nav-btn" id="nav-premium" onclick="switchTab('premium')">
+            <span class="nav-icon">⭐</span><span>Premium</span>
         </button>
-        <button class="nav-item" onclick="switchTab('referrals')">
-            <span class="nav-icon">👥</span>
-            <span data-i18n="nav_referrals">Referir</span>
+        <button class="nav-btn" id="nav-referrals" onclick="switchTab('referrals')">
+            <span class="nav-icon">👥</span><span>Referidos</span>
         </button>
-        <button class="nav-item" onclick="switchTab('account')">
-            <span class="nav-icon">👤</span>
-            <span data-i18n="nav_account">Cuenta</span>
+        <button class="nav-btn" id="nav-guide" onclick="switchTab('guide')">
+            <span class="nav-icon">📖</span><span>Guía</span>
         </button>
-    </div>
+        <button class="nav-btn" id="nav-profile" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span><span>Cuenta</span>
+        </button>
+    </nav>
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
+<script>
 
-    <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
@@ -2434,11 +937,41 @@
             } else {
                 // Normal — mostrar oferta
                 titleEl.textContent = '⭐ ¿Quieres descargar más?';
-                descEl.textContent = 'Prueba Premium 3 días por solo 25⭐';
+                descEl.textContent = 'Prueba Premium 3 días por solo 149⭐';
                 banner.style.background = 'linear-gradient(135deg, #E5A958 0%, #F0C987 100%)';
             }
 
             banner.style.display = 'flex';
+
+            // Lógica Flash Sale en el Tab Premium
+            if (userData.flash_sale && userData.flash_sale.active && !userData.premium) {
+                try {
+                    const end = new Date(userData.flash_sale.end);
+                    if (end > new Date()) {
+                        let flashBanner = document.getElementById('flashSaleBanner');
+                        if (!flashBanner) {
+                            flashBanner = document.createElement('div');
+                            flashBanner.id = 'flashSaleBanner';
+                            flashBanner.onclick = () => buyPremium('flash');
+                            flashBanner.innerHTML = `
+                                <div style="background:linear-gradient(135deg, #f59e0b, #dc2626); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center; color:white; animation: floatUp 2s infinite alternate; cursor:pointer; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);">
+                                    <div style="font-size:24px; margin-bottom:4px; font-weight:800; letter-spacing:1px;">⚡ VENTA FLASH ACTIVA ⚡</div>
+                                    <div style="font-size:14px; margin-bottom:12px;">Plan Básico a Mitad de Precio: <strong style="font-size:18px;">75⭐</strong> (¡Por tiempo limitado!)</div>
+                                    <button style="background:white; color:#dc2626; border:none; border-radius:8px; padding:10px 20px; font-weight:800; text-transform:uppercase; cursor:pointer;">Comprar Descuento Ahora</button>
+                                </div>
+                            `;
+                            const premiumOffer = document.getElementById('premiumOffer');
+                            if (premiumOffer) premiumOffer.insertBefore(flashBanner, premiumOffer.children[1]);
+                        }
+                    } else {
+                        const flashBanner = document.getElementById('flashSaleBanner');
+                        if (flashBanner) flashBanner.remove();
+                    }
+                } catch (e) { }
+            } else {
+                const flashBanner = document.getElementById('flashSaleBanner');
+                if (flashBanner) flashBanner.remove();
+            }
         }
 
         // ========== UPDATE UI ==========
@@ -2738,10 +1271,11 @@
 
             // Plan details
             const plans = {
-                'trial': { stars: 25, days: 3, name: '🎁 Prueba' },
-                'weekly': { stars: 75, days: 7, name: '🔥 Semanal' },
-                'monthly': { stars: 149, days: 30, name: '💎 Mensual' },
-                'quarterly': { stars: 399, days: 90, name: '👑 Trimestral' }
+                'flash': { stars: 75, days: 3, name: '⚡ Venta Flash' },
+                'trial': { stars: 149, days: 3, name: '🚀 Básico' },
+                'weekly': { stars: 333, days: 7, name: '🔥 Pro' },
+                'monthly': { stars: 777, days: 30, name: '💎 Elite' },
+                'quarterly': { stars: 1499, days: 90, name: '👑 Master' }
             };
 
             const plan = plans[planKey] || plans['monthly'];
@@ -2866,11 +1400,11 @@
             // Actualizar números
             document.getElementById('confirmedReferrals').textContent = stats.confirmed || 0;
             document.getElementById('pendingReferrals').textContent = stats.pending || 0;
-            document.getElementById('daysEarned').textContent = stats.days_earned || 0;
-            document.getElementById('progressText').textContent = `${stats.progress || 0}/${stats.next_reward_at || 15}`;
+            document.getElementById('daysEarned').textContent = stats.downloads_earned || 0;
+            document.getElementById('progressText').textContent = `${stats.progress || 0}/${stats.next_reward_at || 1}`;
 
             // Actualizar barra de progreso
-            const progressPercent = ((stats.progress || 0) / (stats.next_reward_at || 15)) * 100;
+            const progressPercent = ((stats.progress || 0) / (stats.next_reward_at || 1)) * 100;
             document.getElementById('progressBar').style.width = `${Math.min(progressPercent, 100)}%`;
 
             // Actualizar enlace
@@ -3008,7 +1542,123 @@
         document.getElementById('linkInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') startDownload();
         });
-    </script>
-</body>
+    
 
+window.toggleFaq = function(qEl) {
+    const item = qEl.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+};
+
+const originalUpdateUI = window.updateUI || function(){};
+window.updateUI = function() {
+    originalUpdateUI();
+    
+    // Update Connection visual
+    const icon = document.getElementById('connIcon');
+    if (icon && typeof isConnected !== 'undefined') {
+        icon.textContent = isConnected ? '✅' : '⛔';
+        const color = isConnected ? 'var(--emerald)' : 'var(--rose)';
+        if(document.getElementById('connTitle')) {
+            document.getElementById('connTitle').textContent = isConnected ? 'Conectado de forma segura' : 'Cuenta desconectada';
+        }
+    }
+    
+    // Credits logic without downloads free (Only Referrals or Premium)
+    const creditsBlock = document.getElementById('creditsBlock');
+    const lockedBlock = document.getElementById('lockedBlock');
+    const creditsCountText = document.getElementById('creditsCountText');
+    const creditsFill = document.getElementById('creditsFill');
+    
+    if (window.userData) {
+        let isPremium = window.userData.premium;
+        // User starts with 0 free downloads except what they earned via referrals
+        let used = window.userData.downloads || 0;
+        let earned = 0; // if we fetched from referrals or stored in DB... 
+        
+        let available = 0; // We define it manually
+        // Note: the backend handles limits, we assume for basic users: max = earned
+        // The user request specified: 'Si isPremium || credits > 0 mostrar el input de descarga, si no mostrar bloque locked'
+        // For accurate tracking if we don't have credits via limits, we assume max value.
+        // Wait, "credits" implies limits.video.max - limits.video.used or similar?
+        let max_downloads = 0;
+        if (userData.limits && userData.limits.video) {
+            max_downloads = userData.limits.video.max || 0;
+            used = userData.limits.video.used || 0;
+        }
+        
+        available = max_downloads - used;
+        if (available < 0) available = 0;
+
+        if (isPremium || available > 0) {
+            if (creditsBlock) creditsBlock.style.display = 'block';
+            if (lockedBlock) lockedBlock.style.display = 'none';
+            if (isPremium) {
+                if (creditsCountText) creditsCountText.textContent = 'ILIMITADAS 👑';
+                if (creditsFill) { creditsFill.style.width = '100%'; creditsFill.style.background = 'linear-gradient(90deg, #10D9A0, #047857)'; }
+            } else {
+                if (creditsCountText) creditsCountText.textContent = available;
+                // Max is based on what they earned. Typically earned in blocks of 10.
+                if (creditsFill) creditsFill.style.width = Math.min((used/(max_downloads))*100, 100) + '%';
+            }
+        } else {
+            if (creditsBlock) creditsBlock.style.display = 'none';
+            if (lockedBlock) lockedBlock.style.display = 'block';
+        }
+    }
+};
+
+window.buyPremium = async function(planKey = 'basic') {
+    if(typeof showToast === 'function') showToast('Preparando pago...');
+    const plans = {
+        'basic': { stars: 333, days: 7, name: '🚀 Básico' },
+        'pro': { stars: 777, days: 30, name: '🔥 Pro' },
+        'elite': { stars: 1499, days: 90, name: '💎 Elite' }
+    };
+    const plan = plans[planKey] || plans['pro'];
+    try {
+        const response = await fetch('/api/miniapp/create-invoice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userData?.user_id || tg.initDataUnsafe?.user?.id,
+                plan_key: planKey
+            })
+        });
+        const result = await response.json();
+        if (result.ok && result.invoice_link) {
+            tg.openInvoice(result.invoice_link, (status) => {
+                if (status === 'paid') {
+                    tg.showAlert('¡Pago exitoso! Disfruta Premium.');
+                    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    setTimeout(() => { loadUserData(); tg.close(); }, 2000);
+                } else if (status === 'cancelled') {
+                    if(typeof showToast === 'function') showToast('Pago cancelado');
+                } else if (status === 'failed') {
+                    if(typeof showToast === 'function') showToast('Error en el pago');
+                }
+            });
+        }
+    } catch (e) {
+        if(typeof showToast === 'function') showToast('Error de conexión');
+    }
+};
+
+const originalSwitchTab = window.switchTab;
+window.switchTab = function(tabId) {
+    document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const panel = document.getElementById('tab-' + tabId);
+    const nav = document.getElementById('nav-' + tabId);
+    if(panel) panel.classList.add('active');
+    if(nav) nav.classList.add('active');
+    
+    window.scrollTo(0, 0);
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+};
+
+</script>
+</body>
 </html>

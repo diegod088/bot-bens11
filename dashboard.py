@@ -1246,7 +1246,8 @@ def miniapp_get_user():
         
         cursor.execute("""
             SELECT user_id, first_name, username, downloads, premium, premium_until,
-                   daily_photo, daily_video, daily_music, daily_apk, created_at, language
+                   daily_photo, daily_video, daily_music, daily_apk, created_at, language,
+                   referrals_rewarded
             FROM users WHERE user_id = ?
         """, (user_id,))
         
@@ -1269,7 +1270,7 @@ def miniapp_get_user():
                 'daily_music': 0,
                 'daily_apk': 0,
                 'limits': {
-                    'video': {'used': 0, 'max': 3},
+                    'video': {'used': 0, 'max': 0},
                     'photo': {'used': 0, 'max': 10},
                     'music': {'used': 0, 'max': 0},
                     'apk': {'used': 0, 'max': 0}
@@ -1278,12 +1279,14 @@ def miniapp_get_user():
         
         user = dict(row)
         is_premium = bool(user['premium'])
+        referrals_rewarded = user.get('referrals_rewarded', 0) or 0
+        earned_downloads = referrals_rewarded * 10
         
         # Calculate limits based on premium status
         limits = {
             'video': {
                 'used': (user['downloads'] or 0) if not is_premium else (user['daily_video'] or 0),
-                'max': 50 if is_premium else 3
+                'max': 50 if is_premium else earned_downloads
             },
             'photo': {
                 'used': user['daily_photo'] or 0,
@@ -1299,6 +1302,21 @@ def miniapp_get_user():
             }
         }
         
+        # Obtener configuración de Flash Sale
+        from database import get_setting, set_setting
+        flash_sale_active = get_setting('flash_sale_active', 'false').lower() == 'true'
+        flash_sale_end = get_setting('flash_sale_end', '')
+        
+        # Verificar si la venta flash ya expiró
+        if flash_sale_active and flash_sale_end:
+            try:
+                end_time = datetime.fromisoformat(flash_sale_end)
+                if datetime.now() > end_time:
+                    set_setting('flash_sale_active', 'false')
+                    flash_sale_active = False
+            except:
+                pass
+        
         return jsonify({
             'user_id': user['user_id'],
             'first_name': user['first_name'] or user_info.get('first_name', 'Usuario'),
@@ -1312,7 +1330,11 @@ def miniapp_get_user():
             'daily_photo': user['daily_photo'] or 0,
             'daily_music': user['daily_music'] or 0,
             'daily_apk': user['daily_apk'] or 0,
-            'limits': limits
+            'limits': limits,
+            'flash_sale': {
+                'active': flash_sale_active,
+                'end': flash_sale_end
+            }
         })
         
     except Exception as e:
@@ -1348,34 +1370,34 @@ def create_invoice():
         
         # Premium plans configuration
         PREMIUM_PLANS = {
-            'trial': {
-                'stars': 25,
-                'days': 3,
-                'name': '🎁 Prueba',
-                'description': 'Prueba Premium por 3 días | Descargas ilimitadas'
-            },
-            'weekly': {
+            'flash': {
                 'stars': 75,
+                'days': 3,
+                'name': '⚡ VENTA FLASH',
+                'description': '¡Descuento 50%! Premium por 3 días'
+            },
+            'basic': {
+                'stars': 333,
                 'days': 7,
-                'name': '🔥 Semanal',
-                'description': 'Premium por 7 días | Mejor precio por día'
+                'name': '🚀 Básico',
+                'description': 'Premium por 7 días | Ideal para empezar'
             },
-            'monthly': {
-                'stars': 149,
+            'pro': {
+                'stars': 777,
                 'days': 30,
-                'name': '💎 Mensual',
-                'description': 'Premium por 30 días | El más popular'
+                'name': '🔥 Pro',
+                'description': 'Premium por 30 días | El más elegido'
             },
-            'quarterly': {
-                'stars': 399,
+            'elite': {
+                'stars': 1499,
                 'days': 90,
-                'name': '👑 Trimestral',
-                'description': 'Premium por 90 días | Ahorra hasta 50%'
+                'name': '💎 Elite',
+                'description': 'Premium por 90 días | Máximo ahorro'
             }
         }
         
-        # Get plan details or default to monthly
-        plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['monthly'])
+        # Get plan details or default to pro
+        plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['pro'])
             
         # Telegram API createInvoiceLink
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/createInvoiceLink"
@@ -1401,6 +1423,47 @@ def create_invoice():
             
     except Exception as e:
         logger.error(f"Create invoice error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/flash-sale', methods=['GET', 'POST'])
+@login_required
+def admin_flash_sale():
+    """API para gestionar la venta flash desde el panel"""
+    from database import get_setting, set_setting
+    try:
+        if request.method == 'GET':
+            active = get_setting('flash_sale_active', 'false').lower() == 'true'
+            end_date = get_setting('flash_sale_end', '')
+            # Verificar expiración real
+            if active and end_date:
+                try:
+                    if datetime.now() > datetime.fromisoformat(end_date):
+                        active = False
+                        set_setting('flash_sale_active', 'false')
+                except:
+                    pass
+            
+            return jsonify({
+                'active': active,
+                'end': end_date
+            })
+        else:
+            data = request.get_json() or {}
+            active = data.get('active', False)
+            hours = data.get('hours', 24)
+            
+            if active:
+                end_time = (datetime.now() + timedelta(hours=int(hours))).isoformat()
+                set_setting('flash_sale_active', 'true')
+                set_setting('flash_sale_end', end_time)
+            else:
+                set_setting('flash_sale_active', 'false')
+                
+            return jsonify({'success': True, 'active': active})
+            
+    except Exception as e:
+        logger.error(f"Error managing flash sale: {e}")
         return jsonify({'error': str(e)}), 500
 
 

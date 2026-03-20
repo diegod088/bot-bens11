@@ -93,47 +93,47 @@ PHONE, CODE, PASSWORD = range(10, 13)
 
 
 # Constants
-FREE_DOWNLOAD_LIMIT = 3  # Free users: 3 videos PERMANENTES (sin reset)
-FREE_PHOTO_LIMIT = 10  # Free users: 10 fotos PERMANENTES (sin reset)
+FREE_DOWNLOAD_LIMIT = 0  # Free users: 0 videos
+FREE_PHOTO_LIMIT = 0  # Free users: 0 fotos
 
 # Premium Plans (Telegram Stars) - Estrategia de Precios Optimizada
 PREMIUM_PLANS = {
-    'trial': {
-        'stars': 30,
+    'flash': {
+        'stars': 75,
         'days': 3,
-        'name': '🎁 Prueba',
+        'name': '⚡ Venta Flash',
         'label': 'Premium 3 días',
-        'badge': '✨ PRUEBA',
-        'description': 'Perfecto para probar'
+        'badge': '💥 50% DESCUENTO',
+        'description': 'Solo por hoy'
     },
-    'weekly': {
-        'stars': 90,
+    'basic': {
+        'stars': 333,
         'days': 7,
-        'name': '🔥 Semanal',
+        'name': '🚀 Básico',
         'label': 'Premium 7 días',
-        'badge': '🔥 MÁS POPULAR',
-        'description': 'Mejor precio por día'
+        'badge': '✨ ESTRATEGIA',
+        'description': 'Ideal para empezar'
     },
-    'monthly': {
-        'stars': 179,
+    'pro': {
+        'stars': 777,
         'days': 30,
-        'name': '💎 Mensual',
+        'name': '🔥 Pro',
         'label': 'Premium 30 días',
         'badge': '⭐ RECOMENDADO',
-        'description': 'El más elegido'
+        'description': 'El más popular'
     },
-    'quarterly': {
-        'stars': 479,
+    'elite': {
+        'stars': 1499,
         'days': 90,
-        'name': '👑 Trimestral',
+        'name': '💎 Elite',
         'label': 'Premium 90 días',
-        'badge': '💰 MEJOR VALOR',
-        'description': 'Ahorra hasta 50%'
+        'badge': '👑 MÁXIMO VALOR',
+        'description': 'Máximo ahorro'
     }
 }
 
-# Backward compatibility (default to monthly plan)
-PREMIUM_PRICE_STARS = PREMIUM_PLANS['monthly']['stars']
+# Backward compatibility (default to pro plan)
+PREMIUM_PRICE_STARS = PREMIUM_PLANS['pro']['stars']
 
 # Premium daily limits (unlimited photos, 50 daily for others)
 PREMIUM_VIDEO_DAILY_LIMIT = 50
@@ -1728,15 +1728,15 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang = get_user_language(user)
         
         # Determine which plan was selected
-        plan_key = 'monthly'  # default
-        if query.data == "pay_premium_trial":
-            plan_key = 'trial'
-        elif query.data == "pay_premium_weekly":
-            plan_key = 'weekly'
-        elif query.data == "pay_premium_monthly":
-            plan_key = 'monthly'
-        elif query.data == "pay_premium_quarterly":
-            plan_key = 'quarterly'
+        plan_key = data.get('plan_key', 'pro')  # Default to pro plan
+        if query.data == "pay_premium_basic":
+            plan_key = 'basic'
+        elif query.data == "pay_premium_pro":
+            plan_key = 'pro'
+        elif query.data == "pay_premium_elite":
+            plan_key = 'elite'
+        elif query.data == "pay_premium_flash":
+            plan_key = 'flash'
         
         plan = PREMIUM_PLANS[plan_key]
         logger.info(f"User {user_id} requested payment invoice for plan: {plan_key} ({plan['stars']}⭐ / {plan['days']}d)")
@@ -2082,21 +2082,21 @@ async def send_premium_invoice_callback(update: Update, context: ContextTypes.DE
     chat_id = update.effective_chat.id
     
     # Get plan details
-    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['monthly'])
+    plan = PREMIUM_PLANS.get(plan_key, PREMIUM_PLANS['pro'])
     
     # Build title and description based on plan
-    if plan_key == 'trial':
+    if plan_key == 'basic':
         title = f"{plan['badge']} Suscripción Premium"
-        description = f"Prueba Premium por {plan['days']} días | Descargas ilimitadas | Ideal para conocer el servicio"
-    elif plan_key == 'weekly':
-        title = f"{plan['badge']} Suscripción Premium"
-        description = f"Premium por {plan['days']} días | Mejor precio por día | Descargas ilimitadas"
-    elif plan_key == 'monthly':
+        description = f"Premium por {plan['days']} días | Ideal para empezar | Descargas ilimitadas"
+    elif plan_key == 'pro':
         title = f"{plan['badge']} Suscripción Premium"
         description = f"Premium por {plan['days']} días (1 mes) | El más popular | Descargas ilimitadas"
-    elif plan_key == 'quarterly':
+    elif plan_key == 'elite':
         title = f"{plan['badge']} Suscripción Premium"
-        description = f"Premium por {plan['days']} días (3 meses) | Ahorra hasta 50% | Descargas ilimitadas"
+        description = f"Premium por {plan['days']} días (3 meses) | Máximo ahorro | Descargas ilimitadas"
+    elif plan_key == 'flash':
+        title = f"{plan['badge']} VIP"
+        description = f"¡Venta Flash! Premium por {plan['days']} días al 50% de descuento"
     else:
         title = "💎 Suscripción Premium"
         description = f"Premium por {plan['days']} días | Descargas ilimitadas"
@@ -2157,7 +2157,7 @@ async def successful_payment_callback(update: Update, context: ContextTypes.DEFA
     try:
         # Parse payload to get days and plan key
         if "premium_" in payload and "_days_" in payload:
-            # Format: premium_3_days_trial_123456789 or premium_30_days_monthly_123456789
+            # Format: premium_7_days_basic_123456789 or premium_30_days_pro_123456789
             parts = payload.split("_days_")
             if len(parts) == 2:
                 days_str = parts[0].replace("premium_", "")
@@ -2661,13 +2661,14 @@ async def handle_media_download(update: Update, context_or_bot,
             referrer_id = confirm_referral(user_id)
             if referrer_id:
                 # Verificar y recompensar al referente si alcanzó 15 referidos
-                days_earned = check_and_reward_referrer(referrer_id)
-                if days_earned > 0:
+                rewards_count = check_and_reward_referrer(referrer_id)
+                if rewards_count > 0:
                     try:
+                        downloads_earned = rewards_count * 10
                         await context.bot.send_message(
                             chat_id=referrer_id,
                             text=f"🎉 *¡Felicidades!*\n\n"
-                                 f"Has alcanzado 15 referidos válidos y has ganado *{days_earned} día de Premium*.\n\n"
+                                 f"Has alcanzado 15 referidos válidos y has ganado *{downloads_earned} descargas extra*.\n\n"
                                  f"🎁 ¡Gracias por ayudarnos a crecer!\n\n"
                                  f"Usa /referidos para ver tu progreso.",
                             parse_mode='Markdown'
@@ -2722,10 +2723,9 @@ async def handle_media_download(update: Update, context_or_bot,
 
 def check_download_limits(user: dict, content_type: str) -> tuple[bool, str, dict]:
     """
-    Verifica si el usuario puede descargar según su plan
+    Verifica si el usuario puede descargar según su plan.
+    Free users: descargas basadas en referidos (15 refs = 10 descargas).
     Retorna: (puede_descargar, tipo_error, datos_error)
-    tipo_error: 'daily_limit', 'total_limit', 'premium_required', None
-    datos_error: dict con 'current', 'limit' para límites diarios
     """
     is_premium = user['premium']
     
@@ -2749,7 +2749,10 @@ def check_download_limits(user: dict, content_type: str) -> tuple[bool, str, dic
                 }
             return True, None, {}
         else:
-            if user['downloads'] >= FREE_DOWNLOAD_LIMIT:
+            # Free users: limit = referrals_rewarded * 10 (0 if no referrals)
+            referrals_rewarded = user.get('referrals_rewarded', 0) or 0
+            earned_downloads = referrals_rewarded * 10
+            if user['downloads'] >= earned_downloads:
                 return False, 'total_limit', {}
             return True, None, {}
     

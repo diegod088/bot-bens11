@@ -97,6 +97,15 @@ def init_database():
         except sqlite3.OperationalError:
             # Column already exists
             pass
+            
+        # Tabla de configuración general
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
         # Add session_string column
         try:
@@ -299,17 +308,16 @@ def confirm_referral(referred_user_id: int) -> Optional[int]:
 
 def check_and_reward_referrer(referrer_id: int) -> int:
     """
-    Verifica si un referente ha alcanzado 15 referidos válidos y le otorga 1 día de Premium.
-    Límite máximo: 15 días acumulables.
+    Verifica si un referente ha alcanzado 15 referidos válidos y le otorga 10 descargas.
     
     Returns:
-        Días de Premium otorgados (0 o 1)
+        Número de recompensas otorgadas
     """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         
         cursor.execute(
-            "SELECT referrals_count, referrals_rewarded, premium_until FROM users WHERE user_id = ?",
+            "SELECT referrals_count, referrals_rewarded FROM users WHERE user_id = ?",
             (referrer_id,)
         )
         user_data = cursor.fetchone()
@@ -320,58 +328,22 @@ def check_and_reward_referrer(referrer_id: int) -> int:
         referrals_count = user_data['referrals_count']
         referrals_rewarded = user_data['referrals_rewarded'] or 0
         
-        # Calcular cuántos grupos de 15 referidos sin recompensar hay
+        # Cada recompensa requiere 15 referidos
         pending_rewards = (referrals_count - referrals_rewarded * 15) // 15
         
         if pending_rewards <= 0:
             return 0
         
-        # Límite: máximo 15 días acumulables
-        max_days_allowed = 15
-        
-        # Calcular días de Premium actuales
-        current_premium_days = 0
-        if user_data['premium_until']:
-            expiry = datetime.fromisoformat(user_data['premium_until'])
-            if expiry > datetime.now():
-                current_premium_days = (expiry - datetime.now()).days
-        
-        # No otorgar si ya tiene 15 días o más
-        if current_premium_days >= max_days_allowed:
-            logger.info(f"User {referrer_id} already has {current_premium_days} premium days. Reward skipped.")
-            return 0
-        
-        # Otorgar 1 día de Premium
-        days_to_add = 1
-        
-        # Calcular nueva fecha de expiración
-        if user_data['premium_until']:
-            expiry = datetime.fromisoformat(user_data['premium_until'])
-            if expiry > datetime.now():
-                new_expiry = expiry + timedelta(days=days_to_add)
-            else:
-                new_expiry = datetime.now() + timedelta(days=days_to_add)
-        else:
-            new_expiry = datetime.now() + timedelta(days=days_to_add)
-        
-        # Aplicar límite de 15 días
-        max_expiry = datetime.now() + timedelta(days=max_days_allowed)
-        if new_expiry > max_expiry:
-            new_expiry = max_expiry
-        
         # Actualizar base de datos
         cursor.execute(
             """UPDATE users 
-               SET premium = 1, 
-                   premium_level = 1, 
-                   premium_until = ?, 
-                   referrals_rewarded = referrals_rewarded + 1 
+               SET referrals_rewarded = referrals_rewarded + ? 
                WHERE user_id = ?""",
-            (new_expiry.isoformat(), referrer_id)
+            (pending_rewards, referrer_id)
         )
         
-        logger.info(f"Rewarded {days_to_add} day(s) of Premium to user {referrer_id}")
-        return days_to_add
+        logger.info(f"Rewarded {pending_rewards * 10} downloads to user {referrer_id}")
+        return pending_rewards
 
 
 def get_referral_stats(user_id: int) -> Dict:
@@ -379,7 +351,7 @@ def get_referral_stats(user_id: int) -> Dict:
     Obtiene las estadísticas de referidos de un usuario.
     
     Returns:
-        Dict con total de referidos, pendientes, confirmados y días ganados
+        Dict con total de referidos, pendientes, confirmados y descargas ganadas
     """
     with get_db_connection() as conn:
         cursor = conn.cursor()
@@ -395,7 +367,7 @@ def get_referral_stats(user_id: int) -> Dict:
             return {
                 'confirmed': 0,
                 'pending': 0,
-                'days_earned': 0,
+                'downloads_earned': 0,
                 'progress': 0,
                 'next_reward_at': 15
             }
@@ -410,13 +382,13 @@ def get_referral_stats(user_id: int) -> Dict:
         )
         pending_count = cursor.fetchone()['count']
         
-        # Calcular progreso hacia la próxima recompensa
-        progress = referrals_count - (referrals_rewarded * 15)
+        # Calcular progreso hacia la próxima recompensa (módulo 15)
+        progress = referrals_count % 15
         
         return {
             'confirmed': referrals_count,
             'pending': pending_count,
-            'days_earned': referrals_rewarded,
+            'downloads_earned': referrals_rewarded * 10,
             'progress': progress,
             'next_reward_at': 15
         }
@@ -438,7 +410,8 @@ def get_user(user_id: int, auto_reset: bool = True) -> Optional[Dict]:
         
         cursor.execute(
             """SELECT user_id, first_name, username, downloads, premium, premium_level, premium_until, 
-               daily_photo, daily_video, daily_music, daily_apk, last_reset, language 
+               daily_photo, daily_video, daily_music, daily_apk, last_reset, language,
+               referrals_rewarded
                FROM users WHERE user_id = ?""",
             (user_id,)
         )
@@ -830,6 +803,38 @@ def check_and_reset_daily_limits(user_id: int) -> bool:
     logger.info(f"Daily limits reset for PREMIUM user {user_id}")
     return True
 
+
+# ==================== SETTINGS (CONFIGURACIÓN) ====================
+
+def get_setting(key: str, default: str = None) -> Optional[str]:
+    """Obtiene un valor de configuración de la base de datos"""
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT value FROM settings WHERE key = ?", (key,))
+            row = cursor.fetchone()
+            if row:
+                return row['value']
+            return default
+    except Exception as e:
+        logger.error(f"Error getting setting {key}: {e}")
+        return default
+
+def set_setting(key: str, value: str) -> bool:
+    """Guarda un valor de configuración en la base de datos"""
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO settings (key, value, updated_at) 
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(key) DO UPDATE SET 
+                value=excluded.value, updated_at=CURRENT_TIMESTAMP
+            """, (key, str(value)))
+            return True
+    except Exception as e:
+        logger.error(f"Error setting {key}: {e}")
+        return False
 
 # ==================== ESTADÍSTICAS ====================
 

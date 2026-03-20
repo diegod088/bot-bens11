@@ -347,6 +347,40 @@
         </div>
     </div>
 
+    <!-- Flash Sale -->
+    <div class="settings-card" style="border-color: #f59e0b;">
+        <div class="settings-header">
+            <div class="settings-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+            </div>
+            <div>
+                <div class="settings-title" style="color: #f59e0b;">Venta Flash VIP</div>
+                <div class="settings-subtitle">Descuento temporal (FOMO)</div>
+            </div>
+        </div>
+
+        <div class="setting-row">
+            <div class="setting-info">
+                <div class="setting-label">Estado de la Promoción</div>
+                <div class="setting-desc" id="flash-sale-status-text">Inactiva</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="flash-sale-toggle" onchange="toggleFlashSale()">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-row" id="flash-sale-duration-row">
+            <div class="setting-info">
+                <div class="setting-label">Duración (Horas)</div>
+                <div class="setting-desc">Tiempo que la oferta de 149⭐ estará visible en toda la WebApp.</div>
+            </div>
+            <input type="number" id="flash-sale-hours" class="number-input" value="24" min="1" max="72">
+        </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="settings-card">
         <div class="settings-header">
@@ -496,6 +530,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         loadSystemInfo();
         loadStats();
+        loadFlashSale();
     });
 
     function loadSystemInfo() {
@@ -518,6 +553,77 @@
                 document.getElementById('stats-active-users').textContent = data.active_today || 0;
             })
             .catch(err => console.error('Error loading stats:', err));
+    }
+
+    function loadFlashSale() {
+        fetch('/api/admin/flash-sale')
+            .then(res => res.json())
+            .then(data => {
+                const toggle = document.getElementById('flash-sale-toggle');
+                const statusText = document.getElementById('flash-sale-status-text');
+                const durationRow = document.getElementById('flash-sale-duration-row');
+
+                if (data.active) toggle.checked = true;
+                else toggle.checked = false;
+
+                if (data.active && data.end) {
+                    const end = new Date(data.end);
+                    statusText.textContent = 'Expira: ' + end.toLocaleString();
+                    statusText.style.color = '#f59e0b';
+                    statusText.style.fontWeight = 'bold';
+                    durationRow.style.opacity = '0.5';
+                    document.getElementById('flash-sale-hours').disabled = true;
+                } else {
+                    statusText.innerHTML = 'Actualmente Inactiva';
+                    statusText.style.color = '';
+                    statusText.style.fontWeight = 'normal';
+                    durationRow.style.opacity = '1';
+                    document.getElementById('flash-sale-hours').disabled = false;
+                }
+            })
+            .catch(err => console.error('Error loading flash sale:', err));
+    }
+
+    function toggleFlashSale() {
+        const toggle = document.getElementById('flash-sale-toggle');
+        const active = toggle.checked;
+        const hours = document.getElementById('flash-sale-hours').value;
+
+        if (active && (!hours || hours <= 0)) {
+            Utils.showToast('Ingresa una duración en horas válida.', 'error');
+            toggle.checked = false;
+            return;
+        }
+
+        if (active && !confirm(`¿Estás seguro de lanzar la Venta Flash FOMO para toda la app por ${hours} horas?`)) {
+            toggle.checked = false;
+            return;
+        }
+
+        if (!active && !confirm('¿Estás seguro de cancelar la Venta Flash actual?')) {
+            toggle.checked = true;
+            return;
+        }
+
+        fetch('/api/admin/flash-sale', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ active: active, hours: hours })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Utils.showToast(active ? `¡Venta Flash ACTIVADA por ${hours}h!` : 'Venta Flash DESACTIVADA', 'success');
+                    loadFlashSale();
+                } else {
+                    Utils.showToast(data.error || 'Error del servidor', 'error');
+                    toggle.checked = !active;
+                }
+            })
+            .catch(err => {
+                Utils.showToast('Error de conexión', 'error');
+                toggle.checked = !active;
+            });
     }
 
     function exportUsers() {

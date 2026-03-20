@@ -7,7 +7,7 @@ MESSAGES = {
     "es": {
         # Start command
         "start_welcome": "📥 BOT DE DESCARGAS\n\n",
-        "start_description": "Descarga fotos y videos de Telegram, incluidos canales privados y restringidos.\n\n",
+        "start_description": "Descarga fotos y videos de Telegram, incluidos canales privados y restringidos.\nNo hay descargas gratuitas activas por defecto.\n🎁 Invita a 15 amigos para ganar 10 descargas o adquiere un Plan Premium.\n\n",
         "start_divider": "🔐 Para acceder a contenido privado, el bot usa tu cuenta\nsolo para descargar el contenido que tú ves en Telegram.\nNo lee chats, no envía mensajes ni modifica tu cuenta.\n\n",
         "start_how_to": "🚀 *Cómo usarlo:*\n1️⃣ Copia el enlace del mensaje\n2️⃣ Pégalo aquí y envíalo\n\n",
         "start_example": "💡 *Ejemplo:*\n`https://t.me/canal/123`\n\n",
@@ -95,7 +95,7 @@ MESSAGES = {
         
         # Plans
         "plans_title": "Si solo quieres probar el bot, te sirve.\nPero si realmente quieres DESCARGAR contenido sin parar... esto NO basta.\n\n",
-        "plans_free": "🚫 *PLAN GRATIS (LIMITADO)*\n\n📸 Fotos: 10 diarias\n🎬 Videos: 3 totales\n🎵 Música: ❌ Bloqueado\n📦 APK: ❌ Bloqueado\n\n",
+        "plans_free": "🚫 *PLAN GRATIS (LIMITADO)*\n\n📸 Fotos: 10 diarias\n🎬 Videos: 0 totales (solo por referidos)\n🎵 Música: ❌ Bloqueado\n📦 APK: ❌ Bloqueado\n\n",
         "plans_premium": "🔥💎 *PLAN PREMIUM — {price} ⭐*\n━━━━━━━━━━━━━━━━━━━━\n📸 Fotos: Ilimitadas\n🎬 Videos: 50 por DÍA\n🎵 Música: 50 por DÍA\n📦 APK: 50 por DÍA\n♻️ Renovación automática cada 24h\n⏳ Dura 30 días completos\n\n",
         "plans_benefits": "🚀 *¿POR QUÉ PREMIUM ES IMPARABLE?*\n✔ Descargas TODO: videos, música, APK, fotos\n✔ 50 descargas diarias por categoría\n✔ Acceso sin restricciones\n✔ Velocidad mejorada\n✔ Ideal para canales privados, contenido frecuente o descargas grandes\n✔ El bot trabaja AL MÁXIMO para ti\n\n",
         "plans_warning": "⚠️ *No te quedes limitado*\nCada día que sigues en Free → Pierdes descargas, tiempo y contenido que podrías guardar.\n\n",
@@ -109,7 +109,7 @@ MESSAGES = {
         "premium_payment_description": "Acceso completo por 30 días",
         "premium_activated": "🎉 *Premium Activado*\n\n━━━━━━━━━━━━━━━━━━━━\n\n✅ Pago recibido exitosamente\n💎 Suscripción Premium activada\n\n📅 Válido hasta: {expiry}\n⏰ Duración: 30 días\n\n━━━━━━━━━━━━━━━━━━━━\n\n🚀 Usa /start para comenzar",
         "invoice_sent": "✅ *Factura enviada*\n\nRevisa el mensaje de pago que apareció arriba.\n💳 Completa el pago para activar Premium.",
-        "payment_not_configured": "⚠️ *Sistema de Pagos en Configuración*\n\nEl bot aún no tiene habilitado Telegram Stars.\n\n━━━━━━━━━━━━━━━━━━━━\n\n📋 *Para el administrador:*\n1. Abre @BotFather\n2. Usa /mybots\n3. Selecciona este bot\n4. Toca 'Payments'\n5. Habilita 'Telegram Stars'\n\n━━━━━━━━━━━━━━━━━━━━\n\n💡 Mientras tanto, disfruta:\n• 3 videos gratis\n• Fotos ilimitadas\n\n📢 Síguenos: @observer_bots",
+        "payment_not_configured": "⚠️ *Sistema de Pagos en Configuración*\n\nEl bot aún no tiene habilitado Telegram Stars.\n\n━━━━━━━━━━━━━━━━━━━━\n\n📋 *Para el administrador:*\n1. Abre @BotFather\n2. Usa /mybots\n3. Selecciona este bot\n4. Toca 'Payments'\n5. Habilita 'Telegram Stars'\n\n━━━━━━━━━━━━━━━━━━━━\n\n💡 Mientras tanto, activa descargas:\n• Invita a 15 amigos",
         "payment_error": "❌ *Error Temporal*\n\nNo se pudo procesar el pago.\nIntenta nuevamente en unos momentos.\n\n📢 Soporte: @observer_bots\n\n🔧 Error: `{error}`",
         
         # Errors
@@ -209,8 +209,7 @@ MESSAGES = {
     "en": {
         # Start command
         "start_welcome": "👋 Hello! Welcome to the Downloader Bot.\n\n",
-        "start_description": "📥 Download photos, videos, music, and files from Telegram messages.\nJust send me the *message link* you want to download.\n\n",
-        "start_divider": "━━━━━━━━━━━━━━━━━━━━━\n",
+        "start_description": "📥 Download photos, videos, music, and files from Telegram messages.\nNo free downloads by default.\n🎁 Invite 15 friends to earn 10 downloads or buy a Premium Plan.\n\n━━━━━━━━━━━━━━━━━━━━━\n",
         "start_how_to": "📌 *How to use?*\n1️⃣ Open the message in Telegram\n2️⃣ Copy the message link\n3️⃣ Paste it here and done ✅\n\n",
         "start_example": "Example: `https://t.me/channel/123`\nFor private channels: `t.me/+invitationCode`\n\n",
         "start_premium_active": "💎 *Premium Plan*\n📅 Expires: {expiry} ({days_left} days)\n\n",
@@ -411,7 +410,7 @@ MESSAGES = {
     "pt": {
         # Start command
         "start_welcome": "📥 BOT DE DOWNLOADS\n\n",
-        "start_description": "Baixe fotos e vídeos do Telegram, incluindo canais privados e restritos.\n\n",
+        "start_description": "Baixe fotos e vídeos do Telegram, incluindo canais privados e restritos.\nSem downloads gratuitos. Obtenha Premium ou convide amigos para ganhar Premium.\n\n",
         "start_divider": "🔐 Para acessar conteúdo privado, o bot usa sua conta\napenas para baixar o conteúdo que você vê no Telegram.\nNão lê chats, não envia mensagens nem modifica sua conta.\n\n",
         "start_how_to": "🚀 *Como usar:*\n1️⃣ Copie o link da mensagem\n2️⃣ Cole aqui e envie\n\n",
         "start_example": "💡 *Exemplo:*\n`https://t.me/canal/123`\n\n",
@@ -607,7 +606,7 @@ MESSAGES = {
     "it": {
         # Start command
         "start_welcome": "📥 BOT DI DOWNLOAD\n\n",
-        "start_description": "Scarica foto e video da Telegram, inclusi canali privati e ristretti.\n\n",
+        "start_description": "Scarica foto e video da Telegram, inclusi canali privati e ristretti.\nNessun download gratuito. Ottieni Premium o invita amici per guadagnare Premium.\n\n",
         "start_divider": "🔐 Per accedere ai contenuti privati, il bot usa il tuo account\nsolo per scaricare i contenuti che vedi su Telegram.\nNon legge chat, non invia messaggi né modifica il tuo account.\n\n",
         "start_how_to": "🚀 *Come usarlo:*\n1️⃣ Copia il link del messaggio\n2️⃣ Incollalo qui e invialo\n\n",
         "start_example": "💡 *Esempio:*\n`https://t.me/canale/123`\n\n",
