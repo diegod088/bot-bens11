@@ -318,6 +318,31 @@
             justify-content: space-between;
             transition: 0.3s;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle 120px at calc(var(--mx, 50) * 1%) calc(var(--my, 50) * 1%), var(--glass-hi, rgba(255, 255, 255, 0.05)), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .plan-card:hover::before {
+            opacity: 1;
+        }
+
+        .plan-card>* {
+            position: relative;
+            z-index: 1;
         }
 
         .plan-card:active {
@@ -327,6 +352,10 @@
         .plan-card.pro {
             border-color: var(--gold);
             background: linear-gradient(145deg, var(--card-hi), rgba(255, 183, 0, 0.05));
+        }
+
+        .plan-card.pro::before {
+            background: radial-gradient(circle 120px at calc(var(--mx, 50) * 1%) calc(var(--my, 50) * 1%), var(--gold-dim, rgba(255, 183, 0, 0.15)), transparent);
         }
 
         .plan-badge {
@@ -698,18 +727,136 @@
             <div class="app-logo">⚜️</div>
             <div class="app-name">DownloadBot</div>
         </div>
-        <div class="user-chip" id="headerConnBtn" onclick="isConnected ? disconnectAccount() : configureAccount()">
+        <div class="user-chip" id="headerConnBtn" onclick="if(!isConnected) configureAccount()">
             <div class="user-avatar" id="userAvatar">U</div>
-            <span id="userName">Usuario</span>
+            <span id="userName" data-i18n="connection_status_disconnected">Iniciar Sesión</span>
             <span id="headerConnIcon" style="font-size: 10px; margin-left: 4px;">⛔</span>
         </div>
     </header>
+
+    <div id="firstLoginScreen"
+        style="display: none; position: fixed; inset: 0; background: var(--void); z-index: 8000; flex-direction: column; align-items: center; justify-content: center; gap: 20px; text-align: center; padding: 40px 24px;">
+        <div id="loginSuccessIcon"
+            style="width: 72px; height: 72px; background: linear-gradient(135deg, var(--gold), var(--gold-d)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; animation: successPop 0.5s var(--spring) forwards;">
+            ✅</div>
+        <h2 id="loginSuccessName"
+            style="font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--txt); margin: 0;">
+            ¡Todo listo!</h2>
+        <p style="font-size: 14px; color: var(--txt-soft); margin: 0;" data-i18n="login_success_desc">Tu cuenta está
+            conectada. Ya puedes descargar cualquier archivo de Telegram.</p>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <div class="chip" style="background: var(--glass); border: 1px solid var(--line); color: var(--txt-soft);">
+                🔒 Privado</div>
+            <div class="chip" style="background: var(--glass); border: 1px solid var(--line); color: var(--txt-soft);">⚡
+                Ilimitado</div>
+            <div class="chip" style="background: var(--glass); border: 1px solid var(--line); color: var(--txt-soft);">
+                🎯 Sin compresión</div>
+        </div>
+        <div class="credits-bar"
+            style="position: absolute; bottom: 40px; left: 24px; right: 24px; height: 4px; border-radius: 2px;">
+            <div class="success-progress-fill"
+                style="height: 100%; background: var(--gold); border-radius: 2px; width: 0%;"></div>
+        </div>
+    </div>
 
     <div class="container" id="app" style="display: none;">
 
         <!-- INICIO TAB -->
         <div id="tab-home" class="tab-panel active">
-            <div class="card" style="padding-bottom: 24px;">
+            <div id="expiryBanner"
+                style="display:none; background:linear-gradient(135deg, rgba(229,169,88,0.15), rgba(229,169,88,0.05)); border:1px solid rgba(229,169,88,0.3); border-radius:var(--rs); padding:12px; margin-bottom:16px; align-items:center; justify-content:space-between; cursor:pointer;"
+                onclick="switchTab('premium'); highlightProPlan();">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">⚠️</span>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:13px; font-weight:700; color:var(--txt);"
+                            data-i18n="expiry_banner_title">Premium Expira Pronto</span>
+                        <span id="expiryBannerDesc" style="font-size:11px; color:var(--txt-soft);">Te quedan menos de 3
+                            días. ¡Renueva ahora!</span>
+                    </div>
+                </div>
+                <span style="color:var(--txt-muted); font-size:18px;">›</span>
+            </div>
+            <!-- VALUE HERO SECTION -->
+            <div style="padding: 0; background: transparent; margin-bottom: 24px;">
+                <h1 id="heroHeadline"
+                    style="font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1.1; color: var(--txt); margin-bottom: 12px; animation: slideUp 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) 0s backwards;"
+                    data-i18n="hero_headline">Descarga todo<br>de Telegram</h1>
+                <p style="font-size: 14px; color: var(--txt-soft); line-height: 1.55; max-width: 300px; margin-bottom: 20px; animation: slideUp 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) 0.08s backwards;"
+                    data-i18n="hero_sub">Accede a canales privados, videos y archivos restringidos en segundos.</p>
+
+                <!-- FEATURE CHIPS -->
+                <div
+                    style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; -ms-overflow-style: none;">
+                    <style>
+                        .status-spinner {
+                            display: inline-block;
+                            width: 18px;
+                            height: 18px;
+                            border: 2px solid var(--gold-dim);
+                            border-top-color: var(--gold);
+                            border-radius: 50%;
+                            animation: spin 0.7s linear infinite;
+                            vertical-align: middle;
+                        }
+
+                        @keyframes successPop {
+                            from {
+                                transform: scale(0);
+                                opacity: 0;
+                            }
+
+                            80% {
+                                transform: scale(1.1);
+                            }
+
+                            to {
+                                transform: scale(1);
+                                opacity: 1;
+                            }
+                        }
+
+                        #tab-home div::-webkit-scrollbar {
+                            display: none;
+                        }
+                    </style>
+                    <div
+                        style="background: var(--glass); border: 1px solid var(--line-white); border-radius: 20px; padding: 6px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--txt-soft); animation: fadeIn 0.5s ease 0.12s backwards;">
+                        <span>🔒</span> <span data-i18n="hero_chip_private">Canales privados</span>
+                    </div>
+                    <div
+                        style="background: var(--glass); border: 1px solid var(--line-white); border-radius: 20px; padding: 6px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--txt-soft); animation: fadeIn 0.5s ease 0.18s backwards;">
+                        <span>⚡</span> <span data-i18n="hero_chip_instant">Al instante</span>
+                    </div>
+                    <div
+                        style="background: var(--glass); border: 1px solid var(--line-white); border-radius: 20px; padding: 6px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--txt-soft); animation: fadeIn 0.5s ease 0.24s backwards;">
+                        <span>🎯</span> <span data-i18n="hero_chip_quality">Sin compresión</span>
+                    </div>
+                </div>
+
+                <!-- SOCIAL PROOF ROW -->
+                <div
+                    style="background: var(--glass); border: 1px solid var(--line-white); border-radius: var(--rm); padding: 14px 20px; display: flex; align-items: center; justify-content: space-around; margin-top: 16px; animation: fadeIn 0.5s ease 0.3s backwards;">
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <span id="heroStatDownloads"
+                            style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--gold);">+12,000</span>
+                        <span
+                            style="font-size: 11px; color: var(--txt-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;"
+                            data-i18n="hero_stat_downloads">archivos entregados</span>
+                    </div>
+                    <div style="border-left: 1px solid var(--line-white); height: 32px;"></div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <span
+                            style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--emerald);">4.9
+                            ★</span>
+                        <span
+                            style="font-size: 11px; color: var(--txt-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;"
+                            data-i18n="hero_stat_rating">valoración media</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card home-hero" style="padding-bottom: 24px;">
                 <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;" data-i18n="app_brand">Descarga Mágica
                 </h2>
                 <p style="color: var(--txt-soft); font-size: 14px; margin-bottom: 20px;" data-i18n="welcome_hint">Obtén
@@ -723,9 +870,18 @@
                     <div class="credits-bar">
                         <div class="credits-fill" id="creditsFill"></div>
                     </div>
-                    <div style="margin-top:24px;" id="downloadArea">
+                    <div style="margin-top:24px; position:relative;" id="downloadArea">
+                        <!-- OVERLAY LOCKEADO -->
+                        <div id="downloadOverlay"
+                            style="display: none; position: absolute; inset: 0; background: rgba(2,8,16,0.85); border-radius: var(--rm); flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 2; cursor: pointer;"
+                            onclick="openLoginGate()">
+                            <div style="font-size: 24px;">🔐</div>
+                            <div style="font-size: 14px; font-weight: 700; color: var(--txt);"
+                                data-i18n="hero_gate_hint">Inicia sesión para descargar</div>
+                        </div>
+
                         <input type="text" id="linkInput" class="input-box" placeholder="https://t.me/c/12345/678"
-                            style="margin-bottom: 12px;">
+                            style="margin-bottom: 12px;" onfocus="if(!isConnected) { this.blur(); openLoginGate(); }">
                         <button class="btn btn-gold" id="downloadBtn" onclick="startDownload()">
                             <span data-i18n="btn_process">⚡ Procesar Enlace</span>
                         </button>
@@ -740,7 +896,8 @@
                         data-i18n="limit_reached_desc">Para seguir descargando contenido exclusivo, necesitas recargar
                         tus descargas.</p>
                     <div style="display:flex; flex-direction:column; gap:12px;">
-                        <button class="btn btn-gold" onclick="switchTab('premium')">💎 Ver Planes Premium</button>
+                        <button class="btn btn-gold" onclick="switchTab('premium'); highlightProPlan();">💎 Ver Planes
+                            Premium</button>
                         <button class="btn btn-outline" onclick="switchTab('referrals')"
                             style="border-color:var(--cyan); color:var(--cyan);">👥 Obtener Gratis (Invitar)</button>
                     </div>
@@ -752,6 +909,14 @@
                 <div
                     style="padding: 16px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between;">
                     <span class="sec-label" style="margin:0;">Últimas Descargas</span>
+                </div>
+                <div id="historyEmpty"
+                    style="display: none; padding: 28px 20px; flex-direction: column; align-items: center; text-align: center;">
+                    <div style="font-size: 40px; animation: iconFloat 3s ease-in-out infinite;">📭</div>
+                    <h4 style="font-size: 15px; font-family: 'Syne', sans-serif; color: var(--txt-soft); margin: 12px 0 4px;"
+                        data-i18n="history_empty_title">Sin descargas aún</h4>
+                    <p style="font-size: 12px; color: var(--txt-muted); margin: 0;" data-i18n="history_empty_desc">Aquí
+                        aparecerán tus archivos descargados.</p>
                 </div>
                 <div id="historyList"></div>
             </div>
@@ -813,6 +978,42 @@
                         <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">1499⭐</div>
                     </div>
                 </div>
+            </div>
+
+            <div class="card" style="margin-top: 24px; padding: 24px; border: 1px solid var(--gold-dim);">
+                <h3 style="font-family: 'Syne', sans-serif; text-align: center; margin-bottom: 20px; color: var(--gold);"
+                    data-i18n="premium_compare_title">Comparación de Planes</h3>
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--line);">
+                            <th style="padding: 12px 0; color: var(--txt-soft);" data-i18n="feature_label">
+                                Característica</th>
+                            <th style="padding: 12px 0; color: var(--txt); text-align: center;">Básico</th>
+                            <th style="padding: 12px 0; color: var(--gold); text-align: center;">Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--line-hi);">
+                            <td style="padding: 12px 0; color: var(--txt-soft);" data-i18n="feat_speed">Velocidad</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--txt-muted);">Estándar</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--gold); font-weight: bold;">
+                                Máxima</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--line-hi);">
+                            <td style="padding: 12px 0; color: var(--txt-soft);" data-i18n="feat_downloads">Limites
+                                diarios</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--txt-muted);">15</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--gold); font-weight: bold;">100+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 0; color: var(--txt-soft);" data-i18n="feat_support">Soporte</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--txt-muted);">Común</td>
+                            <td style="padding: 12px 0; text-align: center; color: var(--gold); font-weight: bold;">
+                                Prioritario</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -882,17 +1083,21 @@
             <div class="card"
                 style="text-align:center; background:linear-gradient(180deg, rgba(255,183,0,0.1) 0%, var(--card) 100%); padding-top: 30px; padding-bottom: 30px;">
                 <div style="font-size:48px; margin-bottom:12px;">📖</div>
-                <h2 style="font-size:24px; font-weight:800; color:var(--gold);" data-i18n="guide_title">Guía Completa
+                <h2 style="font-size:24px; font-weight:800; color:var(--gold);" data-i18n="guide_title">Guía
+                    Completa
                 </h2>
-                <p style="color:var(--txt-soft); font-size:14px; margin-top:8px;" data-i18n="guide_subtitle">Todo lo que
+                <p style="color:var(--txt-soft); font-size:14px; margin-top:8px;" data-i18n="guide_subtitle">
+                    Todo lo que
                     necesitas saber para dominar el bot.</p>
             </div>
 
             <div class="sec-label" style="margin-top:24px;" data-i18n="guide_what_is">¿Qué es DownloadBot?</div>
             <div class="card">
-                <p style="color:var(--txt-soft); font-size:14px; line-height:1.6;" data-i18n="guide_what_desc">Somos tu
+                <p style="color:var(--txt-soft); font-size:14px; line-height:1.6;" data-i18n="guide_what_desc">
+                    Somos tu
                     pasarela para extraer
-                    contenido restringido de Telegram. Archivos que no se pueden guardar, reenviar o descargar de
+                    contenido restringido de Telegram. Archivos que no se pueden guardar, reenviar o descargar
+                    de
                     canales privados ahora están a tu alcance.</p>
                 <div class="chip-wrap">
                     <div class="chip">📹 Videos</div>
@@ -914,7 +1119,8 @@
                 </ol>
             </div>
 
-            <div class="sec-label" style="margin-top:24px;" data-i18n="guide_valid_links">Formatos de enlace válidos
+            <div class="sec-label" style="margin-top:24px;" data-i18n="guide_valid_links">Formatos de enlace
+                válidos
             </div>
             <div class="card">
                 <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
@@ -938,7 +1144,8 @@
                 </div>
             </div>
 
-            <div class="sec-label" style="margin-top:24px;" data-i18n="guide_how_downloads">¿Cómo consigo descargas?
+            <div class="sec-label" style="margin-top:24px;" data-i18n="guide_how_downloads">¿Cómo consigo
+                descargas?
             </div>
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <div class="card"
@@ -946,7 +1153,8 @@
                     <h4 style="color:var(--cyan); font-size:15px; font-weight:700; margin-bottom:6px;"
                         data-i18n="guide_invite_title">👥 Invitando Amigos</h4>
                     <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;" data-i18n="guide_invite_desc">
-                        Recomienda a tus referidos. Cada 15 usuarios que inicien el bot a través de tu enlace, recibirás
+                        Recomienda a tus referidos. Cada 15 usuarios que inicien el bot a través de tu enlace,
+                        recibirás
                         10 descargas gratis inmediatamente y de forma automática.</p>
                 </div>
                 <div class="card"
@@ -954,7 +1162,8 @@
                     <h4 style="color:var(--gold); font-size:15px; font-weight:700; margin-bottom:6px;"
                         data-i18n="guide_premium_title">💎 Adquiriendo Premium</h4>
                     <p style="color:var(--txt-soft); font-size:13px; line-height:1.5;" data-i18n="guide_premium_desc">
-                        Elige tranquilidad. Descargas ILIMITADAS sin cortes ni demoras. Contamos con membresías Premium
+                        Elige tranquilidad. Descargas ILIMITADAS sin cortes ni demoras. Contamos con membresías
+                        Premium
                         a partir de 333⭐ por mes.</p>
                 </div>
             </div>
@@ -964,18 +1173,21 @@
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_3_q">Is it safe to link
                             account?</span><span class="faq-q-icon">+</span></div>
-                    <div class="faq-a" data-i18n="faq_3_a">Totally. We use official Telegram secure authentication.
+                    <div class="faq-a" data-i18n="faq_3_a">Totally. We use official Telegram secure
+                        authentication.
                     </div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_4_q">Why is my download
                             slow?</span><span class="faq-q-icon">+</span></div>
-                    <div class="faq-a" data-i18n="faq_4_a">Large files take time. Premium offers priority speed.</div>
+                    <div class="faq-a" data-i18n="faq_4_a">Large files take time. Premium offers priority speed.
+                    </div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_1_q">How does pasting
                             work?</span><span class="faq-q-icon">+</span></div>
-                    <div class="faq-a" data-i18n="faq_1_a">Just copy on Telegram and use 'Paste' button to go faster.
+                    <div class="faq-a" data-i18n="faq_1_a">Just copy on Telegram and use 'Paste' button to go
+                        faster.
                     </div>
                 </div>
                 <div class="faq-item">
@@ -986,24 +1198,28 @@
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_5_q">What are Telegram
                             Stars?</span><span class="faq-q-icon">+</span></div>
-                    <div class="faq-a" data-i18n="faq_5_a">Official Telegram currency for fast and secure payments.
+                    <div class="faq-a" data-i18n="faq_5_a">Official Telegram currency for fast and secure
+                        payments.
                     </div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_6_q">Does quality
                             drop?</span><span class="faq-q-icon">+</span></div>
-                    <div class="faq-a" data-i18n="faq_6_a">No. We send the original file without any compression.</div>
+                    <div class="faq-a" data-i18n="faq_6_a">No. We send the original file without any
+                        compression.</div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span>¿Hay renovación automática?</span><span
                             class="faq-q-icon">+</span></div>
-                    <div class="faq-a">No hay cobros recurrentes sorpresivos. Recargarás tus días estrella tan solo si
+                    <div class="faq-a">No hay cobros recurrentes sorpresivos. Recargarás tus días estrella tan
+                        solo si
                         tú lo confirmas manualmente cada mes.</div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span>¿Aún necesitas ayuda soporte?</span><span
                             class="faq-q-icon">+</span></div>
-                    <div class="faq-a">Puedes ir tranquilamente a la pestaña "Cuenta" y presionar Centro de Soporte para
+                    <div class="faq-a">Puedes ir tranquilamente a la pestaña "Cuenta" y presionar Centro de
+                        Soporte para
                         comunicarte en privado con el Staff en Telegram.</div>
                 </div>
             </div>
@@ -1011,57 +1227,96 @@
             <div class="sec-label" style="margin-top:24px;" data-i18n="guide_tips">Consejos útiles</div>
             <div class="card">
                 <div style="display:flex; flex-direction:column; gap:12px; font-size:13px; color:var(--txt-soft);">
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">⚡</span> Copia, Pega, Envía
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">⚡</span> Copia, Pega,
+                        Envía
                         rápido, la memoria retiene el caché para que descargues en lotes ágiles.</div>
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🎯</span> Usa el cliente
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🎯</span> Usa el
+                        cliente
                         Telegram Desktop para copiar lotes masivos más sencillo.</div>
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">✨</span> Comprueba cuánta
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">✨</span> Comprueba
+                        cuánta
                         fecha te queda en Configuración periódicamente.</div>
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🚀</span> Comparte tu referido
-                        entre alumnos o en redes TikTok con un video tutorial del bot para ganancias ilimitadas.</div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🚀</span> Comparte tu
+                        referido
+                        entre alumnos o en redes TikTok con un video tutorial del bot para ganancias ilimitadas.
+                    </div>
                 </div>
             </div>
 
             <button class="btn btn-outline" onclick="openSupport()" style="margin-top:16px; margin-bottom: 20px;">
-                <span style="font-size:18px;">💬</span> <span data-i18n="btn_support">Contactar Soporte Técnico</span>
+                <span style="font-size:18px;">💬</span> <span data-i18n="btn_support">Contactar Soporte
+                    Técnico</span>
             </button>
         </div>
 
         <!-- PROFILE TAB -->
         <div id="tab-profile" class="tab-panel">
-            <div class="sec-label" data-i18n="account_title">Tu Cuenta</div>
-            <div class="card">
-                <div class="ami" onclick="switchTab('guide')">
-                    <span class="ami-icon">📖</span>
-                    <div class="ami-text">
-                        <div class="ami-title">Guía de uso</div>
-                        <div class="ami-sub">Cómo usar el bot paso a paso</div>
-                    </div>
-                    <span class="ami-arrow">›</span>
+            <div id="profileGuest" style="display: none; padding-top: 40px; text-align: center;">
+                <div class="card"
+                    style="display: flex; flex-direction: column; align-items: center; padding: 40px 24px;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">👤</div>
+                    <h2 style="font-size: 24px; font-weight: 800; color: var(--txt); margin-bottom: 12px;"
+                        data-i18n="login_gate_title">Inicia sesión</h2>
+                    <p style="font-size: 15px; color: var(--txt-soft); line-height: 1.5; margin-bottom: 24px;"
+                        data-i18n="login_gate_desc">Necesitas una cuenta...</p>
+                    <button class="btn btn-gold" style="width: 100%; font-size: 16px; font-weight: 700;"
+                        onclick="configureAccount()" data-i18n="btn_login">🔐 Iniciar Sesión</button>
                 </div>
-                <div class="ami" id="connBtn" onclick="isConnected ? disconnectAccount() : configureAccount()">
-                    <span class="ami-icon" id="connIcon">🔌</span>
-                    <div class="ami-text">
-                        <div class="ami-title" id="connTitle" data-i18n="account_status_label">Estado de la cuenta</div>
-                        <div class="ami-sub" id="connSub" data-i18n="account_verifying">Verificando...</div>
+            </div>
+
+            <div id="profileAuth" style="display: none;">
+                <div class="sec-label" data-i18n="account_title">Tu Cuenta</div>
+                <div class="card"
+                    style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding: 20px;">
+                    <div class="user-avatar" id="profileAvatar" style="width: 56px; height: 56px; font-size: 24px;">U
                     </div>
-                    <span class="ami-arrow">›</span>
+                    <div style="flex: 1;">
+                        <h2 id="profileUserName"
+                            style="font-size: 20px; font-weight: 700; color: var(--txt); margin: 0 0 4px 0;">
+                            Usuario
+                        </h2>
+                        <div id="profilePlanBadge" class="plan-badge"
+                            style="margin: 0; background: var(--txt-muted); color: #FFF;"
+                            data-i18n="profile_free_badge">Free ✦</div>
+                    </div>
                 </div>
-                <div class="ami" onclick="openSupport()">
-                    <span class="ami-icon">💬</span>
-                    <div class="ami-text">
-                        <div class="ami-title" data-i18n="account_support_label">Centro de soporte</div>
-                        <div class="ami-sub" data-i18n="account_support_desc">Resolución de problemas</div>
+                <!-- Menú normal auth -->
+                <div class="card">
+                    <div class="ami" onclick="switchTab('guide')">
+                        <span class="ami-icon">📖</span>
+                        <div class="ami-text">
+                            <div class="ami-title" data-i18n="guide_title">Tutorial</div>
+                            <div class="ami-sub" data-i18n="guide_subtitle">Aprende a sacar el máximo provecho
+                            </div>
+                        </div>
+                        <span class="ami-arrow">›</span>
                     </div>
-                    <span class="ami-arrow">›</span>
-                </div>
-                <div class="ami" onclick="showLanguageSelector()" style="border:none;">
-                    <span class="ami-icon">🌐</span>
-                    <div class="ami-text">
-                        <div class="ami-title" data-i18n="account_lang_label">Idioma</div>
-                        <div class="ami-sub" id="currentLangLabel">Español</div>
+                    <div class="ami" id="connBtn" onclick="disconnectAccount()">
+                        <span class="ami-icon" id="connIcon">🔌</span>
+                        <div class="ami-text">
+                            <div class="ami-title" id="connTitle" data-i18n="account_status_label">Estado de la
+                                cuenta
+                            </div>
+                            <div class="ami-sub" id="connSub" data-i18n="account_verifying">Verificando...</div>
+                        </div>
+                        <span class="ami-arrow">›</span>
                     </div>
-                    <span class="ami-arrow">›</span>
+                    <div class="ami" onclick="openSupport()">
+                        <span class="ami-icon">💬</span>
+                        <div class="ami-text">
+                            <div class="ami-title" data-i18n="account_support_label">Centro de soporte</div>
+                            <div class="ami-sub" data-i18n="account_support_desc">¿Necesitas ayuda?</div>
+                        </div>
+                        <span class="ami-arrow">›</span>
+                    </div>
+                    <div class="ami" onclick="showLanguageSelector()" style="border:none;">
+                        <span class="ami-icon">🌐</span>
+                        <div class="ami-text">
+                            <div class="ami-title" data-i18n="account_lang_label">Idioma</div>
+                            <div class="ami-sub" id="currentLangLabel">Español</div>
+                        </div>
+                        <span class="ami-arrow">›</span>
+                    </div>
                 </div>
             </div>
 
@@ -1090,7 +1345,39 @@
         </button>
     </nav>
 
+    <!-- LOGIN GATE MODAL -->
+    <div id="loginGateModal"
+        style="display: none; position: fixed; inset: 0; z-index: 10000; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: rgba(0,0,0,0.6);"
+        onclick="if(event.target===this) closeLoginGate()">
+        <div
+            style="background: var(--card); border-top: 1px solid var(--line); border-radius: 24px 24px 0 0; padding: 32px 24px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; text-align: center; animation: slideUp 0.3s ease-out;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+            <h2 id="loginGateTitle" style="font-size: 24px; font-weight: 800; color: var(--txt); margin-bottom: 12px;"
+                data-i18n="login_gate_title">Inicia sesión</h2>
+            <p id="loginGateDesc"
+                style="font-size: 15px; color: var(--txt-soft); line-height: 1.5; margin-bottom: 24px;"
+                data-i18n="login_gate_desc">Necesitas una cuenta para descargar contenido.</p>
+            <button class="btn btn-gold" id="loginGateBtnBtn"
+                style="width: 100%; margin-bottom: 12px; font-size: 16px; font-weight: 700;"
+                onclick="closeLoginGate(); configureAccount();" data-i18n="login_gate_btn">🔐 Iniciar
+                Sesión</button>
+            <button class="btn btn-outline" style="width: 100%; border: none; color: var(--txt-muted);"
+                onclick="closeLoginGate()">Cancelar</button>
+        </div>
+    </div>
+
     <script>
+        function openLoginGate() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            document.getElementById('loginGateTitle').textContent = t('login_gate_title');
+            document.getElementById('loginGateDesc').textContent = t('login_gate_desc');
+            document.getElementById('loginGateBtnBtn').innerHTML = '🔐 ' + t('login_gate_btn');
+            document.getElementById('loginGateModal').style.display = 'flex';
+        }
+
+        function closeLoginGate() {
+            document.getElementById('loginGateModal').style.display = 'none';
+        }
         // Global error handler for debugging
         window.onerror = function (msg, url, line, col, error) {
             console.error(`GLOBAL ERROR: ${msg} at ${line}:${col}`);
@@ -1099,9 +1386,7 @@
             return false;
         };
 
-        let tg = null;
         try {
-            tg = window.Telegram.WebApp;
             if (tg) {
                 tg.expand();
                 tg.ready();
@@ -1111,12 +1396,58 @@
         } catch (e) {
             console.warn('Telegram WebApp no disponible o error al inicializar:', e);
         }
-
         const API_BASE = window.location.origin;
+        const BOT_USERNAME = 'observer_bots';
+        let lastKnownEarned = 0;
         let userData = null;
         let isConnected = false;
-        let currentSlide = 0;
-        let currentLanguage = 'es'; // Default language
+        let currentLanguage = 'es';
+
+        function showFirstLoginScreen() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            const el = document.getElementById('firstLoginScreen');
+            if (!el) return;
+            const nameEl = document.getElementById('loginSuccessName');
+            const tgName = userData?.first_name || tg?.initDataUnsafe?.user?.first_name || '';
+            if (nameEl) nameEl.textContent = tgName ? t('login_success_title').replace('{name}', tgName) : t('login_success_title_generic');
+            el.style.display = 'flex';
+            el.style.animation = 'tabEnter 0.4s var(--ease-out) both';
+            const bar = el.querySelector('.success-progress-fill');
+            if (bar) {
+                bar.style.width = '0%';
+                requestAnimationFrame(() => {
+                    bar.style.transition = 'width 2.5s linear';
+                    bar.style.width = '100%';
+                });
+            }
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transition = 'opacity 0.4s';
+                setTimeout(() => {
+                    el.style.display = 'none';
+                    el.style.opacity = '';
+                }, 400);
+                loadUserData();
+            }, 2500);
+        }
+
+        function startDownloadProgressCycle() {
+            let i = 0;
+            const steps = ['download_step_1', 'download_step_2', 'download_step_3', 'download_step_4'];
+            const el = document.getElementById('statusText');
+            if (!el) return null;
+            el.textContent = t(steps[0]);
+            const interval = setInterval(() => {
+                i = (i + 1) % steps.length;
+                el.style.opacity = '0';
+                el.style.transition = 'opacity 0.25s';
+                setTimeout(() => {
+                    el.textContent = t(steps[i]);
+                    el.style.opacity = '1';
+                }, 260);
+            }, 1800);
+            return interval;
+        }
 
         // ========== AUTO-DETECT LANGUAGE & SHOW ONBOARDING FOR NEW USERS ==========
         function initializeApp() {
@@ -1244,9 +1575,33 @@
         document.getElementById('skipBtn')?.addEventListener('click', finishOnboarding);
 
         // ========== NAVIGATION ==========
+        function highlightProPlan() {
+            setTimeout(() => {
+                const pro = document.querySelector('.plan-card.pro');
+                if (pro) {
+                    pro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    pro.style.transition = 'transform 0.4s, box-shadow 0.4s, border-color 0.4s';
+                    pro.style.transform = 'scale(1.05)';
+                    pro.style.borderColor = 'var(--gold)';
+                    pro.style.boxShadow = '0 0 25px rgba(229, 169, 88, 0.4)';
+                    setTimeout(() => {
+                        pro.style.transform = '';
+                        pro.style.borderColor = '';
+                        pro.style.boxShadow = '';
+                        setTimeout(() => pro.style.transition = '', 400);
+                    }, 1200);
+                }
+            }, 300);
+        }
+
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+
+            ['home', 'premium', 'account', 'referrals', 'guide'].forEach(id => {
+                const panel = document.getElementById('tab-' + id);
+                if (panel) panel.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
 
             document.getElementById('tab-' + tabId).classList.add('active');
             document.querySelector(`[onclick="switchTab('${tabId}')"]`)?.classList.add('active');
@@ -1263,9 +1618,9 @@
         }
 
         // ========== LOAD USER DATA ==========
-        async function loadUserData() {
+        async function loadUserData(retryCount = 0) {
             const status = document.getElementById('loaderStatus');
-            if (status) status.textContent = "Obteniendo datos de usuario...";
+            if (status && retryCount === 0) status.textContent = "Obteniendo datos de usuario...";
             try {
                 const telegramUser = tg?.initDataUnsafe?.user || {};
                 console.log('📱 Datos de usuario Telegram:', telegramUser);
@@ -1284,40 +1639,43 @@
                 if (response.ok) {
                     userData = await response.json();
                     console.log('✓ Datos de usuario obtenidos del servidor:', userData);
-
-                    // Extract language from userData only if not set in URL
-                    const urlLang = new URLSearchParams(window.location.search).get('lang');
-                    if (!urlLang && userData.language) {
-                        currentLanguage = userData.language;
-                        console.log(`📍 Idioma detectado: ${currentLanguage}`);
-                    }
                 } else {
                     console.error('❌ Error en API:', response.status, await response.text());
+                    if (retryCount < 2) {
+                        if (status) status.textContent = t('network_retrying').replace('{n}', retryCount + 1);
+                        setTimeout(() => loadUserData(retryCount + 1), 1200 * (retryCount + 1));
+                        return;
+                    }
                 }
             } catch (e) {
                 console.error('Exception loading user data:', e);
+                if (retryCount < 2) {
+                    if (status) status.textContent = t('network_retrying').replace('{n}', retryCount + 1);
+                    setTimeout(() => loadUserData(retryCount + 1), 1200 * (retryCount + 1));
+                    return;
+                }
             }
 
-            // Fallback data - usar el ID de Telegram directamente
+            // Error state or fallback
             if (!userData) {
+                if (retryCount >= 2) {
+                    const ldr = document.getElementById('loading');
+                    if (ldr) ldr.style.display = 'none';
+                    const errEl = document.createElement('div');
+                    errEl.style.cssText = 'position:fixed;inset:0;background:var(--void);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;z-index:9000;';
+                    errEl.innerHTML = '<div style="font-size:48px;">📡</div><h3 style="font-family:Syne,sans-serif;color:var(--txt);font-size:20px;">' + t('network_error_title') + '</h3><p style="color:var(--txt-soft);font-size:13px;">' + t('network_error_desc') + '</p><button onclick="this.parentElement.remove();document.getElementById(\'loading\').style.display=\'flex\';loadUserData()" class="btn btn-gold" style="max-width:200px;">' + t('network_retry_btn') + '</button>';
+                    document.body.appendChild(errEl);
+                }
+
                 const telegramUser = tg?.initDataUnsafe?.user || {};
                 const telegramUserId = telegramUser.id;
-
                 console.warn('⚠️ Usando datos por defecto con user_id de Telegram:', telegramUserId);
-
-                // Detectar idioma de Telegram (fallback)
-                const urlLang = new URLSearchParams(window.location.search).get('lang');
-                if (!urlLang && telegramUser.language_code) {
-                    currentLanguage = ['es', 'en', 'pt', 'it'].includes(telegramUser.language_code) ?
-                        telegramUser.language_code : 'es';
-                    console.log(`📍 Idioma de Telegram: ${currentLanguage}`);
-                }
 
                 userData = {
                     user_id: telegramUserId || null,
                     first_name: telegramUser.first_name || 'Usuario',
                     username: telegramUser.username || '',
-                    language: currentLanguage,
+                    language: 'es',
                     premium: false,
                     premium_until: null,
                     has_session: false,
@@ -1333,6 +1691,13 @@
                     }
                 };
             }
+
+            // Language auto-detection
+            const urlLang = new URLSearchParams(window.location.search).get('lang');
+            const storedLang = (() => { try { return localStorage.getItem('user_lang'); } catch (e) { return null; } })();
+            const tgLang = tg?.initDataUnsafe?.user?.language_code;
+            const supported = ['es', 'en', 'pt', 'it'];
+            currentLanguage = (urlLang && supported.includes(urlLang)) ? urlLang : (storedLang && supported.includes(storedLang)) ? storedLang : (tgLang && supported.includes(tgLang)) ? tgLang : (userData.language && supported.includes(userData.language)) ? userData.language : 'es';
 
             console.log('✓ userData final antes de updateUI:', userData);
             console.log(`✓ Idioma actual: ${currentLanguage}`);
@@ -1398,20 +1763,25 @@
 
                 if (!card || !list) return;
 
+                const emptyState = document.getElementById('historyEmpty');
                 if (!history.length) {
-                    card.style.display = 'none';
+                    card.style.display = 'block';
+                    if (emptyState) emptyState.style.display = 'flex';
+                    list.style.display = 'none';
                     return;
                 }
 
                 card.style.display = 'block';
+                if (emptyState) emptyState.style.display = 'none';
+                list.style.display = 'block';
                 list.innerHTML = history.map((entry, i) => `
-                    <div style="display:flex; align-items:center; gap:12px; padding:12px 20px; ${i < history.length - 1 ? 'border-bottom:1px solid var(--bg-card);' : ''}">
+                    <div style="display:flex; align-items:center; gap:12px; padding:12px 20px; ${i < history.length - 1 ? 'border-bottom:1px solid var(--card-hi);' : ''}">
                         <div style="font-size:20px; flex-shrink:0;">📥</div>
                         <div style="flex:1; min-width:0;">
-                            <div style="font-size:12px; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${entry.link}</div>
-                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${entry.date} · ${entry.time}</div>
+                            <div style="font-size:12px; color:var(--txt); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${entry.link}</div>
+                            <div style="font-size:11px; color:var(--txt-muted); margin-top:2px;">${entry.date} · ${entry.time}</div>
                         </div>
-                        <button onclick="reuseLink('${entry.link}')" style="background:var(--bg-card); border:none; border-radius:8px; padding:6px 10px; color:var(--accent-blue); font-size:11px; cursor:pointer; flex-shrink:0;">↩ Usar</button>
+                        <button onclick="reuseLink('${entry.link}')" style="background:var(--card-hi); border:none; border-radius:8px; padding:6px 10px; color:var(--cyan); font-size:11px; cursor:pointer; flex-shrink:0;">↩ Usar</button>
                     </div>
                 `).join('');
             } catch (e) {
@@ -1564,12 +1934,27 @@
                             flashBanner.innerHTML = `
                                 <div style="background:linear-gradient(135deg, #f59e0b, #dc2626); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center; color:white; animation: floatUp 2s infinite alternate; cursor:pointer; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);">
                                     <div style="font-size:24px; margin-bottom:4px; font-weight:800; letter-spacing:1px;">⚡ VENTA FLASH ACTIVA ⚡</div>
-                                    <div style="font-size:14px; margin-bottom:12px;">Plan Básico a Mitad de Precio: <strong style="font-size:18px;">75⭐</strong> (¡Por tiempo limitado!)</div>
-                                    <button style="background:white; color:#dc2626; border:none; border-radius:8px; padding:10px 20px; font-weight:800; text-transform:uppercase; cursor:pointer;">Comprar Descuento Ahora</button>
+                                    <div style="font-size:14px; margin-bottom:12px;">Termina en: <strong id="flashCountdown" style="font-size:18px; font-family:'Syne',sans-serif;">00:00:00</strong></div>
+                                    <button style="background:white; color:#dc2626; border:none; border-radius:8px; padding:10px 20px; font-weight:800; text-transform:uppercase; cursor:pointer;">Aprovechar Promoción</button>
                                 </div>
                             `;
                             const premiumOffer = document.getElementById('premiumOffer');
                             if (premiumOffer) premiumOffer.insertBefore(flashBanner, premiumOffer.children[1]);
+
+                            const timer = setInterval(() => {
+                                const now = new Date();
+                                const diff = Math.floor((end - now) / 1000);
+                                if (diff <= 0) {
+                                    clearInterval(timer);
+                                    if (flashBanner) flashBanner.remove();
+                                    return;
+                                }
+                                const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+                                const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+                                const s = String(diff % 60).padStart(2, '0');
+                                const cEl = document.getElementById('flashCountdown');
+                                if (cEl) cEl.textContent = `${h}:${m}:${s}`;
+                            }, 1000);
                         }
                     } else {
                         const flashBanner = document.getElementById('flashSaleBanner');
@@ -1684,6 +2069,22 @@
 
             // Load referral stats
             updateReferralUI();
+
+            const expBanner = document.getElementById('expiryBanner');
+            if (expBanner && userData.premium && userData.premium_until) {
+                const now = new Date();
+                const end = new Date(userData.premium_until);
+                const diffDays = (end - now) / (1000 * 60 * 60 * 24);
+                if (diffDays > 0 && diffDays <= 3) {
+                    expBanner.style.display = 'flex';
+                    const expDesc = document.getElementById('expiryBannerDesc');
+                    if (expDesc) expDesc.textContent = t('expiry_banner_desc').replace('{n}', Math.ceil(diffDays));
+                } else {
+                    expBanner.style.display = 'none';
+                }
+            } else if (expBanner) {
+                expBanner.style.display = 'none';
+            }
         }
 
 
@@ -1705,29 +2106,145 @@
         }
 
         function updateConnectionStatus() {
-            const icon = document.getElementById('connectionIcon');
-            const title = document.getElementById('connectionTitle');
-            const text = document.getElementById('connectionText');
-            const btn = document.getElementById('connectBtn');
+            const requiredEls = ['profileGuest', 'profileAuth', 'headerConnIcon', 'userName'];
+            const allReady = requiredEls.every(id => document.getElementById(id) !== null);
+            if (!allReady) { setTimeout(updateConnectionStatus, 100); return; }
 
             if (isConnected) {
-                icon.className = 'account-icon connected';
-                icon.textContent = '✅';
-                title.textContent = t('connection_status_connected');
-                text.textContent = t('connection_desc_connected');
-                btn.textContent = `🔌 ${t('btn_disconnect')}`;
-                btn.className = 'account-btn danger';
-                btn.onclick = disconnectAccount;
+                try {
+                    const history = JSON.parse(localStorage.getItem('download_history') || '[]');
+                    const pendingLink = localStorage.getItem('last_attempted_link');
+                    const input = document.getElementById('linkInput');
+                    const fillValue = pendingLink || (history.length > 0 ? history[0].link : null);
+                    if (input && fillValue && !input.value) {
+                        input.value = fillValue;
+                        input.style.color = 'var(--txt-soft)';
+                        input.addEventListener('focus', () => { input.style.color = 'var(--txt)'; }, { once: true });
+                    }
+                } catch (e) { }
+            }
+
+            // Profile tab toggle
+            const profileGuest = document.getElementById('profileGuest');
+            const profileAuth = document.getElementById('profileAuth');
+            if (profileGuest && profileAuth) {
+                profileGuest.style.display = isConnected ? 'none' : 'block';
+                profileAuth.style.display = isConnected ? 'block' : 'none';
+            }
+
+            // Link input visual
+            const linkInput = document.getElementById('linkInput');
+            if (linkInput) {
+                linkInput.style.opacity = isConnected ? '1' : '0.45';
+            }
+
+            const downloadOverlay = document.getElementById('downloadOverlay');
+            if (downloadOverlay) {
+                downloadOverlay.style.display = isConnected ? 'none' : 'flex';
+            }
+
+            const icon = document.getElementById('connIcon');
+            const title = document.getElementById('connTitle');
+            const sub = document.getElementById('connSub');
+
+            const headerUserName = document.getElementById('userName');
+            const headerConnIcon = document.getElementById('headerConnIcon');
+
+            const tgUser = tg?.initDataUnsafe?.user || {};
+            const finalName = userData?.username || userData?.first_name || tgUser.first_name || 'Usuario';
+
+            const heroHeadline = document.getElementById('heroHeadline');
+            if (heroHeadline) {
+                if (isConnected) {
+                    const pattern = t('hero_greeting').replace('{name}', finalName);
+                    heroHeadline.innerHTML = `<span style="color:var(--gold)">${pattern}</span><br>¿qué descargas hoy?`;
+                } else {
+                    const defaultText = t('hero_headline');
+                    heroHeadline.innerHTML = defaultText.replace(/\n/g, '<br>');
+                }
+            }
+
+            if (isConnected) {
+                if (icon) icon.textContent = '✅';
+                if (title) { title.setAttribute('data-i18n', 'connection_status_connected'); title.textContent = t('connection_status_connected'); }
+                if (sub) { sub.setAttribute('data-i18n', 'connection_desc_connected'); sub.textContent = t('connection_desc_connected'); }
+
+                if (headerUserName) {
+                    headerUserName.removeAttribute('data-i18n');
+                    headerUserName.textContent = finalName;
+                }
+                if (headerConnIcon) headerConnIcon.style.display = 'none';
+
+                const profileAvatar = document.getElementById('profileAvatar');
+                const profileUserName = document.getElementById('profileUserName');
+                const profilePlanBadge = document.getElementById('profilePlanBadge');
+                if (profileAvatar) profileAvatar.textContent = finalName.charAt(0).toUpperCase();
+                if (profileUserName) profileUserName.textContent = finalName;
+                if (profilePlanBadge) {
+                    const isPremium = userData?.premium;
+                    profilePlanBadge.setAttribute('data-i18n', isPremium ? 'profile_premium_badge' : 'profile_free_badge');
+                    profilePlanBadge.textContent = isPremium ? t('profile_premium_badge') : t('profile_free_badge');
+                    profilePlanBadge.style.background = isPremium ? 'var(--gold)' : 'var(--txt-muted)';
+                    profilePlanBadge.style.color = isPremium ? '#000' : '#FFF';
+                }
             } else {
-                icon.className = 'account-icon disconnected';
-                icon.textContent = '⚠️';
-                title.textContent = t('connection_status_disconnected');
-                text.textContent = t('connection_desc_disconnected');
-                btn.textContent = `⚙️ ${t('btn_configure')}`;
-                btn.className = 'account-btn primary';
-                btn.onclick = configureAccount;
+                if (icon) icon.textContent = '🔌';
+                if (title) { title.setAttribute('data-i18n', 'connection_status_disconnected'); title.textContent = t('connection_status_disconnected'); }
+                if (sub) { sub.setAttribute('data-i18n', 'connection_desc_disconnected'); sub.textContent = t('connection_desc_disconnected'); }
+
+                if (headerUserName) {
+                    headerUserName.setAttribute('data-i18n', 'connection_status_disconnected');
+                    headerUserName.textContent = t('connection_status_disconnected');
+                }
+                if (headerConnIcon) headerConnIcon.style.display = 'inline-block';
             }
         }
+
+        function animateCounter(element, targetStr, duration, prefix = '', suffix = '') {
+            if (sessionStorage.getItem('counters_played')) {
+                element.textContent = prefix + targetStr + suffix;
+                return;
+            }
+            const target = parseInt(targetStr.replace(/,/g, ''), 10);
+            const startStr = element.textContent.replace(/\D/g, '') || "0";
+            const start = parseInt(startStr, 10);
+            const startTime = performance.now();
+
+            function easeOutQuart(x) {
+                return 1 - Math.pow(1 - x, 4);
+            }
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(start + (target - start) * easeOutQuart(progress));
+                element.textContent = prefix + current.toLocaleString('en-US') + suffix;
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = prefix + targetStr + suffix;
+                    sessionStorage.setItem('counters_played', 'true');
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const heroStat = document.getElementById('heroStatDownloads');
+                if (heroStat) {
+                    animateCounter(heroStat, '12,000', 1200, '+', '');
+                }
+            }, 300);
+
+            document.querySelectorAll('.plan-card').forEach(card => {
+                card.addEventListener('pointermove', e => {
+                    const r = card.getBoundingClientRect();
+                    card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1));
+                    card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1));
+                });
+            });
+        });
 
         // ========== DOWNLOAD ==========
         async function startDownload() {
@@ -1747,16 +2264,18 @@
             }
 
             if (!isConnected) {
-                status.className = 'download-status show error';
-                document.getElementById('statusIcon').textContent = '⚠️';
-                document.getElementById('statusText').textContent = 'Configura tu cuenta primero';
+                openLoginGate();
                 return;
             }
 
             btn.disabled = true;
             status.className = 'download-status show loading';
-            document.getElementById('statusIcon').textContent = '⏳';
-            document.getElementById('statusText').textContent = 'Procesando descarga...';
+            document.getElementById('statusIcon').innerHTML = '<span class="status-spinner"></span>';
+            const progressInterval = startDownloadProgressCycle();
+
+            try {
+                localStorage.setItem('last_attempted_link', link);
+            } catch (e) { }
 
             try {
                 const response = await fetch(`${API_BASE}/api/miniapp/download`, {
@@ -1769,11 +2288,12 @@
                 });
 
                 const result = await response.json();
+                if (progressInterval) clearInterval(progressInterval);
 
                 if (result.ok) {
+                    try { localStorage.removeItem('last_attempted_link'); } catch (e) { }
                     status.className = 'download-status show success';
-                    document.getElementById('statusIcon').textContent = '✅';
-                    document.getElementById('statusText').textContent = 'Revisa el chat del bot';
+                    status.innerHTML = `<span id="statusIcon">✅</span><span id="statusText" style="flex:1;">${t('download_success_msg')}</span><button onclick="tg.openTelegramLink('https://t.me/${BOT_USERNAME}')" style="background:var(--gold); color:#000; border:none; border-radius:8px; padding:6px 14px; font-family:Syne,sans-serif; font-weight:800; font-size:12px; cursor:pointer; flex-shrink:0; white-space:nowrap;">${t('open_chat_btn')}</button>`;
                     input.value = '';
 
                     // Mejora 3 y 5: Historial y Efectos
@@ -1782,16 +2302,17 @@
 
                     if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 } else if (result.error === 'no_session') {
+                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
                     status.className = 'download-status show error';
-                    document.getElementById('statusIcon').textContent = '⚠️';
-                    document.getElementById('statusText').textContent = result.message;
+                    status.innerHTML = `<span id="statusIcon">⚠️</span><span id="statusText">${result.message}</span>`;
                 } else {
                     throw new Error(result.error || 'Error');
                 }
             } catch (e) {
+                if (progressInterval) clearInterval(progressInterval);
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
                 status.className = 'download-status show error';
-                document.getElementById('statusIcon').textContent = '❌';
-                document.getElementById('statusText').textContent = 'Error al procesar';
+                status.innerHTML = `<span id="statusIcon">❌</span><span id="statusText">Error al procesar</span>`;
             }
 
             btn.disabled = false;
@@ -1819,6 +2340,7 @@
 
         // ========== ACCOUNT ==========
         async function configureAccount() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             showToast(t('configuring_text'));
 
             try {
@@ -1833,8 +2355,7 @@
                 const result = await response.json();
 
                 if (result.ok) {
-                    tg.showAlert(t('configure_success'));
-                    setTimeout(() => tg.close(), 1500);
+                    showFirstLoginScreen();
                 } else {
                     showToast(t('configure_error'));
                 }
@@ -1987,6 +2508,26 @@
                     linkEl.textContent = 'Cargando...';
                 }
             }
+
+            if (stats.downloads_earned > lastKnownEarned && lastKnownEarned !== 0) {
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                showToast(t('referral_reward_earned').replace('{n}', stats.downloads_earned - lastKnownEarned));
+                const emojis = ['🎈', '🎊', '🎁', '⭐', '✨'];
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const el = document.createElement('div');
+                        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        el.style.cssText = `position:fixed; left:${Math.random() * 100}vw; top:-30px; font-size:${20 + Math.random() * 20}px; z-index:9999; pointer-events:none; transition:transform 2s cubic-bezier(.1,.8,.2,1), opacity 2s;`;
+                        document.body.appendChild(el);
+                        requestAnimationFrame(() => {
+                            el.style.transform = `translateY(100vh) rotate(${Math.random() * 360}deg)`;
+                            el.style.opacity = '0';
+                        });
+                        setTimeout(() => el.remove(), 2000);
+                    }, Math.random() * 500);
+                }
+            }
+            lastKnownEarned = stats.downloads_earned || 0;
         }
 
         async function copyReferralLink() {
