@@ -3220,7 +3220,11 @@ async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def set_affiliate_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Configura el programa de afiliados de Telegram Stars."""
     user_id = update.effective_user.id
+    
+    # Feedback si no es admin para debuggear
     if user_id not in ADMIN_USER_IDS:
+        await update.message.reply_text(f"🚫 *Acceso Denegado*\nTu ID no está en la lista de administradores.\nID: `{user_id}`", parse_mode="Markdown")
+        logger.warning(f"Intento de uso de /afiliados por no-admin: {user_id}")
         return
 
     if not context.args:
@@ -3234,7 +3238,12 @@ async def set_affiliate_command(update: Update, context: ContextTypes.DEFAULT_TY
         return
 
     try:
-        permille = int(context.args[0])
+        try:
+            permille = int(context.args[0])
+        except ValueError:
+            await update.message.reply_text("❌ Por favor, introduce un número válido (ej: 100).")
+            return
+
         if not (0 <= permille <= 1000):
             await update.message.reply_text("❌ La comisión debe estar entre 0 y 1000.")
             return
@@ -3245,7 +3254,7 @@ async def set_affiliate_command(update: Update, context: ContextTypes.DEFAULT_TY
         
         # Telegram API: editBotAffiliateProgram
         payload = {"commission_permille": permille}
-        response = requests.post(url, json=payload, timeout=10).json()
+        response = requests.post(url, json=payload, timeout=20).json()
 
         if response.get("ok"):
             pct = permille / 10
@@ -3259,8 +3268,6 @@ async def set_affiliate_command(update: Update, context: ContextTypes.DEFAULT_TY
             error_msg = response.get("description", "Error desconocido")
             await update.message.reply_text(f"❌ *Error de Telegram:* {error_msg}", parse_mode="Markdown")
 
-    except ValueError:
-        await update.message.reply_text("❌ Por favor, introduce un número válido.")
     except Exception as e:
         logger.error(f"Error en set_affiliate_command: {e}")
         await update.message.reply_text(f"❌ Error interno: {str(e)}")
