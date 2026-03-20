@@ -226,6 +226,9 @@ def init_database():
             )
         """)
         
+        # Index para mejorar rendimiento de la cola con muchos usuarios
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_pending_downloads_status_date ON pending_downloads(status, created_at)")
+        
         logger.info("Database initialized successfully")
 
 

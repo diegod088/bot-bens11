@@ -35,7 +35,7 @@ from telethon.tl.types import MessageMediaPhoto
 from telethon.errors import (
     ChannelPrivateError, ChatForbiddenError, InviteHashExpiredError,
     InviteHashInvalidError, FloodWaitError, UserAlreadyParticipantError,
-    SessionPasswordNeededError
+    SessionPasswordNeededError, AuthKeyUnregisteredError, UserDeactivatedError
 )
 from telethon.tl.functions.messages import ImportChatInviteRequest
 import tempfile
@@ -221,15 +221,28 @@ async def retry_on_error(func, *args, max_retries=MAX_RETRIES, delay=RETRY_DELAY
 
 @asynccontextmanager
 async def get_user_client(user_id: int):
-    """Obtiene un cliente de Telethon para el usuario"""
+    """Obtiene un cliente de Telethon para el usuario y verifica su sesión"""
     session_string = get_user_session(user_id)
     if not session_string:
         raise ValueError("No session found for user")
     
     client = TelegramClient(StringSession(session_string), int(TELEGRAM_API_ID), TELEGRAM_API_HASH)
     await client.connect()
+    
     try:
+        # Verificación activa de la sesión
+        await client.get_me()
         yield client
+    except (AuthKeyUnregisteredError, UserDeactivatedError, SessionPasswordNeededError):
+        logger.error(f"❌ Sesión inválida detectada para usuario {user_id}. Limpiando...")
+        delete_user_session(user_id)
+        # Intentar borrar el archivo físico .session si existe (opcional pero recomendado)
+        try:
+            session_file = f"sessions/session_{user_id}.session"
+            if os.path.exists(session_file):
+                os.remove(session_file)
+        except: pass
+        raise ValueError("Invalid session")
     finally:
         await client.disconnect()
 
@@ -3762,59 +3775,107 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    async with get_user_client(user_id) as client:
-        await handle_message_logic(update, context, client, link, parsed, user_id, user)
+    try:
+        async with get_user_client(user_id) as client:
+            await handle_message_logic(update, context, client, link, parsed, user_id, user)
+    except ValueError as ve:
+        if "Invalid session" in str(ve):
+            await update.message.reply_text(
+                "⚠️ *Sesión Caducada*\n\nTu sesión de Telegram ya no es válida o ha sido cerrada desde otro dispositivo.\n\n"
+                "👉 Por seguridad, he desconectado tu cuenta. **Usa /configurar** para volver a vincularla.",
+                parse_mode='Markdown'
+            )
+        else:
+            logger.error(f"Error en handle_message para usuario {user_id}: {ve}")
+            await update.message.reply_text("❌ Ocurrió un error al procesar tu solicitud.")
+    except Exception as e:
+        logger.error(f"Error inesperado en handle_message para usuario {user_id}: {e}", exc_info=True)
+        await update.message.reply_text("❌ Ocurrió un error inesperado.")
+
+
+# Configuración de concurrencia para descargas
+MAX_CONCURRENT_DOWNLOADS = 5
+download_semaphore = asyncio.Semaphore(MAX_CONCURRENT_DOWNLOADS)
+
+async def process_one_queued_download(application: Application, item: Dict):
+    """Procesa una única descarga de la cola con protección de tiempo y concurrencia"""
+    download_id = item['id']
+    user_id = item['user_id']
+    link = item['link']
+    
+    async with download_semaphore:
+        try:
+            logger.info(f"📥 Processing queued download {download_id} for user {user_id}: {link}")
+            
+            # Check user existence and data
+            user = get_user(user_id)
+            if not user:
+                update_download_status(download_id, 'error', 'User not found')
+                return
+            
+            # Parse link
+            parsed = parse_telegram_link(link)
+            if not parsed:
+                await application.bot.send_message(user_id, "❌ El enlace enviado desde la MiniApp no es válido.")
+                update_download_status(download_id, 'error', 'Invalid link')
+                return
+            
+            # Use handle_message_logic with timeout (15 minutes max per download)
+            try:
+                async with asyncio.timeout(900): # 15 min timeout
+                    async with get_user_client(user_id) as client:
+                        await handle_message_logic(None, application, client, link, parsed, user_id, user)
+                        update_download_status(download_id, 'processed')
+                        logger.info(f"✅ Download {download_id} processed successfully")
+            except TimeoutError:
+                logger.error(f"⏱️ Timeout processing download {download_id}")
+                update_download_status(download_id, 'error', 'Timeout - processing took too long')
+                await application.bot.send_message(user_id, "❌ La descarga ha tardado demasiado y ha sido cancelada.")
+            except ValueError as ve:
+                if "Invalid session" in str(ve):
+                    update_download_status(download_id, 'error', 'Invalid session - user disconnected')
+                    await application.bot.send_message(
+                        user_id, 
+                        "⚠️ *Sesión Caducada*\n\nTu sesión de Telegram ya no es válida. Por seguridad, he desconectado tu cuenta.\n\n👉 Por favor, abre la MiniApp y vuelve a configurarla en la pestaña 'Cuenta'.",
+                        parse_mode='Markdown'
+                    )
+                else:
+                    update_download_status(download_id, 'error', str(ve))
+            except Exception as proc_e:
+                logger.error(f"Error processing queued download {download_id}: {proc_e}")
+                update_download_status(download_id, 'error', str(proc_e))
+                await application.bot.send_message(user_id, f"❌ Error al procesar descarga: {str(proc_e)[:50]}")
+                
+        except Exception as e:
+            logger.error(f"Fatal error in process_one_queued_download {download_id}: {e}")
+            update_download_status(download_id, 'error', f"Fatal: {str(e)}")
 
 
 async def miniapp_queue_observer(application: Application):
     """
     Background task that polls the database for pending downloads from the MiniApp
     """
-    logger.info("🚀 MiniApp Queue Observer started and waiting for items...")
+    logger.info(f"🚀 MiniApp Queue Observer started (Concurrency: {MAX_CONCURRENT_DOWNLOADS})")
     while True:
         try:
             # Poll for next pending download
             item = get_next_pending_download()
             
             if item:
-                download_id = item['id']
-                user_id = item['user_id']
-                link = item['link']
+                # Mark as processing IMMEDIATELY to avoid other threads/tasks picking it up
+                update_download_status(item['id'], 'processing')
                 
-                logger.info(f"📥 Processing queued download {download_id} for user {user_id}: {link}")
+                # Start processing in background without blocking the loop
+                asyncio.create_task(process_one_queued_download(application, item))
                 
-                # Check user existence and data
-                user = get_user(user_id)
-                if not user:
-                    update_download_status(download_id, 'error', 'User not found')
-                    continue
-                
-                # Mark as processing
-                update_download_status(download_id, 'processing')
-                
-                # Parse link
-                parsed = parse_telegram_link(link)
-                if not parsed:
-                    await application.bot.send_message(user_id, "❌ El enlace enviado desde la MiniApp no es válido.")
-                    update_download_status(download_id, 'error', 'Invalid link')
-                    continue
-                
-                # Use handle_message_logic but adapted for no update object
-                try:
-                    async with get_user_client(user_id) as client:
-                        # Passing None as update to indicate background task
-                        await handle_message_logic(None, application, client, link, parsed, user_id, user)
-                        update_download_status(download_id, 'processed')
-                        logger.info(f"✅ Download {download_id} processed successfully")
-                except Exception as proc_e:
-                    logger.error(f"Error processing queued download {download_id}: {proc_e}")
-                    update_download_status(download_id, 'error', str(proc_e))
-                    await application.bot.send_message(user_id, f"❌ Error al procesar descarga: {str(proc_e)[:50]}")
+                # Don't sleep if we found an item, try to pick next one immediately
+                # to fill up the concurrency slots
+                continue
             
         except Exception as queue_e:
             logger.error(f"Error in miniapp_queue_observer: {queue_e}")
             
-        # Wait before next poll
+        # Wait before next poll if queue was empty
         await asyncio.sleep(5)
 
 
