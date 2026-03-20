@@ -788,18 +788,10 @@
             </div>
 
             <div id="downloadArea" style="position: relative; animation: tabEnter 0.5s var(--ease-out) 0.12s both;">
-                <div id="downloadOverlay"
-                    style="display: none; position: absolute; inset: 0; background: rgba(2,8,16,0.85); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; z-index: 2; cursor: pointer; bottom: 30px;"
-                    onclick="openLoginGate()">
-                    <div style="font-size: 24px;">🔐</div>
-                    <div style="font-size: 14px; font-weight: 700; color: var(--txt);" data-i18n="hero_gate_hint">Inicia
-                        sesión para descargar</div>
-                </div>
-
                 <div style="position: relative; margin-bottom: 14px;">
                     <input type="text" id="linkInput" placeholder="Pegar link de video/foto"
                         style="width: 100%; padding: 20px 64px 20px 24px; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18); border-radius: 60px; color: var(--txt); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 500; outline: none; box-sizing: border-box; transition: border-color 0.25s, box-shadow 0.25s; -webkit-appearance: none; appearance: none;"
-                        onfocus="if(!isConnected){ this.blur(); openLoginGate(); } this.style.borderColor='var(--gold)'; this.style.boxShadow='0 0 0 3px var(--gold-dim)';"
+                        onfocus="this.style.borderColor='var(--gold)'; this.style.boxShadow='0 0 0 3px var(--gold-dim)';"
                         onblur="this.style.borderColor='rgba(255,255,255,0.18)'; this.style.boxShadow='none';"
                         data-i18n-placeholder="input_placeholder">
                     <div
