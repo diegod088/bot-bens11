@@ -13,25 +13,24 @@
         rel="stylesheet">
     <style>
         :root {
-            --void: #040912;
-            --deep: #070D1B;
-            --surface: #0C1526;
-            --card: #111E32;
-            --card-hi: #16263F;
-            --line: rgba(255, 183, 0, 0.08);
-            --gold: #FFB700;
-            --gold-dim: rgba(255, 183, 0, 0.18);
-            --gold-glow: rgba(255, 183, 0, 0.35);
-            --cyan: #00D4FF;
-            --cyan-dim: rgba(0, 212, 255, 0.14);
-            --emerald: #10D9A0;
-            --rose: #FF5E7A;
-            --violet: #A855F7;
-            --txt: #EEF2F8;
-            --txt-soft: #8899B8;
-            --txt-muted: #4A5878;
-            --r: 16px;
-            --rs: 10px;
+            --void: #020617;
+            --deep: #070d1b;
+            --surface: #0f172a;
+            --card: #1e293b;
+            --card-hi: #334155;
+            --line: rgba(234, 179, 8, 0.1);
+            --gold: #eab308;
+            --gold-dim: rgba(234, 179, 8, 0.15);
+            --gold-glow: rgba(234, 179, 8, 0.4);
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --txt: #f8fafc;
+            --txt-soft: #94a3b8;
+            --txt-muted: #64748b;
+            --r: 20px;
+            --rs: 12px;
+            --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         * {
@@ -672,6 +671,57 @@
             margin-top: 40px;
         }
 
+        /* Premium Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: 0.3s;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 340px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r);
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transform: translateY(20px);
+            transition: 0.4s var(--spring);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: #000;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-gold:active {
+            transform: scale(0.96);
+        }
+
         .onboarding-dots {
             display: flex;
             gap: 8px;
@@ -781,29 +831,52 @@
 
             <div style="padding: 12px 8px 16px; text-align: center;">
                 <h1 id="heroHeadline"
-                    style="font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 300; letter-spacing: -0.5px; line-height: 1.15; color: var(--txt); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0s both;"
-                    data-i18n="home_title_line1">descargador Telegram</h1>
-                <h1 style="font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; color: var(--gold); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0.06s both;"
-                    data-i18n="home_title_vip">V.i.P</h1>
+                    style="font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 300; letter-spacing: -0.5px; line-height: 1.15; color: var(--txt); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0s both;"
+                    data-i18n="home_title_line1">Acceso Total a</h1>
+                <h1 style="font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1.15; color: var(--gold); margin: 0; animation: tabEnter 0.5s var(--ease-out) 0.06s both;"
+                    data-i18n="home_title_vip">TELEGRAM VIP</h1>
+            </div>
+
+            <!-- Social Proof Bar -->
+            <div
+                style="display: flex; justify-content: space-around; background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 40px; padding: 10px; margin-bottom: 25px; animation: tabEnter 0.5s var(--ease-out) 0.1s both;">
+                <div style="text-align: center;">
+                    <div style="font-size: 14px; font-weight: 800; color: var(--gold);" id="statUsersValue"
+                        data-i18n="stat_users_value">2,000+</div>
+                    <div style="font-size: 10px; color: var(--txt-muted); text-transform: uppercase;"
+                        data-i18n="stat_users_label">Miembros activos</div>
+                </div>
+                <div style="width: 1px; background: var(--line);"></div>
+                <div style="text-align: center;">
+                    <div style="font-size: 14px; font-weight: 800; color: #FFF;" id="statDownloadsValue"
+                        data-i18n="stat_multimedia_value">+15,000</div>
+                    <div style="font-size: 10px; color: var(--txt-muted); text-transform: uppercase;"
+                        data-i18n="stat_multimedia_label">Procesados hoy</div>
+                </div>
+                <div style="width: 1px; background: var(--line);"></div>
+                <div style="text-align: center;">
+                    <div style="font-size: 14px; font-weight: 800; color: var(--emerald);"
+                        data-i18n="stat_rating_value">99.9%</div>
+                    <div style="font-size: 10px; color: var(--txt-muted); text-transform: uppercase;"
+                        data-i18n="stat_rating_label">Uptime</div>
+                </div>
             </div>
 
             <div id="downloadArea" style="position: relative; animation: tabEnter 0.5s var(--ease-out) 0.12s both;">
-                <div style="position: relative; margin-bottom: 10px;">
-                    <input type="text" id="linkInput" placeholder="Pegar link de video/foto"
-                        style="width: 100%; padding: 16px 56px 16px 20px; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.18); border-radius: 60px; color: var(--txt); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 500; outline: none; box-sizing: border-box; transition: border-color 0.25s, box-shadow 0.25s; -webkit-appearance: none; appearance: none;"
-                        onfocus="this.style.borderColor='var(--gold)'; this.style.boxShadow='0 0 0 3px var(--gold-dim)';"
-                        onblur="this.style.borderColor='rgba(255,255,255,0.18)'; this.style.boxShadow='none';"
+                <div style="position: relative; margin-bottom: 15px;">
+                    <input type="text" id="linkInput" placeholder="Pega aquí cualquier link privado..."
+                        style="width: 100%; padding: 18px 60px 18px 24px; background: rgba(0,0,0,0.4); border: 2px solid var(--line); border-radius: 60px; color: var(--txt); font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; outline: none; box-sizing: border-box; transition: 0.3s;"
+                        onfocus="this.style.borderColor='var(--gold)'; this.style.boxShadow='0 0 20px var(--gold-dim)';"
+                        onblur="this.style.borderColor='var(--line)'; this.style.boxShadow='none';"
                         data-i18n-placeholder="input_placeholder">
-                    <div
-                        style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 22px; pointer-events: none;">
-                        ⬇</div>
+                    <button onclick="pasteFromClipboard()"
+                        style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: var(--gold); border: none; width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 4px 10px var(--gold-glow); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                        📋</button>
                 </div>
 
-                <button id="downloadBtn" onclick="startDownload()"
-                    style="width: 100%; padding: 16px 24px; background: #ffffff; border: none; border-radius: 60px; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 900; letter-spacing: 1px; color: #0a0f1e; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.18s, box-shadow 0.2s; box-shadow: 0 6px 24px rgba(255,255,255,0.15);"
-                    onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform=''"
-                    onpointerleave="this.style.transform=''">
-                    <span data-i18n="btn_get_file">OBTENER ARCHIVO</span>
+                <button class="btn btn-gold" id="downloadBtn" onclick="startDownload()"
+                    style="height: 60px; font-size: 17px; letter-spacing: 1px; border-radius: 60px; box-shadow: 0 8px 25px var(--gold-glow); transform: translateZ(0);">
+                    <span id="btnIcon">⚡</span> <span data-i18n="btn_get_file">DESBLOQUEAR ARCHIVO</span>
                 </button>
 
                 <div class="download-status" id="downloadStatus" style="margin-top:12px;">
@@ -912,47 +985,69 @@
 
             <div class="sec-label" style="margin-top: 24px;">💎 Planes VIP</div>
             <div class="plan-grid">
-                <!-- Flash (Hidden by default, will be controlled by JS if needed, or removed as per user prompt we rely on basic/pro/elite only now) -->
+                <!-- Basic (RUN) -->
+                <div class="plan-card" onclick="buyPremium('basic')"
+                    style="border: 1px solid rgba(255,255,255,0.05); background: var(--card); display: flex; align-items: center; padding: 16px; border-radius: var(--r); margin-bottom: 12px; cursor: pointer;">
+                    <div style="flex: 1;">
+                        <div class="plan-badge"
+                            style="background: var(--surface); color: var(--txt-soft); border: 1px solid var(--line); display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-bottom: 5px;"
+                            data-i18n="plan_inicial_badge">⚡ ACCESO INSTANTÁNEO</div>
+                        <div
+                            style="font-family:'Syne'; font-size:20px; font-weight:800; color:var(--txt); margin-top: 2px;">
+                            Plan RUN
+                        </div>
+                        <div style="font-size:12px; color:var(--txt-muted); margin-top: 1px;"
+                            data-i18n="plan_desc_basic">
+                            7 días de acceso total
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-family:'Syne'; font-size:24px; font-weight:900; color:var(--gold);">333⭐</div>
+                    </div>
+                </div>
 
-                <!-- Basic -->
-                <div class="plan-card" onclick="buyPremium('basic')">
-                    <div>
-                        <div class="plan-badge" style="background:var(--txt-muted); color:#FFF;"
-                            data-i18n="plan_inicial_badge">INICIAL</div>
-                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);"><span
-                                data-i18n="plan_trial_name">Básico</span> <span
-                                style="font-size:14px; color:var(--txt-muted); font-weight:500;"
-                                data-i18n="plan_desc_basic">/ 7 días</span></div>
+                <!-- Pro (TURBO) -->
+                <div class="plan-card pro" onclick="buyPremium('pro')"
+                    style="background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid var(--gold); transform: scale(1.02); box-shadow: 0 10px 30px rgba(234, 179, 8, 0.2); display: flex; align-items: center; padding: 16px; border-radius: var(--r); margin-bottom: 12px; cursor: pointer;">
+                    <div style="flex: 1;">
+                        <div class="plan-badge"
+                            style="background: var(--gold); color: #000; font-weight: 900; display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; margin-bottom: 5px;"
+                            data-i18n="plan_weekly_badge">🏆 MÁS VENDIDO</div>
+                        <div
+                            style="font-family:'Syne'; font-size:22px; font-weight:900; color:var(--txt); margin-top: 2px;">
+                            Plan TURBO
+                        </div>
+                        <div style="font-size:12px; color:var(--gold); font-weight: 600; margin-top: 1px;"
+                            data-i18n="plan_desc_pro">
+                            30 días • Recomendado
+                        </div>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">333⭐</div>
+                        <div
+                            style="font-family:'Syne'; font-size:28px; font-weight:900; color:var(--gold); text-shadow: 0 0 15px var(--gold-glow);">
+                            777⭐</div>
                     </div>
                 </div>
-                <!-- Pro -->
-                <div class="plan-card pro" onclick="buyPremium('pro')">
-                    <div>
-                        <div class="plan-badge" data-i18n="plan_weekly_badge">🔥 RECOMENDADO</div>
-                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);"><span
-                                data-i18n="plan_weekly_name">Pro</span> <span
-                                style="font-size:14px; color:var(--txt-muted); font-weight:500;"
-                                data-i18n="plan_desc_pro">/ 30 días</span></div>
+
+                <!-- Elite (ULTRA) -->
+                <div class="plan-card" onclick="buyPremium('elite')"
+                    style="border: 1px solid rgba(16, 185, 129, 0.2); background: var(--card); display: flex; align-items: center; padding: 16px; border-radius: var(--r); margin-bottom: 12px; cursor: pointer;">
+                    <div style="flex: 1;">
+                        <div class="plan-badge"
+                            style="background: var(--emerald); color: #000; font-weight: 900; display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; margin-bottom: 5px;"
+                            data-i18n="plan_max_badge">🔥 AHORRO MÁXIMO</div>
+                        <div
+                            style="font-family:'Syne'; font-size:20px; font-weight:800; color:var(--txt); margin-top: 2px;">
+                            Plan ULTRA
+                        </div>
+                        <div style="font-size:12px; color:var(--txt-muted); margin-top: 1px;"
+                            data-i18n="plan_desc_elite">
+                            90 días de puro VIP
+                        </div>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">777⭐</div>
-                    </div>
-                </div>
-                <!-- Elite -->
-                <div class="plan-card" onclick="buyPremium('elite')">
-                    <div>
-                        <div class="plan-badge" style="background:var(--emerald); color:#000;"
-                            data-i18n="plan_max_badge">ULTIMATE EXPERIENCE</div>
-                        <div style="font-family:'Syne'; font-size:20px; font-weight:700; color:var(--txt);"><span
-                                data-i18n="plan_monthly_name">Elite</span> <span
-                                style="font-size:14px; color:var(--txt-muted); font-weight:500;"
-                                data-i18n="plan_desc_elite">/ 90 días</span></div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--gold);">1499⭐</div>
+                        <div style="font-family:'Syne'; font-size:24px; font-weight:900; color:var(--emerald);">1499⭐
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2328,8 +2423,31 @@
 
             btn.disabled = true;
             status.className = 'download-status show loading';
-            document.getElementById('statusIcon').innerHTML = '<span class="status-spinner"></span>';
-            const progressInterval = startDownloadProgressCycle();
+            const statusText = document.getElementById('statusText');
+            const statusIcon = document.getElementById('statusIcon');
+
+            statusIcon.innerHTML = '<span class="status-spinner"></span>';
+
+            // FAKE PROCESSING SEQUENCE
+            statusText.innerText = 'Analizando pasarela de acceso...';
+            await new Promise(r => setTimeout(r, 1500));
+
+            statusText.innerText = 'Buscando archivo en servidores de Telegram...';
+            await new Promise(r => setTimeout(r, 2000));
+
+            statusText.innerText = 'Verificando permisos y restricciones...';
+            await new Promise(r => setTimeout(r, 1500));
+
+            if (!userData.premium) {
+                statusText.innerText = 'ACCESO RESTRINGIDO: Se requiere nivel Pro.';
+                status.className = 'download-status show error';
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
+                setTimeout(() => openPremiumGate(), 800);
+                btn.disabled = false;
+                return;
+            }
+
+            statusText.innerText = 'Iniciando descarga segura...';
 
             try {
                 localStorage.setItem('last_attempted_link', link);
@@ -2346,40 +2464,39 @@
                 });
 
                 const result = await response.json();
-                if (progressInterval) clearInterval(progressInterval);
 
                 if (result.ok) {
                     try { localStorage.removeItem('last_attempted_link'); } catch (e) { }
                     status.className = 'download-status show success';
-                    status.innerHTML = `<span id="statusIcon">✅</span><span id="statusText" style="flex:1;">${t('download_success_msg')}</span><button onclick="tg.openTelegramLink('https://t.me/${BOT_USERNAME}')" style="background:var(--gold); color:#000; border:none; border-radius:8px; padding:6px 14px; font-family:Syne,sans-serif; font-weight:800; font-size:12px; cursor:pointer; flex-shrink:0; white-space:nowrap;">${t('open_chat_btn')}</button>`;
+                    status.innerHTML = `<span id="statusIcon">✅</span><span id="statusText" style="flex:1;">Listo. Revisa el chat del bot.</span><button onclick="tg.openTelegramLink('https://t.me/${BOT_USERNAME}')" style="background:var(--gold); color:#000; border:none; border-radius:8px; padding:6px 14px; font-family:Syne,sans-serif; font-weight:800; font-size:12px; cursor:pointer; flex-shrink:0; white-space:nowrap;">ABRIR BOT</button>`;
                     input.value = '';
-
-                    // Mejora 3 y 5: Historial y Efectos
                     addToHistory(link);
                     showSuccessEffect();
-
                     if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 } else if (result.error === 'no_session') {
-                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-                    // Force a state reset — session in DB may be broken
                     isConnected = false;
                     userData.has_session = false;
                     updateConnectionStatus();
                     status.className = 'download-status show error';
-                    status.innerHTML = `<span id="statusIcon">⚠️</span><span id="statusText" style="flex:1">Sesión no activa. Ve a Cuenta → Limpiar sesión rota, luego vuelve a configurar.</span>`;
-                    // Open login gate to help user reconfigure
+                    status.innerHTML = `<span id="statusIcon">⚠️</span><span id="statusText" style="flex:1">Sesión no activa. Reconfigura en Perfil.</span>`;
                     setTimeout(() => openLoginGate(), 1200);
                 } else {
                     throw new Error(result.error || 'Error');
                 }
             } catch (e) {
-                if (progressInterval) clearInterval(progressInterval);
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
                 status.className = 'download-status show error';
-                status.innerHTML = `<span id="statusIcon">❌</span><span id="statusText">Error al procesar</span>`;
+                status.innerHTML = `<span id="statusIcon">❌</span><span id="statusText">No se pudo procesar</span>`;
             }
 
             btn.disabled = false;
+        }
+
+        function openPremiumGate() {
+            document.getElementById('premiumGate').classList.add('show');
+        }
+        function closePremiumGate() {
+            document.getElementById('premiumGate').classList.remove('show');
         }
 
         async function pasteFromClipboard() {
@@ -2888,6 +3005,28 @@
         </div>
     </div>
 
-</body>
+<!-- Premium Gate Modal -->
+<div id="premiumGate" class="modal-overlay">
+    <div class="modal-content"
+        style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 35px 25px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6); transform: translateY(20px); transition: 0.4s var(--spring);">
+        <div style="font-size: 50px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--gold-glow));">💎</div>
+        <h2
+            style="font-family: 'Syne', sans-serif; font-weight: 800; color: var(--gold); margin: 0 0 10px; font-size: 22px; letter-spacing: -0.5px;">
+            ¡ARCHIVO ENCONTRADO!</h2>
+        <div style="width: 40px; height: 3px; background: var(--gold); margin: 0 auto 20px; border-radius: 10px;"></div>
+        <p style="color: var(--txt-soft); font-size: 15px; line-height: 1.5; margin-bottom: 30px;">Este contenido
+            requiere una <b>Suscripción Pro</b> activa para ser procesado y desbloqueado.</p>
+
+        <button class="btn btn-gold" onclick="closePremiumGate(); switchTab('premium');"
+            style="width: 100%; height: 55px; font-size: 16px; border-radius: 60px; box-shadow: 0 10px 25px var(--gold-glow); transform: translateZ(0); display: block; margin: 0 auto; background: var(--gold); color: #000; font-weight: 800; border: none; cursor: pointer; transition: 0.2s;">
+            VER PLANES DISPONIBLES
+        </button>
+
+        <button onclick="closePremiumGate()"
+            style="background: transparent; border: none; color: var(--txt-muted); margin-top: 20px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: underline;">
+            Quizás más tarde
+        </button>
+    </div>
+</div></body>
 
 </html>
