@@ -123,7 +123,12 @@ const TRANSLATIONS = {
         "toast_link_pasted": "Enlace pegado correctamente",
         "disconnect_confirm": "¿Seguro que quieres cerrar sesión?",
         "disconnecting_text": "Cerrando sesión segura...",
-        "disconnect_success": "Sesión finalizada correctamente"
+        "disconnect_success": "Sesión finalizada correctamente",
+        "account_title": "Mi Perfil VIP",
+        "profile_free_badge": "Usuario Basic ✦",
+        "profile_premium_badge": "Miembro Pro ⭐",
+        "hero_greeting": "Hola, {name}",
+        "hero_headline": "Acceso Total a\nTELEGRAM VIP"
     },
     "en": {
         "onboarding_title_1": "Unlimited Access",
@@ -248,7 +253,12 @@ const TRANSLATIONS = {
         "toast_link_pasted": "Link pasted successfully",
         "disconnect_confirm": "Are you sure you want to disconnect?",
         "disconnecting_text": "Disconnecting safely...",
-        "disconnect_success": "Session closed successfully"
+        "disconnect_success": "Session closed successfully",
+        "account_title": "My VIP Profile",
+        "profile_free_badge": "Basic User ✦",
+        "profile_premium_badge": "Pro Member ⭐",
+        "hero_greeting": "Hi, {name}",
+        "hero_headline": "Total Access to\nTELEGRAM VIP"
     },
     "pt": {
         "onboarding_title_1": "Acesso Ilimitado",

@@ -971,7 +971,7 @@
             </div>
 
             <div style="padding: 40px 10px 10px; text-align: center;">
-                <h1
+                <h1 id="heroHeadline"
                     style="font-family:'Syne',sans-serif; font-size:36px; font-weight:900; color:var(--txt); margin:0 0 10px; line-height:1.1; letter-spacing:-1px;">
                     <span data-i18n="home_title_line1">Acceso Total a</span><br>
                     <span style="color:var(--gold);" data-i18n="home_title_vip">TELEGRAM VIP</span>
@@ -2410,7 +2410,17 @@
         function updateConnectionStatus() {
             const requiredEls = ['profileGuest', 'profileAuth', 'headerConnIcon', 'userName'];
             const allReady = requiredEls.every(id => document.getElementById(id) !== null);
-            if (!allReady) { setTimeout(updateConnectionStatus, 100); return; }
+
+            // If some elements are missing (e.g. during rapid tab switching or init), 
+            // try to proceed with what we have instead of looping infinitely if one is truly gone.
+            if (!allReady) {
+                console.warn('⚠️ Missing some UI elements for connection status update:', requiredEls.filter(id => !document.getElementById(id)));
+                // We'll still try to run the toggle if the main ones are there
+                if (!document.getElementById('profileGuest') || !document.getElementById('profileAuth')) {
+                    setTimeout(updateConnectionStatus, 200);
+                    return;
+                }
+            }
 
             if (isConnected) {
                 try {
