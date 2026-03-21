@@ -2213,6 +2213,14 @@ async def successful_payment_callback(update: Update, context: ContextTypes.DEFA
     try:
         set_premium(user_id, days=days)
         logger.info(f"✓ Premium activado correctamente para user {user_id}")
+        
+        # Register payment in database for real revenue analytics
+        try:
+            from database import add_payment
+            add_payment(user_id, payment_info.total_amount, payment_info.currency)
+        except Exception as pe:
+            logger.error(f"❌ Error guardando el registro de pago DB: {pe}")
+            
     except Exception as e:
         logger.error(f"❌ Error activando premium: {e}")
         import traceback

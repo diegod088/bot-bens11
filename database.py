@@ -769,7 +769,20 @@ def set_user_language(user_id: int, language: str = 'es'):
             (language, user_id)
         )
     
+    
     logger.info(f"User {user_id} language set to {language}")
+
+
+def add_payment(user_id: int, amount: int, currency: str, status: str = 'completed'):
+    """Record a successful payment in the database."""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """INSERT INTO payments (user_id, amount, currency, status) 
+               VALUES (?, ?, ?, ?)""",
+            (user_id, amount, currency, status)
+        )
+        logger.info(f"Recorded payment: {amount} {currency} from user {user_id}")
 
 
 # ==================== RESET DE LÍMITES ====================
@@ -986,9 +999,9 @@ def get_user_stats() -> Dict:
         cursor.execute("SELECT SUM(daily_apk) FROM users")
         total_apk_today = cursor.fetchone()[0] or 0
         
-        # Ingresos estimados (300 stars por premium)
-        # Asumimos que cada usuario premium pagó 300 stars
-        estimated_revenue = premium_users * 300
+        # Ingresos reales (Suma real de pagos en la tabla payments)
+        cursor.execute("SELECT SUM(amount) FROM payments WHERE status = 'completed'")
+        real_revenue = cursor.fetchone()[0] or 0
         
         return {
             "total_users": total_users,
@@ -1004,7 +1017,7 @@ def get_user_stats() -> Dict:
                 "total": total_photos_today + total_videos_today + total_music_today + total_apk_today
             },
             "revenue": {
-                "stars": estimated_revenue,
+                "stars": real_revenue,
                 "premium_subs": premium_users
             }
         }
