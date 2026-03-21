@@ -1,36 +1,61 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Admin Console{% endblock %}
+{% block title %}Dashboard — Admin Console{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* === MOBILE-FIRST STATS === */
-    .grid-stats {
+    /* ── STAT GRID ── */
+    .stats-grid {
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        margin-bottom: 2rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 16px;
     }
 
     .stat-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 1.25rem 1rem;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 16px;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        animation: fadeIn 0.5s ease-out forwards;
-        opacity: 0;
+        gap: 8px;
         position: relative;
         overflow: hidden;
+        animation: fadeUp 0.4s var(--ease) both;
     }
 
-    @keyframes fadeIn {
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--accent, var(--indigo));
+        border-radius: var(--r) var(--r) 0 0;
+    }
+
+    .stat-card:nth-child(1) {
+        animation-delay: 0.05s;
+    }
+
+    .stat-card:nth-child(2) {
+        animation-delay: 0.10s;
+    }
+
+    .stat-card:nth-child(3) {
+        animation-delay: 0.15s;
+    }
+
+    .stat-card:nth-child(4) {
+        animation-delay: 0.20s;
+    }
+
+    @keyframes fadeUp {
         from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(8px);
         }
 
         to {
@@ -39,979 +64,576 @@
         }
     }
 
-    /* Stagger animation */
-    .stat-card:nth-child(1) {
-        animation-delay: 0.1s;
-    }
-
-    .stat-card:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .stat-card:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-
-    .stat-card:nth-child(4) {
-        animation-delay: 0.4s;
-    }
-
-    .stat-card:active {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-    }
-
     .stat-label {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--txt-soft);
     }
 
     .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-primary);
+        font-family: 'Syne', sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--txt);
+        letter-spacing: -0.5px;
         line-height: 1;
+        transition: opacity 0.2s;
     }
 
-    .stat-change {
-        font-size: 0.75rem;
-        font-weight: 500;
-        padding: 0.25rem 0.5rem;
-        border-radius: 9999px;
+    .stat-icon {
+        position: absolute;
+        right: 12px;
+        top: 14px;
+        font-size: 20px;
+        opacity: 0.4;
+    }
+
+    .stat-badge {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
+        gap: 3px;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 20px;
+        width: fit-content;
     }
 
-    .stat-change.positive {
+    .stat-badge.up {
         background: var(--success-bg);
         color: var(--success);
     }
 
-    .stat-change.negative {
-        background: var(--danger-bg);
-        color: var(--danger);
+    .stat-badge.neutral {
+        background: var(--indigo-dim);
+        color: var(--indigo);
     }
 
-    /* === CHARTS MOBILE === */
-    .charts-grid {
+    /* ── CHARTS ── */
+    .chart-section {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .chart-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--txt-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 14px;
+    }
+
+    .charts-2col {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 16px;
     }
 
-    .chart-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 1.25rem;
+    .chart-box {
+        background: var(--card-hi);
+        border-radius: var(--r-sm);
+        padding: 12px;
     }
 
-    .chart-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-        gap: 1rem;
-    }
-
-    .chart-title {
-        font-size: 1rem;
+    .chart-box-title {
+        font-size: 11px;
+        color: var(--txt-soft);
         font-weight: 600;
-        color: var(--text-primary);
-        line-height: 1.4;
+        margin-bottom: 10px;
     }
 
-    .chart-subtitle {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        margin-top: 0.25rem;
+    .chart-box canvas {
+        max-height: 180px;
     }
 
-    .chart-actions {
+    /* ── ACTIVITY GRID ── */
+    .activity-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .act-card {
+        background: var(--card-hi);
+        border-radius: var(--r-sm);
+        padding: 12px;
         display: flex;
-        gap: 0.5rem;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .act-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--indigo-dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
         flex-shrink: 0;
     }
 
-    .chart-action {
-        padding: 0.5rem;
-        background: none;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        color: var(--text-secondary);
-        cursor: pointer;
-        transition: all 0.2s;
-        font-size: 0.875rem;
-    }
-
-    .chart-action:active {
-        background: var(--bg-body);
-        border-color: var(--primary);
-        color: var(--primary);
-    }
-
-    .chart-container {
-        position: relative;
-        height: 200px;
-        /* Shorter on mobile */
-        margin-top: 1rem;
-    }
-
-    /* === RESPONSIVE UTILITIES === */
-    .mobile-grid-1 {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    @media (min-width: 768px) {
-        .mobile-grid-1 {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    /* === BROADCAST SECTION MOBILE === */
-    .broadcast-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 1.25rem;
-        margin-bottom: 2rem;
-    }
-
-    .broadcast-header {
-        margin-bottom: 1rem;
-    }
-
-    .broadcast-info {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        margin-bottom: 1rem;
-        line-height: 1.4;
-    }
-
-    .broadcast-form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .form-label {
-        font-weight: 500;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-    }
-
-    .form-input,
-    .form-textarea {
-        padding: 0.75rem;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        background: var(--bg-surface);
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        transition: border-color 0.2s;
-    }
-
-    .form-input:focus,
-    .form-textarea:focus {
-        outline: none;
-        border-color: var(--primary);
-    }
-
-    .form-textarea {
-        min-height: 100px;
-        resize: vertical;
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-    }
-
-    .form-actions .btn {
-        flex: 1;
-        min-width: 120px;
-    }
-
-    .stat-label svg {
-        min-width: 16px;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        letter-spacing: -0.025em;
-        transition: all 0.3s ease;
-    }
-
-    .stat-trend {
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        color: var(--text-tertiary);
-    }
-
-    .trend-up {
-        color: var(--success);
-    }
-
-    .trend-neutral {
-        color: var(--text-tertiary);
-    }
-
-    /* === BROADCAST CARD === */
-    .broadcast-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 1.25rem 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .broadcast-card textarea,
-    .broadcast-card select {
-        font-size: 16px;
-        width: 100%;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        padding: 0.75rem;
-        margin: 0.5rem 0 1rem 0;
-        font-family: inherit;
-        background: var(--bg-body);
-        color: var(--text-primary);
-    }
-
-    .broadcast-card textarea {
-        min-height: 120px;
-        resize: none;
-    }
-
-    .broadcast-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .broadcast-info {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-    }
-
-    /* === ACTIVITY GRID === */
-    .activity-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin-top: 1rem;
-    }
-
-    .activity-card {
-        background: var(--bg-body);
-        border-radius: var(--radius-md);
-        padding: 0.75rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        text-align: center;
-        transition: all 0.2s;
-    }
-
-    .activity-card:active {
-        background: var(--primary-light);
-    }
-
-    .activity-icon {
-        font-size: 1.75rem;
-    }
-
-    .activity-label {
-        font-size: 0.7rem;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-    }
-
-    .activity-value {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    /* === SYSTEM INFO === */
-    .system-info {
-        background: var(--bg-body);
-        border-radius: var(--radius-md);
-        padding: 1rem;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .info-item {
-        text-align: center;
-    }
-
-    .info-label {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        margin-bottom: 0.25rem;
-    }
-
-    .info-value {
-        font-size: 1rem;
+    .act-label {
+        font-size: 10px;
+        color: var(--txt-soft);
         font-weight: 600;
-        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 2px;
     }
 
-    /* === DESKTOP RESPONSIVE === */
-    @media (min-width: 768px) {
-        .grid-stats {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
+    .act-value {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--txt);
+    }
 
-        .stat-card {
-            padding: 1.5rem;
-            gap: 0.5rem;
-        }
+    /* ── SYSTEM STATUS ── */
+    .status-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+    }
 
-        .stat-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-        }
+    .status-item {
+        background: var(--card-hi);
+        border-radius: var(--r-sm);
+        padding: 10px 12px;
+        text-align: center;
+    }
 
-        .stat-card:active {
-            transform: none;
-        }
+    .status-label {
+        font-size: 10px;
+        color: var(--txt-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 4px;
+    }
 
-        .stat-value {
-            font-size: 1.875rem;
-        }
+    .status-value {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--txt);
+    }
 
-        .broadcast-card {
-            padding: 1.5rem;
-        }
+    /* ── BROADCAST ── */
+    .broadcast-section {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 16px;
+        margin-top: 16px;
+    }
 
-        .broadcast-controls {
-            flex-direction: row;
-            align-items: flex-end;
-        }
+    .broadcast-section-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--txt);
+        margin-bottom: 4px;
+    }
 
-        .broadcast-card select,
-        .broadcast-card textarea {
-            padding: 0.5rem 1rem;
-        }
+    .broadcast-section-sub {
+        font-size: 12px;
+        color: var(--txt-soft);
+        margin-bottom: 16px;
+    }
 
-        .broadcast-card textarea {
-            min-height: 100px;
-        }
+    .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
 
-        .activity-grid {
+    .char-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--txt-soft);
+        margin-top: 4px;
+    }
+
+    .btn-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    .broadcast-result {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: var(--r-sm);
+        font-size: 13px;
+        font-weight: 500;
+        display: none;
+    }
+
+    /* ── DESKTOP BREAKPOINTS ── */
+    @media (min-width: 640px) {
+        .stats-grid {
             grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
         }
 
-        .activity-card {
-            flex-direction: row;
-            text-align: left;
-            align-items: center;
-            padding: 1rem;
+        .charts-2col {
+            grid-template-columns: 1fr 1fr;
         }
 
-        .activity-icon {
-            font-size: 2rem;
+        .activity-row {
+            grid-template-columns: repeat(4, 1fr);
         }
 
-        .system-info {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .info-item {
-            text-align: left;
-        }
-
-        @media (min-width: 1024px) {
-            .grid-stats {
-                grid-template-columns: repeat(4, 1fr);
-            }
+        .broadcast-result {
+            display: none;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="section-header">
-    <h1 class="section-title">📊 Dashboard</h1>
+
+<!-- PAGE HEADER -->
+<div class="section-header mb-4">
+    <div>
+        <div class="page-title">📊 Dashboard</div>
+        <div class="page-sub">Vista general del bot en tiempo real</div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="updateStats()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10" />
+            <polyline points="1 20 1 14 7 14" />
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+        </svg>
+        Actualizar
+    </button>
 </div>
 
-<!-- Main Stats with Staggered Animation -->
-<div class="grid-stats">
-    <div class="stat-card">
-        <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            Usuarios Totales
-        </div>
+<!-- STAT CARDS -->
+<div class="stats-grid">
+    <div class="stat-card" style="--accent: #6366f1;">
+        <span class="stat-icon">👥</span>
+        <div class="stat-label">Usuarios totales</div>
         <div class="stat-value" id="total-users">{{ stats.total_users }}</div>
-        <div class="stat-trend trend-neutral">Base completa</div>
+        <div class="stat-badge neutral">Base completa</div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon
-                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                </polygon>
-            </svg>
-            Premium
-        </div>
+    <div class="stat-card" style="--accent: #f59e0b;">
+        <span class="stat-icon">⭐</span>
+        <div class="stat-label">Premium</div>
         <div class="stat-value" id="premium-users">{{ stats.premium_users }}</div>
-        <div class="stat-trend trend-up">Activos</div>
+        <div class="stat-badge up">Activos</div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Descargas
-        </div>
+    <div class="stat-card" style="--accent: #10b981;">
+        <span class="stat-icon">📥</span>
+        <div class="stat-label">Descargas</div>
         <div class="stat-value" id="total-downloads">{{ stats.total_downloads }}</div>
-        <div class="stat-trend trend-neutral">Total histórico</div>
+        <div class="stat-badge neutral">Histórico</div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-label">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            Ingresos Est.
-        </div>
-        <div class="stat-value" id="estimated-revenue">{{ stats.estimated_revenue }}</div>
-        <div class="stat-trend trend-up">Mensual</div>
+    <div class="stat-card" style="--accent: #8b5cf6;">
+        <span class="stat-icon">💰</span>
+        <div class="stat-label">Ingresos est.</div>
+        <div class="stat-value" id="estimated-revenue" style="font-size:18px; margin-top:2px;">{{
+            stats.estimated_revenue }}</div>
+        <div class="stat-badge up">Mensual</div>
     </div>
 </div>
 
-<!-- Charts Section -->
-<div class="card" style="margin-bottom: 1.5rem;">
-    <div class="section-header" style="margin-bottom: 1rem;">
-        <h2 class="section-title">📈 Gráficos</h2>
-    </div>
-
-    <div class="mobile-grid-1" style="margin-bottom: 1rem;">
-        <!-- Revenue Chart -->
-        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">💰 Ingresos (7 días)</h3>
-            <canvas id="revenueChart" style="max-height: 200px;"></canvas>
+<!-- CHARTS -->
+<div class="chart-section">
+    <div class="chart-section-title">Gráficos — últimos 7 días</div>
+    <div class="charts-2col">
+        <div class="chart-box">
+            <div class="chart-box-title">💰 Ingresos</div>
+            <canvas id="revenueChart"></canvas>
         </div>
-
-        <!-- Users Chart -->
-        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">👥 Usuarios (7 días)</h3>
-            <canvas id="usersChart" style="max-height: 200px;"></canvas>
+        <div class="chart-box">
+            <div class="chart-box-title">👥 Usuarios nuevos</div>
+            <canvas id="usersChart"></canvas>
         </div>
-    </div>
-
-    <div class="mobile-grid-1">
-        <!-- Distribution Chart -->
-        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">🎯 Distribución</h3>
-            <canvas id="distributionChart" style="max-height: 180px;"></canvas>
+        <div class="chart-box">
+            <div class="chart-box-title">🎯 Distribución usuarios</div>
+            <canvas id="distributionChart"></canvas>
         </div>
-
-        <!-- Downloads Chart -->
-        <div style="background: var(--bg-body); border-radius: var(--radius-md); padding: 1rem;">
-            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary);">📥 Descargas</h3>
-            <canvas id="downloadsChart" style="max-height: 180px;"></canvas>
+        <div class="chart-box">
+            <div class="chart-box-title">📥 Tipos de descarga</div>
+            <canvas id="downloadsChart"></canvas>
         </div>
     </div>
 </div>
 
-<!-- Activity Card -->
-<div class="card" style="margin-bottom: 1.5rem;" id="activity-section">
-    <div class="section-header" style="margin-bottom: 1rem;">
-        <h2 class="section-title">📈 Actividad Diaria</h2>
-    </div>
-
-    <div class="activity-grid">
-        <div class="activity-card">
-            <div class="activity-icon">📸</div>
+<!-- DAILY ACTIVITY -->
+<div class="card mb-4">
+    <div class="chart-section-title" style="margin-bottom:12px;">⚡ Actividad de hoy</div>
+    <div class="activity-row">
+        <div class="act-card">
+            <div class="act-icon">📸</div>
             <div>
-                <div class="activity-label">Fotos</div>
-                <div class="activity-value" id="daily-photos">{{ stats.daily_stats.photos }}</div>
+                <div class="act-label">Fotos</div>
+                <div class="act-value" id="daily-photos">{{ stats.daily_stats.photos }}</div>
             </div>
         </div>
-
-        <div class="activity-card">
-            <div class="activity-icon">🎬</div>
+        <div class="act-card">
+            <div class="act-icon">🎬</div>
             <div>
-                <div class="activity-label">Videos</div>
-                <div class="activity-value" id="daily-videos">{{ stats.daily_stats.videos }}</div>
+                <div class="act-label">Videos</div>
+                <div class="act-value" id="daily-videos">{{ stats.daily_stats.videos }}</div>
             </div>
         </div>
-
-        <div class="activity-card">
-            <div class="activity-icon">🎵</div>
+        <div class="act-card">
+            <div class="act-icon">🎵</div>
             <div>
-                <div class="activity-label">Música</div>
-                <div class="activity-value" id="daily-music">{{ stats.daily_stats.music }}</div>
+                <div class="act-label">Música</div>
+                <div class="act-value" id="daily-music">{{ stats.daily_stats.music }}</div>
             </div>
         </div>
-
-        <div class="activity-card">
-            <div class="activity-icon">📱</div>
+        <div class="act-card">
+            <div class="act-icon">📱</div>
             <div>
-                <div class="activity-label">APKs</div>
-                <div class="activity-value" id="daily-apk">{{ stats.daily_stats.apk }}</div>
+                <div class="act-label">APKs</div>
+                <div class="act-value" id="daily-apk">{{ stats.daily_stats.apk }}</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- System Info -->
-<div class="card" style="margin-bottom: 1.5rem;">
-    <h2 class="section-title" style="margin-bottom: 1rem;">⚙️ Estado del Sistema</h2>
-    <div class="system-info">
-        <div class="info-item">
-            <div class="info-label">Estado</div>
-            <div class="info-value" style="color: var(--success);">🟢 Online</div>
+<!-- SYSTEM STATUS -->
+<div class="card mb-4">
+    <div class="chart-section-title" style="margin-bottom:12px;">⚙️ Estado del sistema</div>
+    <div class="status-row">
+        <div class="status-item">
+            <div class="status-label">Estado</div>
+            <div class="status-value" style="color:var(--success);">🟢 Online</div>
         </div>
-        <div class="info-item">
-            <div class="info-label">Base de Datos</div>
-            <div class="info-value">SQLite</div>
+        <div class="status-item">
+            <div class="status-label">Base de datos</div>
+            <div class="status-value">SQLite</div>
         </div>
-        <div class="info-item">
-            <div class="info-label">Actualizado</div>
-            <div class="info-value text-xs" id="last-updated">Justo ahora</div>
+        <div class="status-item">
+            <div class="status-label">Actualizado</div>
+            <div class="status-value text-sm" id="last-updated" style="font-size:11px;">Ahora</div>
         </div>
     </div>
 </div>
 
-<!-- Broadcast Section - Simplified for Mobile -->
-<div class="broadcast-card">
-    <h2 class="section-title" style="margin-bottom: 0.5rem;">📢 Mensaje Masivo</h2>
-    <div class="broadcast-info">Envía mensajes a todos tus usuarios</div>
+<!-- BROADCAST -->
+<div class="broadcast-section">
+    <div class="broadcast-section-title">📢 Mensaje masivo</div>
+    <div class="broadcast-section-sub">Envía notificaciones a todos tus usuarios directamente.</div>
 
-    <label
-        style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0.5rem;">Destinatarios</label>
-    <select id="broadcast-target" onchange="updateBroadcastCount()">
-        <option value="all">Todos los usuarios ({{ stats.total_users }})</option>
-        <option value="premium">Solo Premium ({{ stats.premium_users }})</option>
-        <option value="free">Solo Free ({{ stats.total_users - stats.premium_users }})</option>
-    </select>
+    <div class="form-row">
+        <div>
+            <label class="form-label">Destinatarios</label>
+            <select class="form-select" id="broadcast-target" onchange="updateBroadcastCount()">
+                <option value="all">Todos los usuarios ({{ stats.total_users }})</option>
+                <option value="premium">Solo Premium ({{ stats.premium_users }})</option>
+                <option value="free">Solo Free ({{ stats.total_users - stats.premium_users }})</option>
+            </select>
+        </div>
 
-    <label
-        style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0.5rem;">Mensaje</label>
-    <textarea id="broadcast-message" placeholder="Escribe tu mensaje aquí..."></textarea>
+        <div>
+            <label class="form-label">Mensaje</label>
+            <textarea class="form-textarea" id="broadcast-message" placeholder="Escribe tu mensaje aquí..."
+                oninput="updateCharCount(this)"></textarea>
+            <div class="char-row">
+                <span id="char-count">0 / 4096</span>
+                <span id="broadcast-count">{{ stats.total_users }} destinatarios</span>
+            </div>
+        </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <span class="broadcast-info" id="char-count">0 / 4096</span>
-        <span class="broadcast-info" id="broadcast-count">{{ stats.total_users }} destinatarios</span>
+        <div class="btn-row">
+            <button class="btn btn-outline w-full" onclick="previewBroadcast()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+                Previsualizar
+            </button>
+            <button class="btn btn-primary w-full" onclick="sendBroadcast()" id="send-broadcast-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+                Enviar
+            </button>
+        </div>
     </div>
 
-    <div style="display: flex; gap: 0.75rem; flex-direction: column;">
-        <button onclick="previewBroadcast()" class="btn btn-outline" style="width: 100%;">👁 Previsualizar</button>
-        <button onclick="sendBroadcast()" class="btn btn-primary" style="width: 100%;" id="send-broadcast-btn">📤
-            Enviar</button>
-    </div>
-
-    <div id="broadcast-result" style="margin-top: 1rem; padding: 1rem; border-radius: var(--radius-md); display: none;">
-    </div>
+    <div id="broadcast-result" class="broadcast-result"></div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script>
-    // Chart instances
-    let revenueChart, usersChart, distributionChart, downloadsChart;
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+
+    const chartDefaults = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { size: 10 } } }
+        }
+    };
+
+    let charts = {};
 
     function initCharts() {
-        // Revenue Chart
-        fetch('/api/charts/revenue')
-            .then(r => r.json())
-            .then(data => {
-                const ctx = document.getElementById('revenueChart').getContext('2d');
-                if (revenueChart) revenueChart.destroy();
-                revenueChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'Ingresos',
-                            data: data.data,
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { drawBorder: false } }
-                        }
-                    }
-                });
-            });
+        const c = (id) => document.getElementById(id).getContext('2d');
 
-        // Users Chart
-        fetch('/api/charts/users')
-            .then(r => r.json())
-            .then(data => {
-                const ctx = document.getElementById('usersChart').getContext('2d');
-                if (usersChart) usersChart.destroy();
-                usersChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'Usuarios Nuevos',
-                            data: data.data,
-                            backgroundColor: '#3b82f6',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { drawBorder: false } }
-                        }
-                    }
-                });
+        // Revenue
+        fetch('/api/charts/revenue').then(r => r.json()).then(data => {
+            if (charts.revenue) charts.revenue.destroy();
+            charts.revenue = new Chart(c('revenueChart'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{ data: data.data, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3 }]
+                },
+                options: chartDefaults
             });
+        });
 
-        // Distribution Chart
-        fetch('/api/charts/distribution')
-            .then(r => r.json())
-            .then(data => {
-                const ctx = document.getElementById('distributionChart').getContext('2d');
-                if (distributionChart) distributionChart.destroy();
-                distributionChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            data: data.data,
-                            backgroundColor: data.colors
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: { position: 'bottom' }
-                        }
-                    }
-                });
+        // Users
+        fetch('/api/charts/users').then(r => r.json()).then(data => {
+            if (charts.users) charts.users.destroy();
+            charts.users = new Chart(c('usersChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{ data: data.data, backgroundColor: 'rgba(99,102,241,0.5)', borderRadius: 5 }]
+                },
+                options: chartDefaults
             });
+        });
 
-        // Downloads Chart
-        fetch('/api/charts/downloads')
-            .then(r => r.json())
-            .then(data => {
-                const ctx = document.getElementById('downloadsChart').getContext('2d');
-                if (downloadsChart) downloadsChart.destroy();
-                downloadsChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            data: data.data,
-                            backgroundColor: data.colors
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: { position: 'bottom' }
-                        }
-                    }
-                });
+        // Distribution (doughnut)
+        fetch('/api/charts/distribution').then(r => r.json()).then(data => {
+            if (charts.dist) charts.dist.destroy();
+            charts.dist = new Chart(c('distributionChart'), {
+                type: 'doughnut',
+                data: { labels: data.labels, datasets: [{ data: data.data, backgroundColor: data.colors, borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10 } } }, cutout: '65%' }
             });
+        });
+
+        // Downloads
+        fetch('/api/charts/downloads').then(r => r.json()).then(data => {
+            if (charts.dl) charts.dl.destroy();
+            charts.dl = new Chart(c('downloadsChart'), {
+                type: 'doughnut',
+                data: { labels: data.labels, datasets: [{ data: data.data, backgroundColor: data.colors, borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10 } } }, cutout: '65%' }
+            });
+        });
     }
-
-    // Initialize charts on load
-    window.addEventListener('load', initCharts);
-
-    // Activity section is now always visible but responsive via CSS
 
     function updateStats() {
-        fetch('/api/stats')
-            .then(response => response.json())
-            .then(data => {
-                const updateElement = (id, value) => {
-                    const el = document.getElementById(id);
-                    if (el && el.textContent !== String(value)) {
-                        el.style.opacity = '0.5';
-                        setTimeout(() => {
-                            el.textContent = value;
-                            el.style.opacity = '1';
-                        }, 100);
-                    }
-                };
-
-                updateElement('total-users', data.total_users);
-                updateElement('premium-users', data.premium_users);
-                updateElement('total-downloads', data.total_downloads);
-                updateElement('estimated-revenue', data.estimated_revenue);
-                updateElement('daily-photos', data.daily_stats.photos);
-                updateElement('daily-videos', data.daily_stats.videos);
-                updateElement('daily-music', data.daily_stats.music);
-                updateElement('daily-apk', data.daily_stats.apk);
-
-                const now = new Date();
-                document.getElementById('last-updated').textContent = now.toLocaleTimeString();
-
-                // Refresh charts every 5 minutes
-                initCharts();
-            })
-            .catch(err => console.error('Error:', err));
+        fetch('/api/stats').then(r => r.json()).then(data => {
+            const set = (id, v) => {
+                const el = document.getElementById(id);
+                if (el && el.textContent !== String(v)) {
+                    el.style.opacity = '0.3';
+                    setTimeout(() => { el.textContent = v; el.style.opacity = '1'; }, 150);
+                }
+            };
+            set('total-users', data.total_users);
+            set('premium-users', data.premium_users);
+            set('total-downloads', data.total_downloads);
+            set('estimated-revenue', data.estimated_revenue);
+            set('daily-photos', data.daily_stats.photos);
+            set('daily-videos', data.daily_stats.videos);
+            set('daily-music', data.daily_stats.music);
+            set('daily-apk', data.daily_stats.apk);
+            document.getElementById('last-updated').textContent = new Date().toLocaleTimeString('es-ES');
+            Utils.toast('Datos actualizados', 'success');
+        }).catch(() => Utils.toast('Error al actualizar', 'error'));
     }
 
-    // Update every 30 seconds
-    setInterval(updateStats, 30000);
-    // Update charts every 5 minutes
-    setInterval(initCharts, 300000);
-
-    // === BROADCAST ===
-    // Pasar variables de Django a JavaScript de forma segura
-    const statsData = {{ stats| tojson | safe }};
-
-    document.getElementById('broadcast-message').addEventListener('input', function () {
-        const count = this.value.length;
-        document.getElementById('char-count').textContent = count + ' / 4096';
-    });
+    // Broadcast
+    function updateCharCount(el) {
+        document.getElementById('char-count').textContent = `${el.value.length} / 4096`;
+    }
 
     function updateBroadcastCount() {
-        const target = document.getElementById('broadcast-target').value;
-        const counts = {
-            all: statsData.total_users,
-            premium: statsData.premium_users,
-            free: statsData.total_users - statsData.premium_users
+        const map = {
+            all: {{ stats.total_users }
+    },
+    premium: { { stats.premium_users } },
+    free: { { stats.total_users - stats.premium_users } }
         };
-        document.getElementById('broadcast-count').textContent = counts[target] + ' destinatarios';
+    const v = document.getElementById('broadcast-target').value;
+    document.getElementById('broadcast-count').textContent = `${map[v]} destinatarios`;
     }
 
     function previewBroadcast() {
-        const message = document.getElementById('broadcast-message').value;
-        const target = document.getElementById('broadcast-target').value;
-        const resultDiv = document.getElementById('broadcast-result');
-
-        if (!message.trim()) {
-            resultDiv.innerHTML = '<span style="color: var(--danger);">⚠️ El mensaje no puede estar vacío</span>';
-            resultDiv.style.display = 'block';
-            resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
-            return;
-        }
-
-        const counts = { all: statsData.total_users, premium: statsData.premium_users, free: statsData.total_users - statsData.premium_users };
-        const labels = { all: 'todos', premium: 'premium', free: 'free' };
-
-        resultDiv.innerHTML = `
-            <div style="font-weight: 600; margin-bottom: 0.5rem;">📊 Vista previa:</div>
-            <div style="font-size: 0.875rem;">Destinatarios: <strong>${counts[target]}</strong> (${labels[target]})</div>
-            <div style="padding: 0.75rem; background: var(--bg-body); border-radius: var(--radius-md); margin-top: 0.75rem; font-size: 0.875rem;">
-                ${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
-            </div>
-        `;
-        resultDiv.style.display = 'block';
-        resultDiv.style.background = 'rgba(42, 171, 238, 0.1)';
+        const msg = document.getElementById('broadcast-message').value.trim();
+        if (!msg) { Utils.toast('Escribe un mensaje primero', 'error'); return; }
+        const r = document.getElementById('broadcast-result');
+        r.style.display = 'block';
+        r.style.background = 'var(--card-hi)';
+        r.style.border = '1px solid var(--line)';
+        r.style.color = 'var(--txt)';
+        r.innerHTML = `<div style="font-size:11px;color:var(--txt-soft);margin-bottom:6px;font-weight:600;text-transform:uppercase;">Vista previa</div>${msg.replace(/\n/g, '<br>')}`;
     }
 
-    function sendBroadcast() {
-        const message = document.getElementById('broadcast-message').value;
+    async function sendBroadcast() {
+        const msg = document.getElementById('broadcast-message').value.trim();
         const target = document.getElementById('broadcast-target').value;
-        const resultDiv = document.getElementById('broadcast-result');
+        if (!msg) { Utils.toast('Escribe un mensaje primero', 'error'); return; }
+
         const btn = document.getElementById('send-broadcast-btn');
-
-        if (!message.trim()) {
-            resultDiv.innerHTML = '<span style="color: var(--danger);">⚠️ El mensaje no puede estar vacío</span>';
-            resultDiv.style.display = 'block';
-            resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
-            return;
-        }
-
-        if (!confirm('¿Enviar este mensaje?')) return;
-
         btn.disabled = true;
-        btn.innerHTML = '⏳ Enviando...';
-        resultDiv.innerHTML = '<div style="text-align: center;"><div class="spinner"></div><p style="margin-top: 0.5rem; font-size: 0.875rem;">Enviando...</p></div>';
-        resultDiv.style.display = 'block';
-        resultDiv.style.background = 'rgba(42, 171, 238, 0.1)';
+        btn.innerHTML = `<div class="spinner"></div> Enviando...`;
 
-        fetch('/api/admin/broadcast', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: message, target: target })
-        })
-            .then(res => res.json())
-            .then(data => {
-                btn.disabled = false;
-                btn.innerHTML = '📤 Enviar';
-
-                if (data.success) {
-                    resultDiv.innerHTML = `✅ ¡Completado! Enviados: <strong>${data.sent}</strong>`;
-                    resultDiv.style.background = 'rgba(109, 194, 109, 0.1)';
-                    document.getElementById('broadcast-message').value = '';
-                    document.getElementById('char-count').textContent = '0 / 4096';
-                } else {
-                    resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error: ${data.error}</span>`;
-                    resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
-                }
-            })
-            .catch(err => {
-                btn.disabled = false;
-                btn.innerHTML = '📤 Enviar';
-                resultDiv.innerHTML = `<span style="color: var(--danger);">❌ Error: ${err.message}</span>`;
-                resultDiv.style.background = 'rgba(229, 91, 91, 0.1)';
+        try {
+            const resp = await fetch('/api/broadcast', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg, target })
             });
+            const data = await resp.json();
+            const r = document.getElementById('broadcast-result');
+            r.style.display = 'block';
+            if (data.success) {
+                r.style.background = 'var(--success-bg)';
+                r.style.border = '1px solid rgba(16,185,129,0.2)';
+                r.style.color = 'var(--success)';
+                r.textContent = `✅ Enviado a ${data.sent} usuarios`;
+                document.getElementById('broadcast-message').value = '';
+                Utils.toast(`Enviado a ${data.sent} usuarios`, 'success');
+            } else {
+                r.style.background = 'var(--danger-bg)';
+                r.style.border = '1px solid rgba(248,113,113,0.2)';
+                r.style.color = 'var(--danger)';
+                r.textContent = `❌ Error: ${data.error || 'desconocido'}`;
+                Utils.toast('Error al enviar', 'error');
+            }
+        } catch (e) {
+            Utils.toast('Error de conexión', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar`;
+        }
     }
+
+    // Auto-refresh every 2 min
+    window.addEventListener('load', () => {
+        initCharts();
+        setInterval(updateStats, 120000);
+    });
 </script>
 {% endblock %}
-<style>
-    .grid-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .stat-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        transition: all 0.2s;
-    }
-
-    .stat-card:hover {
-        border-color: var(--primary);
-        box-shadow: var(--shadow-md);
-    }
-
-    .stat-label {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .stat-value {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        letter-spacing: -0.025em;
-    }
-
-    .stat-trend {
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
-
-    .trend-up {
-        color: var(--success);
-    }
-
-    .trend-neutral {
-        color: var(--text-tertiary);
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .section-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-
-    .activity-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-    }
-
-    .activity-card {
-        background: var(--bg-body);
-        border-radius: var(--radius-md);
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .activity-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: white;
-        border: 1px solid var(--border);
-        color: var(--primary);
-    }
-
-    .system-info-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .system-info-table td {
-        padding: 1rem 0;
-        border-bottom: 1px solid var(--border);
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-    }
-
-    .system-info-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .system-info-table strong {
-        color: var(--text-primary);
-        font-weight: 500;
-    }
-</style>
