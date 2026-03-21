@@ -1048,10 +1048,12 @@
                     data-i18n="limit_reached_desc">Para seguir descargando contenido exclusivo, necesitas recargar tus
                     descargas.</p>
                 <div style="display:flex; flex-direction:column; gap:12px;">
-                    <button class="btn btn-gold" onclick="switchTab('premium'); highlightProPlan();">💎 Ver Planes
+                    <button class="btn btn-gold" onclick="switchTab('premium'); highlightProPlan();"
+                        data-i18n="limit_btn_premium">💎 Ver Planes
                         Premium</button>
                     <button class="btn btn-outline" onclick="switchTab('referrals')"
-                        style="border-color:var(--cyan); color:var(--cyan);">👥 Obtener Gratis (Invitar)</button>
+                        style="border-color:var(--cyan); color:var(--cyan);" data-i18n="limit_btn_free">👥 Obtener
+                        Gratis (Invitar)</button>
                 </div>
             </div>
 
@@ -1440,7 +1442,8 @@
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="account_support_label">¿Aún necesitas
                             ayuda soporte?</span><span class="faq-q-icon">+</span></div>
-                    <div class="faq-a">Puedes ir tranquilamente a la pestaña "Cuenta" y presionar Centro de Soporte para
+                    <div class="faq-a" data-i18n="support_faq_a">Puedes ir tranquilamente a la pestaña "Cuenta" y
+                        presionar Centro de Soporte para
                         comunicarte en privado con el Staff en Telegram.</div>
                 </div>
             </div>
@@ -1448,19 +1451,18 @@
             <div class="sec-label" style="margin-top:24px;" data-i18n="guide_tips">Consejos útiles</div>
             <div class="card">
                 <div style="display:flex; flex-direction:column; gap:12px; font-size:13px; color:var(--txt-soft);">
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">⚡</span> Copia, Pega,
-                        Envía
-                        rápido, la memoria retiene el caché para que descargues en lotes ágiles.</div>
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🎯</span> Usa el
-                        cliente
-                        Telegram Desktop para copiar lotes masivos más sencillo.</div>
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">✨</span> Comprueba
-                        cuánta
-                        fecha te queda en Configuración periódicamente.</div>
-                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🚀</span> Comparte tu
-                        referido
-                        entre alumnos o en redes TikTok con un video tutorial del bot para ganancias ilimitadas.
-                    </div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">⚡</span><span
+                            data-i18n="guide_tip_1">Copia, Pega, Envía
+                            rápido, la memoria retiene el caché para que descargues en lotes ágiles.</span></div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🎯</span><span
+                            data-i18n="guide_tip_2">Usa el cliente
+                            Telegram Desktop para copiar lotes masivos más sencillo.</span></div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">✨</span><span
+                            data-i18n="guide_tip_3">Comprueba cuánta
+                            fecha te queda en Configuración periódicamente.</span></div>
+                    <div style="display:flex; gap:10px;"><span style="color:var(--gold);">🚀</span><span
+                            data-i18n="guide_tip_4">Comparte tu enlace
+                            de afiliados para ganar gratis.</span></div>
                 </div>
             </div>
 
