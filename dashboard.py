@@ -1396,25 +1396,25 @@ def create_invoice():
         # Premium plans configuration
         PREMIUM_PLANS = {
             'flash': {
-                'stars': 75,
+                'stars': 52,
                 'days': 3,
                 'name': '⚡ VENTA FLASH',
                 'description': '¡Descuento 50%! Premium por 3 días'
             },
             'basic': {
-                'stars': 333,
+                'stars': 233,
                 'days': 7,
                 'name': '🚀 Básico',
                 'description': 'Premium por 7 días | Ideal para empezar'
             },
             'pro': {
-                'stars': 777,
+                'stars': 544,
                 'days': 30,
                 'name': '🔥 Pro',
                 'description': 'Premium por 30 días | El más elegido'
             },
             'elite': {
-                'stars': 1499,
+                'stars': 1049,
                 'days': 90,
                 'name': '💎 Elite',
                 'description': 'Premium por 90 días | Máximo ahorro'

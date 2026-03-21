@@ -109,7 +109,7 @@ FREE_PHOTO_LIMIT = 0  # Free users: 0 fotos
 # Premium Plans (Telegram Stars) - Estrategia de Precios Optimizada
 PREMIUM_PLANS = {
     'flash': {
-        'stars': 75,
+        'stars': 52,
         'days': 3,
         'name': '⚡ Venta Flash',
         'label': 'Premium 3 días',
@@ -117,7 +117,7 @@ PREMIUM_PLANS = {
         'description': 'Solo por hoy'
     },
     'basic': {
-        'stars': 333,
+        'stars': 233,
         'days': 7,
         'name': '🚀 Básico',
         'label': 'Premium 7 días',
@@ -125,7 +125,7 @@ PREMIUM_PLANS = {
         'description': 'Ideal para empezar'
     },
     'pro': {
-        'stars': 777,
+        'stars': 544,
         'days': 30,
         'name': '🔥 Pro',
         'label': 'Premium 30 días',
@@ -133,7 +133,7 @@ PREMIUM_PLANS = {
         'description': 'El más popular'
     },
     'elite': {
-        'stars': 1499,
+        'stars': 1049,
         'days': 90,
         'name': '💎 Elite',
         'label': 'Premium 90 días',
