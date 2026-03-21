@@ -1137,63 +1137,112 @@
 
         <!-- REFERRALS TAB -->
         <div id="tab-referrals" class="tab-panel">
-            <div class="card" style="text-align:center; padding: 30px 20px;">
-                <div style="font-size:48px; margin-bottom:16px;">🎁</div>
-                <h2 style="font-size:22px; font-weight:800; margin-bottom:8px;" data-i18n="referrals_title">Gana
-                    Descargas</h2>
-                <!-- Cada 15 refs = 10 descargas -->
-                <p style="color:var(--txt-soft); font-size:14px; line-height:1.5;" data-i18n="referrals_desc">Invita a
-                    15 amigos a iniciar el bot y recibe 10 descargas gratis inmediatamente.</p>
 
-                <div style="background:var(--bg-input); border-radius:var(--rs); padding:16px; margin-top:24px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                        <span style="font-size:12px; color:var(--txt-muted); font-weight:700;"
-                            data-i18n="referral_progress">PROGRESS</span>
-                        <div style="font-family:'Syne'; font-size:18px; font-weight:800; color:var(--cyan);"
-                            id="refProgressText">0/15</div>
-                    </div>
-                    <div class="credits-bar" style="height:8px; margin-bottom:0;">
-                        <div class="credits-fill" id="progressBar" style="width:0%; background:var(--cyan);"></div>
-                    </div>
-                </div>
+            <!-- HERO -->
+            <div style="text-align:center; padding:28px 8px 20px;">
+                <div style="
+                    width:64px; height:64px;
+                    background:linear-gradient(135deg, var(--cyan), #0ea5e9);
+                    border-radius:18px;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:28px; margin:0 auto 16px;
+                    box-shadow:0 8px 24px rgba(34,211,238,0.25);
+                ">🎁</div>
+                <h2 style="font-family:'Syne',sans-serif; font-size:24px; font-weight:900; color:var(--txt); margin:0 0 8px; letter-spacing:-0.5px;"
+                    data-i18n="referrals_title">Gana descargas gratis</h2>
+                <p style="font-size:13px; color:var(--txt-soft); line-height:1.6; max-width:260px; margin:0 auto;"
+                    data-i18n="referrals_desc">
+                    Invita a 15 amigos a iniciar el bot y recibe 10 descargas gratis inmediatamente.
+                </p>
+            </div>
 
-                <div style="margin-top:20px; text-align:left;">
-                    <label
-                        style="font-size:11px; color:var(--txt-soft); text-transform:uppercase; font-weight:700; display:block; margin-bottom:8px;"
-                        data-i18n="referral_unique_link">Your unique link:</label>
+            <!-- CÓMO FUNCIONA -->
+            <div style="display:flex; align-items:flex-start; gap:0; margin-bottom:20px;">
+                <div style="flex:1; text-align:center; padding:0 4px;">
                     <div
-                        style="background:var(--card-hi); border:1px solid var(--line); border-radius:12px; padding:12px; display:flex; align-items:center; gap:10px;">
-                        <code id="referralLink"
-                            style="flex:1; font-size:12px; color:var(--txt-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
-                            data-i18n="referral_link_loading">Loading link...</code>
-                        <span onclick="copyReferralLink()"
-                            style="cursor:pointer; color:var(--gold); font-size:18px;">📋</span>
+                        style="width:36px; height:36px; background:var(--card-hi); border:1px solid var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; margin:0 auto 8px;">
+                        🔗</div>
+                    <div style="font-size:11px; font-weight:700; color:var(--txt); margin-bottom:3px;">Comparte</div>
+                    <div style="font-size:10px; color:var(--txt-muted); line-height:1.4;">Tu enlace único</div>
+                </div>
+                <div style="padding-top:18px; color:var(--line); font-size:18px;">›</div>
+                <div style="flex:1; text-align:center; padding:0 4px;">
+                    <div
+                        style="width:36px; height:36px; background:var(--card-hi); border:1px solid var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; margin:0 auto 8px;">
+                        👥</div>
+                    <div style="font-size:11px; font-weight:700; color:var(--txt); margin-bottom:3px;">15 amigos</div>
+                    <div style="font-size:10px; color:var(--txt-muted); line-height:1.4;">Inician el bot</div>
+                </div>
+                <div style="padding-top:18px; color:var(--line); font-size:18px;">›</div>
+                <div style="flex:1; text-align:center; padding:0 4px;">
+                    <div
+                        style="width:36px; height:36px; background:rgba(34,211,238,0.1); border:1px solid rgba(34,211,238,0.2); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; margin:0 auto 8px;">
+                        ⚡</div>
+                    <div style="font-size:11px; font-weight:700; color:var(--cyan); margin-bottom:3px;">+10 descargas
                     </div>
+                    <div style="font-size:10px; color:var(--txt-muted); line-height:1.4;">Al instante</div>
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-                <div class="card"
-                    style="margin:0; padding:16px; display:flex; flex-direction:column; align-items:center;">
-                    <div style="color:var(--txt-soft); font-size:11px; text-transform:uppercase; font-weight:700; margin-bottom:8px;"
-                        data-i18n="referrals_total_label">
-                        Totales</div>
-                    <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--txt);"
+            <!-- PROGRESO -->
+            <div class="card" style="padding:18px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                        <div style="font-size:13px; font-weight:700; color:var(--txt);" data-i18n="referral_progress">
+                            Progreso actual</div>
+                        <div style="font-size:11px; color:var(--txt-muted); margin-top:2px;">Hacia tu próxima recompensa
+                        </div>
+                    </div>
+                    <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:900; color:var(--cyan);"
+                        id="refProgressText">0/15</div>
+                </div>
+                <div class="credits-bar" style="height:8px; background:rgba(34,211,238,0.08);">
+                    <div class="credits-fill" id="progressBar" style="width:0%; background:var(--cyan);"></div>
+                </div>
+            </div>
+
+            <!-- ESTADÍSTICAS -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                <div class="card" style="padding:16px; text-align:center;">
+                    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--txt-muted); margin-bottom:10px;"
+                        data-i18n="referrals_total_label">Referidos totales</div>
+                    <div style="font-family:'Syne',sans-serif; font-size:28px; font-weight:900; color:var(--txt);"
                         id="refConfirmed">0</div>
+                    <div style="font-size:11px; color:var(--txt-muted); margin-top:4px;">usuarios</div>
                 </div>
                 <div class="card"
-                    style="margin:0; padding:16px; display:flex; flex-direction:column; align-items:center;">
-                    <!-- 'Ganadas' -->
-                    <div style="color:var(--txt-soft); font-size:11px; text-transform:uppercase; font-weight:700; margin-bottom:8px;"
-                        data-i18n="referrals_earned_label">Ganadas</div>
-                    <div style="font-family:'Syne'; font-size:24px; font-weight:800; color:var(--emerald);"
+                    style="padding:16px; text-align:center; border-color:rgba(16,185,129,0.2); background:linear-gradient(160deg, var(--card), rgba(16,185,129,0.03));">
+                    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--txt-muted); margin-bottom:10px;"
+                        data-i18n="referrals_earned_label">Descargas ganadas</div>
+                    <div style="font-family:'Syne',sans-serif; font-size:28px; font-weight:900; color:var(--emerald);"
                         id="refEarned">0</div>
+                    <div style="font-size:11px; color:var(--txt-muted); margin-top:4px;">créditos</div>
                 </div>
             </div>
 
-            <button class="btn btn-cyan" onclick="shareReferralLink()">
-                <span style="font-size:18px;">🔗</span> <span data-i18n="btn_share">Compartir Enlace</span>
+            <!-- ENLACE -->
+            <div class="card" style="padding:16px; margin-bottom:14px;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--txt-muted); margin-bottom:10px;"
+                    data-i18n="referral_unique_link">Tu enlace de invitación</div>
+                <div
+                    style="background:var(--card-hi); border:1px solid var(--line); border-radius:var(--rs); padding:12px 14px; display:flex; align-items:center; gap:10px;">
+                    <code id="referralLink"
+                        style="flex:1; font-size:12px; color:var(--txt-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:monospace;"
+                        data-i18n="referral_link_loading">Cargando enlace...</code>
+                    <button onclick="copyReferralLink()"
+                        style="background:var(--card); border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:14px; color:var(--txt-muted); transition:all 0.2s; flex-shrink:0;"
+                        onmouseenter="this.style.borderColor='var(--cyan)'; this.style.color='var(--cyan)'"
+                        onmouseleave="this.style.borderColor='var(--line)'; this.style.color='var(--txt-muted)'">📋</button>
+                </div>
+            </div>
+
+            <!-- CTA COMPARTIR -->
+            <button class="btn btn-cyan" onclick="shareReferralLink()"
+                style="font-size:15px; font-weight:800; height:52px;">
+                <span style="font-size:18px;">🔗</span>
+                <span data-i18n="btn_share">Compartir mi enlace</span>
             </button>
+
         </div>
 
         <!-- GUIDE TAB -->
