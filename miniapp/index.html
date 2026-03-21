@@ -2634,6 +2634,10 @@
 
                 if (result.ok) {
                     loadUserData();
+                    // Close the MiniApp so the user can see the message sent to the bot chat
+                    if (tg?.close) {
+                        setTimeout(() => tg.close(), 1200);
+                    }
                 } else {
                     showToast(t('configure_error'));
                 }
