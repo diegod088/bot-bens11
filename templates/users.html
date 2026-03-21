@@ -15,11 +15,11 @@
     .toolbar input,
     .toolbar select {
         padding: 0.75rem;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
         font-size: 16px;
-        background: var(--bg-surface);
-        color: var(--text-primary);
+        background: var(--card);
+        color: var(--txt);
     }
 
     .toolbar .btn {
@@ -35,9 +35,9 @@
     }
 
     .user-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
         padding: 1rem;
         display: flex;
         flex-direction: column;
@@ -63,20 +63,20 @@
 
     .user-id {
         font-size: 0.75rem;
-        color: var(--text-tertiary);
+        color: var(--txt-muted);
         margin-bottom: 0.25rem;
     }
 
     .user-name {
         font-size: 1rem;
         font-weight: 600;
-        color: var(--text-primary);
+        color: var(--txt);
         word-break: break-word;
     }
 
     .user-username {
         font-size: 0.85rem;
-        color: var(--text-secondary);
+        color: var(--txt-soft);
     }
 
     .user-meta {
@@ -102,9 +102,9 @@
     }
 
     .badge-free {
-        background: var(--bg-body);
-        color: var(--text-secondary);
-        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--txt-soft);
+        border: 1px solid var(--line);
     }
 
     .badge-success {
@@ -123,7 +123,7 @@
         gap: 0.5rem;
         font-size: 0.85rem;
         padding-top: 0.75rem;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--line);
     }
 
     .stat-item {
@@ -132,11 +132,11 @@
     }
 
     .stat-label {
-        color: var(--text-secondary);
+        color: var(--txt-soft);
     }
 
     .stat-value {
-        color: var(--text-primary);
+        color: var(--txt);
         font-weight: 600;
     }
 
@@ -155,8 +155,8 @@
     .table-container {
         display: none;
         overflow-x: auto;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
     }
 
     table {
@@ -166,19 +166,19 @@
     }
 
     th {
-        background: var(--bg-body);
+        background: var(--surface);
         padding: 0.75rem 1rem;
         text-align: left;
         font-weight: 600;
-        color: var(--text-secondary);
-        border-bottom: 1px solid var(--border);
+        color: var(--txt-soft);
+        border-bottom: 1px solid var(--line);
         white-space: nowrap;
     }
 
     td {
         padding: 1rem;
-        border-bottom: 1px solid var(--border);
-        color: var(--text-primary);
+        border-bottom: 1px solid var(--line);
+        color: var(--txt);
     }
 
     tr:last-child td {
@@ -186,7 +186,7 @@
     }
 
     tr:hover td {
-        background: var(--bg-body);
+        background: var(--surface);
     }
 
     /* === PAGINATION === */
@@ -204,24 +204,24 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        background: var(--bg-surface);
-        color: var(--text-secondary);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        background: var(--card);
+        color: var(--txt-soft);
         cursor: pointer;
         transition: all 0.2s;
         font-size: 0.75rem;
     }
 
     .page-btn:active:not(:disabled) {
-        border-color: var(--primary);
-        color: var(--primary);
+        border-color: var(--indigo);
+        color: var(--indigo);
     }
 
     .page-btn.active {
-        background: var(--primary);
+        background: var(--indigo);
         color: white;
-        border-color: var(--primary);
+        border-color: var(--indigo);
     }
 
     .page-btn:disabled {
@@ -233,20 +233,24 @@
     .loading-state {
         padding: 2rem 1rem;
         text-align: center;
-        color: var(--text-secondary);
+        color: var(--txt-soft);
     }
 
     .spinner {
         width: 24px;
         height: 24px;
-        border: 2px solid var(--border);
-        border-top-color: var(--primary);
+        border: 2px solid var(--line);
+        border-top-color: var(--indigo);
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
         margin: 0 auto 1rem;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 
     /* === DESKTOP RESPONSIVE === */
     @media (min-width: 768px) {
@@ -284,8 +288,8 @@
 
     /* === BULK ACTIONS BANNER === */
     #bulk-actions {
-        background: var(--primary-light);
-        border-radius: var(--radius-lg);
+        background: var(--indigo-dim);
+        border-radius: var(--r);
         padding: 1rem;
         margin-bottom: 1rem;
         display: none;
@@ -322,17 +326,22 @@
 <div class="card">
     <div class="toolbar">
         <div style="position: relative;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="search-input" placeholder="Buscar por nombre, usuario o ID..." style="padding-left: 2.5rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--txt-muted); pointer-events: none;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-input" placeholder="Buscar por nombre, usuario o ID..."
+                style="padding-left: 2.5rem;">
         </div>
-        
+
         <select id="status-filter" onchange="loadUsers(1)">
             <option value="all">Todos los usuarios</option>
             <option value="premium">⭐ Premium activo</option>
             <option value="premium-expired">⭐ Premium expirado</option>
             <option value="free">Gratuito</option>
         </select>
-        
+
         <select id="sort-filter" onchange="loadUsers(1)">
             <option value="created_at-desc">📅 Más recientes</option>
             <option value="created_at-asc">📅 Más antiguos</option>
@@ -340,14 +349,14 @@
             <option value="updated_at-desc">⏱️ Más activos</option>
             <option value="premium_until-desc">⭐ Próximo vencimiento</option>
         </select>
-        
+
         <select id="per-page-filter" onchange="changePerPage()">
             <option value="10">10 por pág.</option>
             <option value="20" selected>20 por pág.</option>
             <option value="50">50 por pág.</option>
             <option value="100">100 por pág.</option>
         </select>
-        
+
         <button class="btn btn-primary" onclick="exportCSV()" title="Exportar CSV">
             💾 CSV
         </button>
@@ -356,8 +365,9 @@
     <!-- Bulk Actions Banner (Mobile) -->
     <div id="bulk-actions">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 600; color: var(--primary);" id="selected-count">0 seleccionados</span>
-            <button class="btn btn-outline" onclick="clearSelection()" style="width: auto; padding: 0.5rem 1rem;">Cancelar</button>
+            <span style="font-weight: 600; color: var(--indigo);" id="selected-count">0 seleccionados</span>
+            <button class="btn btn-outline" onclick="clearSelection()"
+                style="width: auto; padding: 0.5rem 1rem;">Cancelar</button>
         </div>
         <button class="btn btn-primary" onclick="bulkAddPremium()">✨ Añadir Premium a Seleccionados</button>
     </div>
@@ -448,22 +458,22 @@
         if (selectedUsers.size === 0) return;
         const days = prompt('¿Cuántos días?', '30');
         if (!days) return;
-        
+
         fetch('/api/admin/add-premium-bulk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_ids: Array.from(selectedUsers), days: parseInt(days) })
         })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                Utils.showToast(`Premium añadido a ${data.affected} usuarios`, 'success');
-                clearSelection();
-                loadUsers(1);
-            } else {
-                Utils.showToast(data.error, 'error');
-            }
-        });
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    Utils.showToast(`Premium añadido a ${data.affected} usuarios`, 'success');
+                    clearSelection();
+                    loadUsers(1);
+                } else {
+                    Utils.showToast(data.error, 'error');
+                }
+            });
     }
 
     function renderUsersCards(users) {
@@ -471,7 +481,7 @@
         grid.innerHTML = '';
 
         if (users.length === 0) {
-            grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No se encontraron usuarios</div>';
+            grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--txt-soft);">No se encontraron usuarios</div>';
             return;
         }
 
@@ -479,7 +489,7 @@
             const isPremium = user.is_premium;
             const daysLeft = isPremium ? getDaysLeft(user.premium_expiry) : 0;
             const nameDisplay = user.first_name || (user.username ? `@${user.username}` : 'Usuario');
-            
+
             const card = document.createElement('div');
             card.className = 'user-card';
             card.innerHTML = `
@@ -531,7 +541,7 @@
             const isPremium = user.is_premium;
             const daysLeft = isPremium ? getDaysLeft(user.premium_expiry) : 0;
             const nameDisplay = user.first_name || (user.username ? `@${user.username}` : 'Usuario');
-            
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="font-medium">${user.user_id}</td>
@@ -572,7 +582,7 @@
                 const span = document.createElement('span');
                 span.textContent = '...';
                 span.style.padding = '0.5rem';
-                span.style.color = 'var(--text-tertiary)';
+                span.style.color = 'var(--txt-muted)';
                 container.appendChild(span);
             }
         }
@@ -631,7 +641,7 @@
     document.getElementById('search-input').addEventListener('keypress', e => {
         if (e.key === 'Enter') loadUsers(1);
     });
-    
+
     // Búsqueda en tiempo real (opcional)
     document.getElementById('search-input').addEventListener('input', () => {
         loadUsers(1);
@@ -642,148 +652,3 @@
 
 </script>
 {% endblock %}
-<style>
-    .toolbar {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-
-    .search-input {
-        flex: 1;
-        min-width: 240px;
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        font-size: 0.875rem;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    .search-input:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 2px var(--primary-light);
-    }
-
-    .table-container {
-        overflow-x: auto;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.875rem;
-    }
-
-    th {
-        background: var(--bg-body);
-        padding: 0.75rem 1.5rem;
-        text-align: left;
-        font-weight: 600;
-        color: var(--text-secondary);
-        border-bottom: 1px solid var(--border);
-        white-space: nowrap;
-    }
-
-    td {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--border);
-        color: var(--text-primary);
-    }
-
-    tr:last-child td {
-        border-bottom: none;
-    }
-
-    tr:hover td {
-        background: var(--bg-body);
-    }
-
-    .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    .badge-premium {
-        background: var(--warning-bg);
-        color: var(--warning);
-    }
-
-    .badge-free {
-        background: var(--bg-body);
-        color: var(--text-secondary);
-        border: 1px solid var(--border);
-    }
-
-    .badge-success {
-        background: var(--success-bg);
-        color: var(--success);
-    }
-
-    .badge-danger {
-        background: var(--danger-bg);
-        color: var(--danger);
-    }
-
-    .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 2rem;
-    }
-
-    .page-btn {
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        background: var(--bg-surface);
-        color: var(--text-secondary);
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .page-btn:hover:not(:disabled) {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
-
-    .page-btn.active {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-    }
-
-    .page-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .loading-state {
-        padding: 4rem;
-        text-align: center;
-        color: var(--text-secondary);
-    }
-    
-    .spinner {
-        width: 24px;
-        height: 24px;
-        border: 2px solid var(--border);
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin: 0 auto 1rem;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-</style>

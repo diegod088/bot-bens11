@@ -417,11 +417,9 @@ def get_analytics():
         
         conn.close()
         
-        # PROBLEMA 3b: Cálculos de monetización reales
-        STARS_PER_PREMIUM = 149
-        USD_PER_STAR = 0.017  # precio aproximado de Telegram Stars
-        estimated_revenue_usd = round(premium_users * STARS_PER_PREMIUM * USD_PER_STAR, 2)
-        estimated_revenue_stars = premium_users * STARS_PER_PREMIUM
+        # Ingresos reales basados en transacciones
+        cursor.execute("SELECT SUM(amount) FROM payments WHERE status = 'completed'")
+        real_revenue_stars = cursor.fetchone()[0] or 0
         
         # Tasa de conversión (simplificada)
         conversion_rate = premium_percentage
@@ -431,15 +429,15 @@ def get_analytics():
             'premium_users': premium_users,
             'free_users': free_users,
             'premium_percentage': premium_percentage,
-            'estimated_revenue': estimated_revenue_usd,
-            'estimated_revenue_usd': estimated_revenue_usd,
-            'estimated_revenue_stars': estimated_revenue_stars,
-            'conversion_rate': conversion_rate,
             'total_videos': total_videos,
             'total_photos': total_photos,
             'total_music': total_music,
             'total_apks': total_apks,
-            'recent_premium': recent_premium
+            'recent_premium': recent_premium,
+            'estimated_revenue': real_revenue_stars,
+            'estimated_revenue_usd': round(real_revenue_stars * 0.017, 2),
+            'estimated_revenue_stars': real_revenue_stars,
+            'conversion_rate': conversion_rate
         })
     
     except Exception as e:

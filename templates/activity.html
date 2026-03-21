@@ -20,21 +20,21 @@
 
     .filter-btn {
         padding: 0.5rem 1rem;
-        border: 1px solid var(--border);
-        background: var(--bg-surface);
-        border-radius: var(--radius-md);
+        border: 1px solid var(--line);
+        background: var(--card);
+        border-radius: var(--r-sm);
         font-size: 0.875rem;
         cursor: pointer;
         transition: all 0.2s;
     }
 
     .filter-btn:hover, .filter-btn.active {
-        border-color: var(--primary);
-        color: var(--primary);
+        border-color: var(--indigo);
+        color: var(--indigo);
     }
 
     .filter-btn.active {
-        background: var(--primary-light);
+        background: var(--indigo-dim);
     }
 
     .timeline {
@@ -49,7 +49,7 @@
         top: 0;
         bottom: 0;
         width: 2px;
-        background: var(--border);
+        background: var(--line);
     }
 
     .timeline-item {
@@ -68,20 +68,20 @@
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: var(--primary);
-        border: 2px solid var(--bg-surface);
-        box-shadow: 0 0 0 3px var(--primary-light);
+        background: var(--indigo);
+        border: 2px solid var(--card);
+        box-shadow: 0 0 0 3px var(--indigo-dim);
     }
 
     .timeline-dot.download { background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
     .timeline-dot.premium { background: var(--warning); box-shadow: 0 0 0 3px var(--warning-bg); }
-    .timeline-dot.user { background: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+    .timeline-dot.user { background: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); }
     .timeline-dot.error { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-bg); }
 
     .timeline-content {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
         padding: 1rem 1.25rem;
     }
 
@@ -94,17 +94,17 @@
 
     .timeline-title {
         font-weight: 500;
-        color: var(--text-primary);
+        color: var(--txt);
     }
 
     .timeline-time {
         font-size: 0.75rem;
-        color: var(--text-tertiary);
+        color: var(--txt-muted);
     }
 
     .timeline-desc {
         font-size: 0.875rem;
-        color: var(--text-secondary);
+        color: var(--txt-soft);
     }
 
     .timeline-meta {
@@ -119,7 +119,7 @@
         align-items: center;
         gap: 0.25rem;
         font-size: 0.75rem;
-        color: var(--text-tertiary);
+        color: var(--txt-muted);
     }
 
     .stats-row {
@@ -130,9 +130,9 @@
     }
 
     .mini-stat {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
         padding: 1rem;
         text-align: center;
     }
@@ -140,12 +140,12 @@
     .mini-stat-value {
         font-size: 1.5rem;
         font-weight: 700;
-        color: var(--text-primary);
+        color: var(--txt);
     }
 
     .mini-stat-label {
         font-size: 0.75rem;
-        color: var(--text-secondary);
+        color: var(--txt-soft);
         margin-top: 0.25rem;
     }
 
@@ -157,7 +157,7 @@
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        color: var(--text-secondary);
+        color: var(--txt-soft);
     }
 
     .empty-state svg {
@@ -170,7 +170,7 @@
         align-items: center;
         gap: 1rem;
         margin: 1.5rem 0;
-        color: var(--text-tertiary);
+        color: var(--txt-muted);
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -181,7 +181,7 @@
         content: '';
         flex: 1;
         height: 1px;
-        background: var(--border);
+        background: var(--line);
     }
 </style>
 {% endblock %}
@@ -363,7 +363,7 @@
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                             ID: ${activity.user_id}
                         </span>
-                        <a href="/user/${activity.user_id}" class="meta-item" style="color: var(--primary);">
+                        <a href="/user/${activity.user_id}" class="meta-item" style="color: var(--indigo);">
                             Ver usuario →
                         </a>
                     </div>
