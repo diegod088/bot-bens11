@@ -569,12 +569,11 @@
     }
 
     function updateBroadcastCount() {
-        const map = {
-            all: {{ stats.total_users }
-    },
-    premium: { { stats.premium_users } },
-    free: { { stats.total_users - stats.premium_users } }
-        };
+        const totalUsers = {{ stats.total_users }
+    };
+    const premiumUsers = {{ stats.premium_users }};
+    const freeUsers = totalUsers - premiumUsers;
+    const map = { all: totalUsers, premium: premiumUsers, free: freeUsers };
     const v = document.getElementById('broadcast-target').value;
     document.getElementById('broadcast-count').textContent = `${map[v]} destinatarios`;
     }
