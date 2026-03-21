@@ -271,7 +271,13 @@ const TRANSLATIONS = {
         "home_title_line1": "Acesso Total a",
         "home_title_vip": "TELEGRAM VIP",
         "input_placeholder": "Cole qualquer link privado aqui...",
-        "btn_get_file": "DESBLOQUEAR ARQUIVO"
+        "btn_get_file": "DESBLOQUEAR ARQUIVO",
+        "nav_account": "Perfil",
+        "account_title": "Meu Perfil VIP",
+        "profile_free_badge": "Usuário Básico ✦",
+        "profile_premium_badge": "Membro Pro ⭐",
+        "hero_greeting": "Olá, {name}",
+        "hero_headline": "Acesso Total a\nTELEGRAM VIP"
     },
     "it": {
         "onboarding_title_1": "Accesso Illimitato",
@@ -284,7 +290,13 @@ const TRANSLATIONS = {
         "home_title_line1": "Accesso Totale a",
         "home_title_vip": "TELEGRAM VIP",
         "input_placeholder": "Incolla qui qualsiasi link privato...",
-        "btn_get_file": "SBLOCCA FILE"
+        "btn_get_file": "SBLOCCA FILE",
+        "nav_account": "Profilo",
+        "account_title": "Mio Profilo VIP",
+        "profile_free_badge": "Utente Base ✦",
+        "profile_premium_badge": "Membro Pro ⭐",
+        "hero_greeting": "Ciao, {name}",
+        "hero_headline": "Accesso Totale a\nTELEGRAM VIP"
     }
 };
 

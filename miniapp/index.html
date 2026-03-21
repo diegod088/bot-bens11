@@ -1530,7 +1530,7 @@
                         <span class="ami-icon">🌐</span>
                         <div class="ami-text">
                             <div class="ami-title" data-i18n="account_lang_label">Idioma</div>
-                            <div class="ami-sub" id="currentLangLabel">Español</div>
+                            <div class="ami-sub" id="currentLangLabelGuest">Español</div>
                         </div>
                         <span class="ami-arrow">›</span>
                     </div>
@@ -1586,7 +1586,7 @@
                         <span class="ami-icon">🌐</span>
                         <div class="ami-text">
                             <div class="ami-title" data-i18n="account_lang_label">Idioma</div>
-                            <div class="ami-sub" id="currentLangLabel">Español</div>
+                            <div class="ami-sub" id="currentLangLabelAuth">Español</div>
                         </div>
                         <span class="ami-arrow">›</span>
                     </div>
@@ -2408,73 +2408,29 @@
 
 
         function updateConnectionStatus() {
-            const requiredEls = ['profileGuest', 'profileAuth', 'headerConnIcon', 'userName'];
-            const allReady = requiredEls.every(id => document.getElementById(id) !== null);
-
-            // If some elements are missing (e.g. during rapid tab switching or init), 
-            // try to proceed with what we have instead of looping infinitely if one is truly gone.
-            if (!allReady) {
-                console.warn('⚠️ Missing some UI elements for connection status update:', requiredEls.filter(id => !document.getElementById(id)));
-                // We'll still try to run the toggle if the main ones are there
-                if (!document.getElementById('profileGuest') || !document.getElementById('profileAuth')) {
-                    setTimeout(updateConnectionStatus, 200);
-                    return;
-                }
-            }
-
-            if (isConnected) {
-                try {
-                    const history = JSON.parse(localStorage.getItem('download_history') || '[]');
-                    const pendingLink = localStorage.getItem('last_attempted_link');
-                    const input = document.getElementById('linkInput');
-                    const fillValue = pendingLink || (history.length > 0 ? history[0].link : null);
-                    if (input && fillValue && !input.value) {
-                        input.value = fillValue;
-                        input.style.color = 'var(--txt-soft)';
-                        input.addEventListener('focus', () => { input.style.color = 'var(--txt)'; }, { once: true });
-                    }
-                } catch (e) { }
-            }
-
-            // Profile tab toggle
             const profileGuest = document.getElementById('profileGuest');
             const profileAuth = document.getElementById('profileAuth');
-            if (profileGuest && profileAuth) {
-                profileGuest.style.display = isConnected ? 'none' : 'block';
-                profileAuth.style.display = isConnected ? 'block' : 'none';
+
+            if (!profileGuest || !profileAuth) {
+                console.error('CRITICAL: Profile containers missing!');
+                setTimeout(updateConnectionStatus, 300);
+                return;
             }
 
-            // Link input visual
-            const linkInput = document.getElementById('linkInput');
-            if (linkInput) {
-                linkInput.style.opacity = isConnected ? '1' : '0.45';
-            }
+            // Toggle visibility
+            profileGuest.style.display = isConnected ? 'none' : 'block';
+            profileAuth.style.display = isConnected ? 'block' : 'none';
 
-            const downloadOverlay = document.getElementById('downloadOverlay');
-            if (downloadOverlay) {
-                downloadOverlay.style.display = isConnected ? 'none' : 'flex';
-            }
-
-            const icon = document.getElementById('connIcon');
-            const title = document.getElementById('connTitle');
-            const sub = document.getElementById('connSub');
-
-            const headerUserName = document.getElementById('userName');
-            const headerConnIcon = document.getElementById('headerConnIcon');
-
+            // Update UI components
             const tgUser = tg?.initDataUnsafe?.user || {};
             const finalName = userData?.username || userData?.first_name || tgUser.first_name || 'Usuario';
 
+            const headerUserName = document.getElementById('userName');
+            const headerConnIcon = document.getElementById('headerConnIcon');
+            const icon = document.getElementById('connIcon');
+            const title = document.getElementById('connTitle');
+            const sub = document.getElementById('connSub');
             const heroHeadline = document.getElementById('heroHeadline');
-            if (heroHeadline) {
-                if (isConnected) {
-                    const pattern = t('hero_greeting').replace('{name}', finalName);
-                    heroHeadline.innerHTML = `<span style="color:var(--gold)">${pattern}</span><br>¿qué descargas hoy?`;
-                } else {
-                    const defaultText = t('hero_headline');
-                    heroHeadline.innerHTML = defaultText.replace(/\n/g, '<br>');
-                }
-            }
 
             if (isConnected) {
                 if (icon) icon.textContent = '✅';
@@ -2509,6 +2465,25 @@
                     headerUserName.textContent = t('connection_status_disconnected');
                 }
                 if (headerConnIcon) headerConnIcon.style.display = 'inline-block';
+            }
+
+            // Update language labels
+            const langLabels = { 'es': 'Español', 'en': 'English', 'pt': 'Português', 'it': 'Italiano' };
+            const langText = langLabels[currentLanguage] || 'Español';
+            const guestLang = document.getElementById('currentLangLabelGuest');
+            const authLang = document.getElementById('currentLangLabelAuth');
+            if (guestLang) guestLang.textContent = langText;
+            if (authLang) authLang.textContent = langText;
+
+            // Headline update
+            if (heroHeadline) {
+                if (isConnected) {
+                    const pattern = t('hero_greeting').replace('{name}', finalName);
+                    heroHeadline.innerHTML = `<span style="color:var(--gold)">${pattern}</span><br>¿qué descargas hoy?`;
+                } else {
+                    const defaultText = t('hero_headline') || 'Acceso Total a\nTELEGRAM VIP';
+                    heroHeadline.innerHTML = defaultText.replace(/\n/g, '<br>');
+                }
             }
         }
 
