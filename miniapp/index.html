@@ -1469,8 +1469,8 @@
             </button>
         </div>
 
-        <!-- PROFILE TAB -->
-        <div id="tab-profile" class="tab-panel">
+        <!-- ACCOUNT TAB -->
+        <div id="tab-account" class="tab-panel">
             <div id="profileGuest" style="padding-top:20px; display: none;">
 
                 <!-- Card hero de login -->
@@ -1613,7 +1613,7 @@
         <button class="nav-btn" id="nav-guide" onclick="switchTab('guide')">
             <span class="nav-icon">📖</span><span data-i18n="guide_title">Guía</span>
         </button>
-        <button class="nav-btn" id="nav-profile" onclick="switchTab('profile')">
+        <button class="nav-btn" id="nav-account" onclick="switchTab('account')">
             <span class="nav-icon">👤</span><span data-i18n="nav_account">Cuenta</span>
         </button>
     </nav>
@@ -1923,7 +1923,7 @@
         function switchTab(tabId) {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 
-            ['home', 'premium', 'account', 'referrals', 'guide', 'profile'].forEach(id => {
+            ['home', 'premium', 'account', 'referrals', 'guide'].forEach(id => {
                 const panel = document.getElementById('tab-' + id);
                 if (panel) panel.classList.remove('active');
             });
