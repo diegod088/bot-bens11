@@ -95,7 +95,17 @@ const TRANSLATIONS = {
         "stat_users_label": "Miembros activos",
         "stat_users_value": "2,000+",
         "stat_rating_label": "Calidad de servicio",
-        "stat_rating_value": "99.9%"
+        "stat_rating_value": "99.9%",
+        "download_analyzing": "Analizando pasarela de acceso...",
+        "download_searching": "Buscando archivo en servidores de Telegram...",
+        "download_verifying": "Verificando permisos y restricciones...",
+        "download_starting": "Iniciando descarga segura...",
+        "download_error_premium": "ACCESO RESTRINGIDO: Se requiere nivel Pro.",
+        "download_success_bot": "Listo. Revisa el chat del bot.",
+        "download_btn_open": "ABRIR BOT",
+        "payment_success": "¡Pago exitoso! Disfruta Premium.",
+        "payment_cancelled": "Pago cancelado",
+        "payment_error": "Error en el pago"
     },
     "en": {
         "onboarding_title_1": "Unlimited Access",
@@ -192,7 +202,17 @@ const TRANSLATIONS = {
         "stat_users_label": "Active members",
         "stat_users_value": "2,000+",
         "stat_rating_label": "Service quality",
-        "stat_rating_value": "99.9%"
+        "stat_rating_value": "99.9%",
+        "download_analyzing": "Analyzing access gateway...",
+        "download_searching": "Searching for file on Telegram servers...",
+        "download_verifying": "Verifying permissions and restrictions...",
+        "download_starting": "Starting secure download...",
+        "download_error_premium": "RESTRICTED ACCESS: Pro level required.",
+        "download_success_bot": "Done. Check the bot chat.",
+        "download_btn_open": "OPEN BOT",
+        "payment_success": "Payment successful! Enjoy Premium.",
+        "payment_cancelled": "Payment cancelled",
+        "payment_error": "Payment failed"
     },
     "pt": {
         "onboarding_title_1": "Acesso Ilimitado",
