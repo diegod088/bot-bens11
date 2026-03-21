@@ -1471,7 +1471,7 @@
 
         <!-- ACCOUNT TAB -->
         <div id="tab-account" class="tab-panel">
-            <div id="profileGuest" style="padding-top:20px; display: none;">
+            <div id="accountGuest" style="padding-top:20px;">
 
                 <!-- Card hero de login -->
                 <div class="card" style="
@@ -1537,18 +1537,18 @@
                 </div>
             </div>
 
-            <div id="profileAuth" style="display: none;">
+            <div id="accountAuth">
                 <div class="sec-label" data-i18n="account_title">Tu Cuenta</div>
                 <div class="card"
                     style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding: 20px;">
-                    <div class="user-avatar" id="profileAvatar" style="width: 56px; height: 56px; font-size: 24px;">U
+                    <div class="user-avatar" id="accountAvatar" style="width: 56px; height: 56px; font-size: 24px;">U
                     </div>
                     <div style="flex: 1;">
-                        <h2 id="profileUserName"
+                        <h2 id="accountUserName"
                             style="font-size: 20px; font-weight: 700; color: var(--txt); margin: 0 0 4px 0;">
                             Usuario
                         </h2>
-                        <div id="profilePlanBadge" class="plan-badge"
+                        <div id="accountPlanBadge" class="plan-badge"
                             style="margin: 0; background: var(--txt-muted); color: #FFF;"
                             data-i18n="profile_free_badge">Free ✦</div>
                     </div>
@@ -1647,6 +1647,13 @@
     </div>
 
     <script>
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
+            console.error('GLOBAL ERROR:', msg, 'at', lineNo, ':', columnNo);
+            const errMsg = `Error: ${msg} (L${lineNo})`;
+            if (typeof showToast === 'function') showToast(errMsg, 5000);
+            return false;
+        };
+
         function openLoginGate() {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             document.getElementById('loginGateModal').style.display = 'flex';
@@ -2408,18 +2415,18 @@
 
 
         function updateConnectionStatus() {
-            const profileGuest = document.getElementById('profileGuest');
-            const profileAuth = document.getElementById('profileAuth');
+            const accountGuest = document.getElementById('accountGuest');
+            const accountAuth = document.getElementById('accountAuth');
 
-            if (!profileGuest || !profileAuth) {
-                console.error('CRITICAL: Profile containers missing!');
+            if (!accountGuest || !accountAuth) {
+                console.error('CRITICAL: Account containers missing!');
                 setTimeout(updateConnectionStatus, 300);
                 return;
             }
 
             // Toggle visibility
-            profileGuest.style.display = isConnected ? 'none' : 'block';
-            profileAuth.style.display = isConnected ? 'block' : 'none';
+            accountGuest.style.display = isConnected ? 'none' : 'block';
+            accountAuth.style.display = isConnected ? 'block' : 'none';
 
             // Update UI components
             const tgUser = tg?.initDataUnsafe?.user || {};
@@ -2443,17 +2450,17 @@
                 }
                 if (headerConnIcon) headerConnIcon.style.display = 'none';
 
-                const profileAvatar = document.getElementById('profileAvatar');
-                const profileUserName = document.getElementById('profileUserName');
-                const profilePlanBadge = document.getElementById('profilePlanBadge');
-                if (profileAvatar) profileAvatar.textContent = finalName.charAt(0).toUpperCase();
-                if (profileUserName) profileUserName.textContent = finalName;
-                if (profilePlanBadge) {
+                const accountAvatar = document.getElementById('accountAvatar');
+                const accountUserName = document.getElementById('accountUserName');
+                const accountPlanBadge = document.getElementById('accountPlanBadge');
+                if (accountAvatar) accountAvatar.textContent = finalName.charAt(0).toUpperCase();
+                if (accountUserName) accountUserName.textContent = finalName;
+                if (accountPlanBadge) {
                     const isPremium = userData?.premium;
-                    profilePlanBadge.setAttribute('data-i18n', isPremium ? 'profile_premium_badge' : 'profile_free_badge');
-                    profilePlanBadge.textContent = isPremium ? t('profile_premium_badge') : t('profile_free_badge');
-                    profilePlanBadge.style.background = isPremium ? 'var(--gold)' : 'var(--txt-muted)';
-                    profilePlanBadge.style.color = isPremium ? '#000' : '#FFF';
+                    accountPlanBadge.setAttribute('data-i18n', isPremium ? 'profile_premium_badge' : 'profile_free_badge');
+                    accountPlanBadge.textContent = isPremium ? t('profile_premium_badge') : t('profile_free_badge');
+                    accountPlanBadge.style.background = isPremium ? 'var(--gold)' : 'var(--txt-muted)';
+                    accountPlanBadge.style.color = isPremium ? '#000' : '#FFF';
                 }
             } else {
                 if (icon) icon.textContent = '🔌';
