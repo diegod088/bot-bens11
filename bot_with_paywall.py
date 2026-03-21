@@ -12,6 +12,7 @@ import re
 import asyncio
 import logging
 import threading
+from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice, WebAppInfo

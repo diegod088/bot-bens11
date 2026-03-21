@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DownloadBot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="translations.js"></script>
+    <script src="/miniapp/translations.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"
@@ -1472,7 +1472,6 @@
         <!-- ACCOUNT TAB -->
         <div id="tab-account" class="tab-panel">
             <div id="accountGuest" style="padding-top:20px;">
-
                 <!-- Card hero de login -->
                 <div class="card" style="
                     text-align:center; padding:36px 24px;
@@ -1492,37 +1491,10 @@
                         Vincula tu Telegram para descargar contenido de canales privados. Es rápido y 100% seguro.
                     </p>
 
-                    <!-- Chips de beneficios -->
-                    <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:24px;">
-                        <span
-                            style="background:var(--gold-soft); border:1px solid var(--gold-dim); color:var(--gold); font-size:11px; font-weight:700; padding:5px 12px; border-radius:var(--r-pill);">🔒
-                            Privado</span>
-                        <span
-                            style="background:var(--gold-soft); border:1px solid var(--gold-dim); color:var(--gold); font-size:11px; font-weight:700; padding:5px 12px; border-radius:var(--r-pill);">⚡
-                            Instantáneo</span>
-                        <span
-                            style="background:var(--gold-soft); border:1px solid var(--gold-dim); color:var(--gold); font-size:11px; font-weight:700; padding:5px 12px; border-radius:var(--r-pill);">🛡️
-                            Sin riesgos</span>
-                    </div>
-
-                    <!-- Botón de conectar -->
                     <button class="btn btn-gold" onclick="configureAccount()"
                         style="font-size:16px; font-weight:900; height:56px; border-radius:var(--r-pill); box-shadow:0 8px 25px var(--gold-glow);">
                         ⚙️ Conectar mi cuenta
                     </button>
-                </div>
-
-                <!-- Opciones adicionales — mantener onclick existentes -->
-                <div class="card" onclick="forceDisconnect()"
-                    style="cursor:pointer; border-color:rgba(251,113,133,0.2); background:rgba(251,113,133,0.04); padding: 0;">
-                    <div class="ami" style="border:none; padding: 16px;">
-                        <span class="ami-icon" style="background:rgba(251,113,133,0.1);">🗑️</span>
-                        <div class="ami-text">
-                            <div class="ami-title" style="color:var(--rose);">Limpiar sesión rota</div>
-                            <div class="ami-sub">Si el bot dice conectado pero no funciona</div>
-                        </div>
-                        <span class="ami-arrow" style="color:var(--rose);">›</span>
-                    </div>
                 </div>
 
                 <div class="card" style="cursor:pointer; margin-top:12px; padding: 0;" onclick="showLanguageSelector()">
@@ -1553,35 +1525,18 @@
                             data-i18n="profile_free_badge">Free ✦</div>
                     </div>
                 </div>
-                <!-- Menú normal auth -->
+
                 <div class="card">
-                    <div class="ami" onclick="switchTab('guide')">
-                        <span class="ami-icon">📖</span>
-                        <div class="ami-text">
-                            <div class="ami-title" data-i18n="guide_title">Tutorial</div>
-                            <div class="ami-sub" data-i18n="guide_subtitle">Aprende a sacar el máximo provecho
-                            </div>
-                        </div>
-                        <span class="ami-arrow">›</span>
-                    </div>
                     <div class="ami" id="connBtn" onclick="disconnectAccount()">
-                        <span class="ami-icon" id="connIcon">🔌</span>
+                        <span class="ami-icon" id="connIcon">✅</span>
                         <div class="ami-text">
-                            <div class="ami-title" id="connTitle" data-i18n="account_status_label">Estado de la
-                                cuenta
+                            <div class="ami-title" id="connTitle" data-i18n="account_status_label">Estado de la cuenta
                             </div>
-                            <div class="ami-sub" id="connSub" data-i18n="account_verifying">Verificando...</div>
+                            <div class="ami-sub" id="connSub" data-i18n="connection_status_connected">Conectado</div>
                         </div>
                         <span class="ami-arrow">›</span>
                     </div>
-                    <div class="ami" onclick="openSupport()">
-                        <span class="ami-icon">💬</span>
-                        <div class="ami-text">
-                            <div class="ami-title" data-i18n="account_support_label">Centro de soporte</div>
-                            <div class="ami-sub" data-i18n="account_support_desc">¿Necesitas ayuda?</div>
-                        </div>
-                        <span class="ami-arrow">›</span>
-                    </div>
+
                     <div class="ami" onclick="showLanguageSelector()" style="border:none;">
                         <span class="ami-icon">🌐</span>
                         <div class="ami-text">
@@ -1593,7 +1548,7 @@
                 </div>
             </div>
 
-            <div style="text-align:center; font-size:11px; color:var(--txt-muted); margin-top:20px;">
+            <div style="text-align:center; font-size:11px; color:var(--txt-muted); margin-top:30px;">
                 DownloadBot v3.0 Luxury<br>Dark Edition
             </div>
         </div>
