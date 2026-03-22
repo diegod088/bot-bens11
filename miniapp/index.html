@@ -2455,11 +2455,6 @@
                 return;
             }
 
-            if (!isConnected) {
-                openLoginGate();
-                return;
-            }
-
             btn.disabled = true;
             status.className = 'download-status show loading';
             const statusText = document.getElementById('statusText');
@@ -2482,6 +2477,14 @@
                 status.className = 'download-status show error';
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
                 setTimeout(() => openPremiumGate(), 800);
+                btn.disabled = false;
+                return;
+            }
+
+            if (!isConnected) {
+                statusText.innerText = 'Cuenta no vinculada';
+                status.className = 'download-status show error';
+                setTimeout(() => openLoginGate(), 800);
                 btn.disabled = false;
                 return;
             }
