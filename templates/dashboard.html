@@ -569,9 +569,8 @@
     }
 
     function updateBroadcastCount() {
-        const totalUsers = {{ stats.total_users }
-    };
-    const premiumUsers = {{ stats.premium_users }};
+        const totalUsers = {{ stats.total_users }};
+        const premiumUsers = {{ stats.premium_users }};
     const freeUsers = totalUsers - premiumUsers;
     const map = { all: totalUsers, premium: premiumUsers, free: freeUsers };
     const v = document.getElementById('broadcast-target').value;
