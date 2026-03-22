@@ -1406,7 +1406,7 @@ def create_invoice():
                 'description': 'Premium por 7 días | Ideal para empezar'
             },
             'pro': {
-                'stars': 544,
+                'stars': 500,
                 'days': 30,
                 'name': '🔥 Pro',
                 'description': 'Premium por 30 días | El más elegido'

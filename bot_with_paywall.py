@@ -125,7 +125,7 @@ PREMIUM_PLANS = {
         'description': 'Ideal para empezar'
     },
     'pro': {
-        'stars': 544,
+        'stars': 500,
         'days': 30,
         'name': '🔥 Pro',
         'label': 'Premium 30 días',
