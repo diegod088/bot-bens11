@@ -569,8 +569,9 @@
     }
 
     function updateBroadcastCount() {
-        const totalUsers = {{ stats.total_users }};
-        const premiumUsers = {{ stats.premium_users }};
+        const totalUsers = {{ stats.total_users }
+    };
+    const premiumUsers = {{ stats.premium_users }};
     const freeUsers = totalUsers - premiumUsers;
     const map = { all: totalUsers, premium: premiumUsers, free: freeUsers };
     const v = document.getElementById('broadcast-target').value;
@@ -598,7 +599,7 @@
         btn.innerHTML = `<div class="spinner"></div> Enviando...`;
 
         try {
-            const resp = await fetch('/api/broadcast', {
+            const resp = await fetch('/api/admin/broadcast', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: msg, target })

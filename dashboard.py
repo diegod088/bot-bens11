@@ -1152,9 +1152,10 @@ def broadcast_message():
             return jsonify({'error': 'No hay usuarios para enviar el mensaje'}), 400
         
         # Enviar mensajes usando la API de Telegram
-        bot_token = os.getenv('TELEGRAM_TOKEN')
-        if not bot_token:
+        if not TELEGRAM_TOKEN:
             return jsonify({'error': 'Token de Telegram no configurado'}), 500
+        
+        bot_token = TELEGRAM_TOKEN
         
         sent = 0
         failed = 0
