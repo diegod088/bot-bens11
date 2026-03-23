@@ -14,7 +14,7 @@ from functools import wraps
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import sqlite3
-from database import get_user_stats, has_active_session, delete_user_session, get_referral_stats
+from database import get_user_stats, has_active_session, delete_user_session, get_referral_stats, ensure_user_exists, update_user_info, create_user
 import logging
 import requests
 
@@ -1260,6 +1260,15 @@ def miniapp_get_user():
         if not user_id:
             return jsonify({'error': 'User ID required'}), 400
         
+        # ASEGURAR QUE EL USUARIO EXISTE Y ACTUALIZAR SUS DATOS
+        # Esto registra al usuario en el Panel de Administración si es nuevo
+        first_name = user_info.get('first_name')
+        username = user_info.get('username')
+        language = user_info.get('language_code', 'es')
+        
+        # Registrar o actualizar info del usuario
+        create_user(user_id, first_name=first_name, username=username, language=language)
+        
         # Check if user has a session in database
         has_session = has_active_session(user_id)
         
@@ -1501,6 +1510,9 @@ def miniapp_download():
         
         if not user_id:
             return jsonify({'error': 'User ID required'}), 400
+        
+        # Asegurar que el usuario existe en la DB (por si entra directo por link sin pasar por /user)
+        ensure_user_exists(user_id)
         
         if not link or 't.me/' not in link:
             return jsonify({'error': 'Valid Telegram link required'}), 400

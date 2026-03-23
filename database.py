@@ -508,7 +508,7 @@ def create_user(user_id: int, first_name: str = None, username: str = None, lang
             # Si ya existe, actualizar nombre, username y language
             if first_name or username or language:
                 cursor.execute(
-                    "UPDATE users SET first_name = ?, username = ?, language = ? WHERE user_id = ?",
+                    "UPDATE users SET first_name = ?, username = ?, language = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
                     (first_name, username, language, user_id)
                 )
             return False
@@ -531,8 +531,8 @@ def update_user_info(user_id: int, first_name: str = None, username: str = None)
         
         if first_name or username:
             cursor.execute(
-                "UPDATE users SET first_name = ?, username = ?, updated_at = ? WHERE user_id = ?",
-                (first_name, username, datetime.now(), user_id)
+                "UPDATE users SET first_name = ?, username = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
+                (first_name, username, user_id)
             )
             logger.info(f"Updated user info for {user_id}: {first_name}, @{username}")
             return True
